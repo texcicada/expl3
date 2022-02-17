@@ -1,0 +1,521 @@
+\documentclass{article}
+\usepackage{regexpatch}% also loads xparse
+\usepackage{fontspec}
+\newfontfamily\testfont{Noto Serif}
+%\tracingxpatches
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,xparse}
+\tcbuselibrary{listings}
+
+
+\DeclareTCBListing{mybox}{ s O{} m }{%
+colback=red!3!white,
+colframe=red!75!blue,
+fonttitle=\sffamily\bfseries,
+bicolor,
+colbacklower=yellow!20,
+segmentation style={double=white,draw=blue,
+double distance=1pt,solid},
+listing options={style=tcblatex,numbers=left,numberstyle=\small\color{blue!75!black},numbersep=5pt},%IfBooleanTF={#1}
+%{listing side text}
+%{text side listing},
+title=\getegcounter\ -- #3,#2}
+
+
+
+\ExplSyntaxOn
+
+%\int_new:N \ic_eg_count
+%\newcounter{egcounter}[section]
+\newcounter{ic_eg_count}[section]
+%\newcommand\getegcounter{\refstepcounter{egcounter}[\thesection.\theegcounter]}
+
+
+\cs_new:Nn \ic_get_egnum: {
+%\refstepcounter{egcounter}[\thesection.\theegcounter]
+\refstepcounter{ic_eg_count}[\thesection.\theic_eg_count]
+}
+
+\cs_set_eq:NN \getegcounter \ic_get_egnum:
+
+
+\int_new:N \g_commcount_int
+\NewDocumentCommand { \comm } {  } {
+	\textsc{Commentary:} ~
+	\int_gset:Nn \g_commcount_int { 0 }
+}
+\NewDocumentCommand { \cc } {  } {
+	\par\noindent
+	( \int_gincr:N \g_commcount_int
+	{
+		\sffamily
+		\int_use:N \g_commcount_int
+		}
+	) ~
+}
+\NewDocumentCommand { \nocomm } {  } {
+	-- ~
+}
+\NewDocumentCommand { \res } {  } {
+	\par\textsc{Result:} ~
+}
+
+
+
+%\newcommand{\dobb}[1]{\renewcommand\ProcessedArgument{\fbox{\textcolor{blue}{\textbf{#1}}}}}
+
+
+\cs_new:Npn \ic_do_bluebold: #1  {
+\renewcommand\ProcessedArgument{\fbox{\textcolor{blue}{\textbf{#1}}}}
+%\cs_gset:Nn \ic_processed_arg:n { \fbox{\textcolor{blue}{\textbf{#1}}} }
+%\exp_args:NNo \cs_gset_eq:NN \ProcessedArgument \ic_processed_arg:n
+}
+
+
+\NewDocumentCommand { \dca } { s o >{\ic_do_bluebold:}m v } {
+	#4 ~ : ~ 
+	\IfBooleanTF {#1} {star} {no star}
+	;~ \IfNoValueTF {#2} {no opt = #2} {OArg = #2}
+	;~ MArg = #3.
+%	\par \#3 ~ after ~ pre-processing = #3
+}
+
+\NewDocumentEnvironment { codeillus } { +b } {
+	\begin{quotation}
+	\marginpar{\getegcounter}
+	\ttfamily
+	#1
+	\end{quotation}
+}{}
+
+%\newcommand\icmarker{ \% <------}
+\cs_new:Nn \ic_marker: {  \% ~ <------ }
+\tl_new:N \l_ic_parm_tl
+\NewDocumentCommand { \vv } { m O{\ic_marker:} } {
+	\tl_set:Nn \l_ic_parm_tl { #1 }
+	{
+	\bfseries
+	\color{blue}
+%  \detokenize { #1 }
+  \tl_to_str:N \l_ic_parm_tl
+	} ~~~ #2
+}
+
+\ExplSyntaxOff
+
+
+
+
+\begin{document}
+
+\section{Basics}
+
+%===================== 
+\begin{codeillus}
+\vv{\ExplSyntaxOn}
+
+Some code.
+
+Some code.
+
+Some code.
+
+\vv{\ExplSyntaxOff}
+
+\end{codeillus}
+
+
+%===================== 
+\begin{codeillus}
+Some code.
+
+\vv{\group_begin:}
+
+Some code.
+
+\vv{\group_end:}
+
+Some code.
+\end{codeillus}
+
+
+
+%===================== 
+\begin{mybox}{Grouping}
+\ExplSyntaxOn
+Text ~ text ~
+\group_begin:
+\color{red}
+\large
+text ~ text ~
+\group_end:
+text ~ text.
+\ExplSyntaxOff
+\end{mybox}
+\bigskip
+
+
+
+
+%===================== 
+\begin{mybox}{Defining a function}
+\ExplSyntaxOn
+\cs_new:Npn \ic_funca:n #1 { {\color{blue} \bfseries #1 } }
+
+Text ~ \ic_funca:n { ~ This ~ is ~ blue ~ bold. } ~ Text.
+\ExplSyntaxOff
+\end{mybox}
+\bigskip
+
+
+
+%===================== 
+\begin{mybox}{Defining a user command}
+\ExplSyntaxOn
+\NewDocumentCommand { \mycmdb } { m } {
+\cs_new:Npn \ic_funcb:n ##1 { {\color{blue} \bfseries ##1 } }
+ \ic_funcb:n { #1 }
+ }
+\ExplSyntaxOff
+Text \mycmdb{This is blue bold.} Text.
+\end{mybox}
+\bigskip
+
+
+%===================== 
+\begin{mybox}{Using a token list}
+\ExplSyntaxOn
+\tl_new:N \l_myicc_tl
+\NewDocumentCommand { \mycmdc } { m } {
+\tl_set:Nn \l_myicc_tl { #1 }
+\cs_new:Npn \ic_funcc:N ##1 { {\color{blue} \bfseries ##1 } }
+ \ic_funcc:N \l_myicc_tl
+ }
+\ExplSyntaxOff
+Text \mycmdc{This is blue bold.} Text.
+\end{mybox}
+\bigskip
+
+
+
+%===================== 
+\begin{mybox}{Appending to a token list}
+\ExplSyntaxOn
+\tl_new:N \l_myicd_tl
+\NewDocumentCommand { \mycmdd } { m } {
+\tl_set:Nn \l_myicd_tl { #1 }
+\tl_put_right:Nn \l_myicd_tl { $\leftarrow$ ! ! }
+\tl_put_left:Nn \l_myicd_tl { ! ! $\rightarrow$ }
+\cs_new:Npn \ic_funcd:N ##1 { {\color{blue} \bfseries ##1 } }
+ \ic_funcd:N \l_myicd_tl
+ }
+\ExplSyntaxOff
+Text \mycmdd{This is blue bold.} Text.
+\end{mybox}
+\bigskip
+
+
+%===================== 
+\begin{mybox}{Modifying a token list (\texttt{\textbackslash tl\_replace})} 
+\ExplSyntaxOn
+\tl_new:N \l_myice_tl
+\NewDocumentCommand { \mycmde } { m } {
+\tl_set:Nn \l_myice_tl { #1 }
+\tl_replace_all:Nnn \l_myice_tl { blue } { not ~ red }
+\tl_replace_all:Nnn \l_myice_tl { bold } { italic }
+\cs_new:Npn \ic_funce:N ##1 { {\color{blue} \bfseries ##1 } }
+ \ic_funce:N \l_myice_tl
+ }
+\ExplSyntaxOff
+Text \mycmde{This is blue bold.} Text.
+\end{mybox}
+\bigskip
+
+%===================== 
+\begin{mybox}{Modifying a token list (\texttt{\textbackslash regex\_replace})} 
+\ExplSyntaxOn
+\tl_new:N \l_myicez_tl
+\NewDocumentCommand { \mycmdez } { m } {
+\tl_set:Nn \l_myicez_tl { #1 }
+\regex_replace_all:nnN 
+{ (\c{color} \cB\{ [^\cE\}]* \cE\}) } 
+{ not \  } 
+\l_myicez_tl
+\regex_replace_all:nnN 
+{ \c{textbf}(.+)(bold) } 
+{ is\ \c{textsc}\1 small\ caps } 
+\l_myicez_tl
+\tl_use:N \l_myicez_tl
+ }
+\ExplSyntaxOff
+Text \mycmdez{This is {\color{blue}blue} and \textbf{bold}.} Text.
+\end{mybox}
+\bigskip
+
+
+
+
+%===================== 
+\begin{mybox}{Copying a control sequence}
+\ExplSyntaxOn
+\cs_new:Npn \ic_funcf:N #1 { {\color{blue} \bfseries #1 } }
+\cs_new_eq:NN \mybbcmd \ic_funcf:N
+\ExplSyntaxOff
+Text \mybbcmd{This is blue bold.} Text.
+\end{mybox}
+\bigskip
+
+
+
+
+%===================== 
+\begin{mybox}{Looping}
+\ExplSyntaxOn
+\cs_set:Npn \ic_funcg:n #1 { \symbol{#1} }
+\cs_set:Nn \ic_funcgb:  {
+\int_step_function:nnnN { 97 } { 1 } { 122 } \ic_funcg:n
+\ 
+}
+\cs_new_eq:NN \myloopcmd \ic_funcgb:
+\ExplSyntaxOff
+Text \myloopcmd Text.
+\end{mybox}
+\bigskip
+
+\comm
+\cc Open the expl3 environment.
+\cc Define a 1-parameter function, g, that will print a glyph, given the glyph's slot number, in the current font using the symbol command.
+\cc Define a no-parameter function, gb, that will
+\cc step through values 97 to 122 (inclusive) and pass each value to the g function.
+\cc Add a space (replacing the one gobbled after the command in the user code).
+\cc \nocomm
+\cc Create a user-command, \textbackslash myloopcmd, that will call the gb function.
+\cc Close the expl3 environment.
+\cc Use the user-command
+\res The letters a..z are printed, followed by a space.
+%\begin{quotation}
+%>>\myloopcmd<<
+%\end{quotation}
+
+
+
+%===================== 
+\begin{mybox}{Mapping function}
+\ExplSyntaxOn
+\cs_set:Npn \ic_funch:n #1 { \fbox{#1}. }
+\tl_new:N \l_myich_tl
+\NewDocumentCommand { \mycmdh } { m } {
+\tl_set:Nn \l_myich_tl { #1 }
+\tl_map_function:NN \l_myich_tl \ic_funch:n
+\par tl ~ = ~ >> \tl_use:N \l_myich_tl << 
+}
+\ExplSyntaxOff
+Text \mycmdh{abc{de}fgh} Text.
+\end{mybox}
+\bigskip
+
+
+%===================== 
+\begin{mybox}{Mapping inline function}
+\ExplSyntaxOn
+\cs_set:Npn \ic_funci:n #1 { \fbox{#1}. }
+\tl_new:N \l_myici_tl
+\NewDocumentCommand { \mycmdi } { m } {
+\tl_set:Nn \l_myici_tl { #1 }
+\tl_map_inline:Nn \l_myici_tl { \ic_funci:n {##1} }
+\par tl ~ = ~ >> \tl_use:N \l_myici_tl << 
+}
+\ExplSyntaxOff
+Text \mycmdi{abc{de}fgh} Text.
+\end{mybox}
+\bigskip
+
+
+%===================== 
+\begin{mybox}{Contents of a token list (1)}
+\ExplSyntaxOn
+\tl_new:N \l_myicj_tl
+\NewDocumentCommand { \mycmdj } { m } {
+\tl_set:Nn \l_myicj_tl { #1 }
+\par (a) ~ \tl_count:N \l_myicj_tl  \ token ~ groups.
+\par (b) ~ \tl_count_tokens:n { \l_myicj_tl } ~ token \int_compare:nNnTF {\tl_count_tokens:n { \l_myicj_tl }} = { 1 } { } { s }.
+\par (c) ~ \exp_args:No \tl_count_tokens:n { \l_myicj_tl } ~ tokens: ~
+{ \color{blue} \tl_to_str:N \l_myicj_tl }.
+}
+\ExplSyntaxOff
+\mycmdj{abc{de}fgh}
+\end{mybox}
+\bigskip
+
+
+
+
+%===================== 
+\begin{mybox}{Contents of a token list (2)}
+\ExplSyntaxOn
+\tl_new:N \l_myick_tl
+\NewDocumentCommand { \mycmdk } { m } {
+\tl_set:Nn \l_myick_tl { #1 }
+\par head: ~ \tl_head:N \l_myick_tl  
+\par tail: ~ \tl_tail:N \l_myick_tl  
+\par reverse: ~ \tl_reverse:N \l_myick_tl   \tl_use:N \l_myick_tl ~<~ \tl_to_str:N \l_myick_tl
+\par 5th ~ item : ~ \tl_item:Nn \l_myick_tl { 5 }
+\par reverse: ~ \tl_reverse:N \l_myick_tl   \tl_use:N \l_myick_tl ~<~ \tl_to_str:N \l_myick_tl
+\par reverse ~ items: ~ \exp_args:No \tl_reverse_items:n { \l_myick_tl } ~<~ \tl_to_str:N \l_myick_tl
+\par 5th ~ item : ~ \tl_item:Nn \l_myick_tl { 5 }
+}
+\ExplSyntaxOff
+\mycmdk{abc{de}fgh}
+\end{mybox}
+\bigskip
+
+
+
+
+
+%===================== 
+\begin{mybox}{Tokens}
+\ExplSyntaxOn
+\tl_new:N \l_myiclz_tl
+\cs_set:Npn \ic_funcl:n #1 { 
+\tl_set:Nn \l_myiclz_tl { #1 }
+\fbox{ \strut \tl_to_str:N \l_myiclz_tl } $^ \exp_args:No \tl_count_tokens:n { \l_myiclz_tl }$
+\int_compare:nNnT 
+{ \exp_args:No \tl_count_tokens:n { \l_myiclz_tl } }
+> 
+{ 1 }
+ { >> \mycmdl{#1} << }
+}
+\tl_new:N \l_myicl_tl
+\NewDocumentCommand { \mycmdl } { m } {
+\tl_set:Nn \l_myicl_tl { #1 }
+\tl_map_function:NN \l_myicl_tl \ic_funcl:n
+}
+\ExplSyntaxOff
+ \mycmdl{abc{d\textit{e}}fgh}
+\end{mybox}
+\bigskip
+
+%\tl_item:Nn
+
+
+
+
+
+
+*=====
+
+
+
+\section{regexpatch}
+
+
+\begin{mybox}{testca}
+\newcommand{\testca}{\textit{label}}
+Before: \testca
+\par \regexpatchcmd{\testca}{\c{textit}}{\c{textbf}}{S}{F}
+\par \xpatchcmd{\testca}{label}{babble}{S}{F}
+\par After: \testca
+\end{mybox}
+\bigskip
+
+
+%\xshowcmd*\ph
+%\makeatletter
+%\makeatother
+
+%\tracingxpatches
+\begin{mybox}{ph: Too many brace levels}
+\newcommand{\ph}[1]{
+\textbf{\textsc{{\color{blue}#1}}}\ \ }
+Before: {\testfont\ph{Snail in the Bottle}}
+\regexpatchcmd{\ph}{\c{color}\cB\{blue\cE\}}{red}{}{F}
+\par After: {\testfont\ph{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+\tracingxpatches[0]
+\begin{mybox}{ph2: Two levels of braces}
+\newcommand{\phb}[1]{\textsc{{\color{blue}#1}}\ \ }
+Before: {\testfont\phb{Snail in the Bottle}}
+\regexpatchcmd{\phb}{\c{color}\cB\{blue\cE\}}{red}{}{F}
+\par After: {\testfont\phb{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+\begin{mybox}{ph3: Entire \textbackslash color command replaced}
+\newcommand{\phc}[1]{{
+\bfseries\scshape\color{blue}#1\ \ }}
+Before: {\testfont\phc{Snail in the Bottle}}
+\regexpatchcmd{\phc}{\c{color}\cB\{blue\cE\}} {\c{color}\cB\{red\cE\}}{}{F}
+\par After: {\testfont\phc{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+\begin{mybox}{ph4: Text replaced: `blue' > `red'}
+\newcommand{\phd}[1]{{
+\bfseries\scshape\color{blue}#1\ \ }}
+Before: {\testfont\phd{Snail in the Bottle}}
+\xpatchcmd{\phd}{blue}{red}{}{F}
+\par After: {\testfont\phd{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+
+
+\begin{mybox}{ph5: Text (`blue') replaced by a macro (`\textbackslash mycolour')}
+\newcommand{\mycolour}{green}
+\newcommand{\phe}[1]{{
+\bfseries\scshape\color{blue}#1\ \ }}
+Before: {\testfont\phe{Snail in the Bottle}}
+\regexpatchcmd{\phe}{blue}{\c{mycolour}}{}{F}
+\par After: {\testfont\phe{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+
+\begin{mybox}{ph6: Multi-level grouping without braces\footnote{\sffamily\color{blue!5} ``patchable'' = it can be reconstructed from its decomposition under the current category code egime. -- Manual, \S 7.1 (2018/05/02)}} 
+\newcommand{\mycolour}{brown}
+\newcommand{\phf}[1]{\begingroup
+\bfseries\begingroup\scshape\begingroup\color{blue}#1\endgroup\ smallcaps\endgroup \ bold\endgroup\ normal \ \ }
+Before: {\testfont\phf{Snail in the Bottle}}
+\regexpatchcmd{\phf}{blue}{\c{mycolour}}{}{F}
+\par After: {\testfont\phf{Snail in the Bottle}}
+\end{mybox}
+\bigskip
+
+\dca{x}{\dca{x}}
+
+\dca*{y}{\dca*{y}}
+
+\dca[abc]{z}{\dca[abc]{z}}
+
+\dca[xyz]{zz}{\dca[xyz]{zz}}
+
+\dca*[xyzz]{zzz}{\dca*[xyzz]{zzz}}
+
+
+\begin{mybox}{ph4a: Text replaced: `blue' > `red'}
+\newcommand{\phda}[2]{{
+\bfseries\scshape\color{blue}#1\normalcolor\ in the \color{blue}#2}}
+Before: {\testfont\phda{Snail}{Bottle}}
+\xpatchcmd{\phda}{blue}{red}{}{F}
+\par After: {\testfont\phda{Snail}{Bottle}}
+\end{mybox}
+\bigskip
+
+\begin{mybox}{ph4b: Text replaced: all `blue' > `red'}
+\newcommand{\phdb}[2]{{
+\bfseries\scshape\color{blue}#1\normalcolor\ in the \color{blue}#2}}
+Before: {\testfont\phdb{Snail}{Bottle}}
+\xpatchcmd*{\phdb}{blue}{red}{}{F}
+\par After: {\testfont\phdb{Snail}{Bottle}}
+\end{mybox}
+\bigskip
+
+
+
+
+
+\end{document}
