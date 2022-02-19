@@ -1,12 +1,24 @@
 \documentclass{article}
 \usepackage{regexpatch}% also loads xparse
+\usepackage[table]{xcolor}
 \usepackage{fontspec}
 \newfontfamily\testfont{Noto Serif}
+\newfontfamily\fmeta{Noto Serif}
+\newfontfamily\termfont{Noto Sans}
 %\tracingxpatches
 
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,xparse}
 \tcbuselibrary{listings}
+%\usepacktage{lstlinebgrd}
+\usepackage{showexpl}
+\renewcommand\ResultBox{\fcolorbox{blue!75!black}{brown!3!yellow!5}}
+%\setlength\ResultBoxSep{5mm}% default: \fboxsep
+%\setlength\ResultBoxRule{2mm}% default: \fboxrule
+%\usepackage{ltxguidex}
+
+\newfontfamily\fontmeta{Noto Serif}%[Colour=blue,Scale=1.1]
+
 
 
 \DeclareTCBListing{mybox}{ s O{} m }{%
@@ -26,6 +38,78 @@ title=\getegcounter\ -- #3,#2}
 
 \ExplSyntaxOn
 
+\NewDocumentCommand { \lmr } {  } {
+	\usefont{T1}{lmr}{m}{n} 
+}
+\NewDocumentCommand { \lmrp } { m } {
+	{ \lmr #1 }
+}
+%-----
+\NewDocumentCommand { \metaleftangle } {  } {
+	 \lmrp { \symbol {14} }
+}
+\NewDocumentCommand { \metarightangle } {  } {
+	 \lmrp { \symbol {15} }
+}
+%-----
+\NewDocumentCommand { \metaleftbracket } {  } {
+	 {\fontmeta\color{blue} [}
+}
+\NewDocumentCommand { \metarightbracket } {  } {
+	 {\fontmeta\color{blue} ]}
+}
+%-----
+\NewDocumentCommand { \metaleftbrace } {  } {
+	 {\lmr\color{red}\bfseries \{ }
+}
+\NewDocumentCommand { \metarightbrace } {  } {
+	 {\lmr\color{red}\bfseries \} }
+}
+%-----
+\NewDocumentCommand { \meta } { s m } {
+	{
+	\lmr 
+	\IfBooleanTF {#1} { } { \metaleftangle }
+	\textit{#2} 
+	\IfBooleanTF {#1} { } { \metarightangle }	 
+	}
+}
+\NewDocumentCommand { \oarg } { s m } {
+	\metaleftbracket
+	\IfBooleanTF {#1} { \meta* } { \meta }
+	 {#2} 
+	 \metarightbracket
+}
+\NewDocumentCommand { \marg } { s m } {
+	\metaleftbrace
+	\IfBooleanTF {#1} { \meta* } { \meta }
+	 {#2} 
+	\metarightbrace
+}
+
+\tl_new:N \l_myparma_tl
+\NewDocumentCommand { \cmd } { m } {
+		\tl_set:Nn \l_myparma_tl {#1}
+		{ \bfseries\ttfamily\textbackslash
+%			\IfBooleanTF {#1} 	
+%			{ 
+				\tl_to_str:N
+%			} 
+%			{ }
+		 \l_myparma_tl 
+		}
+}
+
+
+\NewDocumentCommand { \term } { s m } {
+	{
+		\termfont
+		\IfBooleanTF {#1} { \textsc } { \color{blue} } 
+	 	{#2} 
+	 }
+}
+
+%==============================
 %\int_new:N \ic_eg_count
 %\newcounter{egcounter}[section]
 \newcounter{ic_eg_count}[section]
@@ -104,10 +188,75 @@ title=\getegcounter\ -- #3,#2}
 
 \ExplSyntaxOff
 
+%========================================
 
+\newcommand\theadrcol{\rowcolor{blue!80}}
+\newcommand\theadcellstyle{\color{white}\sffamily}
 
+\newcommand\tablea[2]{%
+\begin{quotation}
+\begin{tabular}{ll}
+\theadrcol
+\theadcellstyle #1 & \theadcellstyle #2 \\
+}
 
+\newcommand\tableb{%
+\hline
+\end{tabular}
+\end{quotation}
+}
+
+%========================================
 \begin{document}
+
+Meta-commands used in this document:
+
+\begin{LTXexample}[numbers=left]
+\textit{italic text}\par
+\meta{placeholder}\par
+   \cmd{command}\par
+\oarg{bar}\marg{foo}\par
+\oarg*{bar}\marg*{foo}\par
+   \cmd{ic_funca:n}\par
+\term{function}\par
+\term*{Function}\par
+\end{LTXexample}
+
+\section{Introduction}
+
+\term*{Variables}
+
+\textbackslash\meta{scope}\_\meta{module}\_\meta{name}\_\meta{type}
+
+\tablea{Scope}{Description}
+l & local \\
+g & global \\
+\tableb
+
+\tablea{Type}{Description}
+bool & boolean \\
+box & box \\
+cctab & category code table \\
+clist & clist \\
+dim & dimension \\
+flag & flag \\
+fp & floating point \\
+fparray & floating point array \\
+int & integer \\
+intarry & integer array \\
+msg & message \\
+muskip & muskip \\
+prop & property list \\
+seq & sequence \\
+skip & skip \\
+str & string \\
+tl & token list \\
+\tableb
+
+
+\term*{Functions}
+
+\textbackslash\meta{name}\meta{signature marker}\meta{signature}
 
 \section{Basics}
 
@@ -285,12 +434,12 @@ Text \myloopcmd Text.
 
 \comm
 \cc Open the expl3 environment.
-\cc Define a 1-parameter function, g, that will print a glyph, given the glyph's slot number, in the current font using the symbol command.
-\cc Define a no-parameter function, gb, that will
-\cc step through values 97 to 122 (inclusive) and pass each value to the g function.
+\cc Define a 1-parameter function, \meta*{g}, that will print a glyph, given the glyph's slot number, in the current font using the \cmd{symbol} command.
+\cc Define a no-parameter function, \meta*{gb}, that will
+\cc step through values 97 to 122 (inclusive) and pass each value to the \meta*{g} function.
 \cc Add a space (replacing the one gobbled after the command in the user code).
 \cc \nocomm
-\cc Create a user-command, \textbackslash myloopcmd, that will call the gb function.
+\cc Create a user-command, \cmd{myloopcmd}, as a copy of the \meta*{gb} function.
 \cc Close the expl3 environment.
 \cc Use the user-command
 \res The letters a..z are printed, followed by a space.
@@ -340,7 +489,7 @@ Text \mycmdi{abc{de}fgh} Text.
 \tl_set:Nn \l_myicj_tl { #1 }
 \par (a) ~ \tl_count:N \l_myicj_tl  \ token ~ groups.
 \par (b) ~ \tl_count_tokens:n { \l_myicj_tl } ~ token \int_compare:nNnTF {\tl_count_tokens:n { \l_myicj_tl }} = { 1 } { } { s }.
-\par (c) ~ \exp_args:No \tl_count_tokens:n { \l_myicj_tl } ~ tokens: ~
+\par (c) ~ \exp_args:No \tl_count_tokens:n { \l_myicj_tl } ~ token \int_compare:nNnTF {\exp_args:No \tl_count_tokens:n { \l_myicj_tl }} = { 1 } { } { s } : ~
 { \color{blue} \tl_to_str:N \l_myicj_tl }.
 }
 \ExplSyntaxOff
@@ -348,7 +497,7 @@ Text \mycmdi{abc{de}fgh} Text.
 \end{mybox}
 \bigskip
 
-
+\cmd{l_myicj_tl} will always be one token.
 
 
 %===================== 
@@ -396,6 +545,102 @@ Text \mycmdi{abc{de}fgh} Text.
  \mycmdl{abc{d\textit{e}}fgh}
 \end{mybox}
 \bigskip
+
+
+%===================== 
+\begin{mybox}{Variants}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \tl_count_tokens:n { V }
+\tl_new:N \l_myicmz_tl
+\cs_set:Npn \ic_funcm:n #1 { 
+\tl_set:Nn \l_myicmz_tl { #1 }
+\fbox{ \strut \tl_to_str:N \l_myicmz_tl } $^ \tl_count_tokens:V \l_myicmz_tl $
+\int_compare:nNnT 
+{ \tl_count_tokens:V \l_myicmz_tl }
+> 
+{ 1 }
+ { >> \mycmdm{#1} << }
+}
+\tl_new:N \l_myicm_tl
+\NewDocumentCommand { \mycmdm } { m } {
+\tl_set:Nn \l_myicm_tl { #1 }
+\tl_map_function:NN \l_myicm_tl \ic_funcm:n
+}
+\ExplSyntaxOff
+ \mycmdm{abc{d\textit{e}}fgh}
+\end{mybox}
+\bigskip
+
+
+%===================== 
+\begin{mybox}{Box}
+\ExplSyntaxOn
+\box_new:N \l_myicn_box
+\hbox_set:Nn \l_myicn_box { \fbox { \Huge C \color{red}\tiny e } }
+wd = \dim_use:N \box_wd:N \l_myicn_box \par
+ht = \dim_use:N \box_ht:N \l_myicn_box \par
+dp = \dim_use:N \box_dp:N \l_myicn_box \par
+xxx \box_use:N \l_myicn_box xxx \par
+\box_rotate:Nn \l_myicn_box { 40 }
+wd = \dim_use:N \box_wd:N \l_myicn_box \par
+ht = \dim_use:N \box_ht:N \l_myicn_box \par
+dp = \dim_use:N \box_dp:N \l_myicn_box \par
+xxx \box_use:N \l_myicn_box xxx
+\ExplSyntaxOff
+\end{mybox}
+\bigskip
+
+
+
+%===================== 
+\begin{mybox}{Box 2}
+\ExplSyntaxOn
+\box_new:N \l_myico_box
+\box_new:N \l_myicov_box
+\cs_set:Npn \ic_funco: { 0.72 }
+\cs_set:Npn \ic_funcoz:nn #1#2 { 
+\hbox_set:Nn \l_myico_box {  { \Huge #1 \color{red}\tiny #2 } }
+\hbox_set:Nn \l_myicov_box {  \color{red}\Huge #1 }
+\box_use:N \l_myico_box\llap { 
+\box_rotate:Nn \l_myico_box { 40 } \box_scale:Nnn \l_myico_box {\ic_funco:}{\ic_funco:}
+\box_use:N \l_myico_box\llap { 
+\box_rotate:Nn \l_myico_box { 40 } \box_scale:Nnn \l_myico_box {\ic_funco:}{\ic_funco:}
+\box_use:N \l_myico_box\llap { 
+\box_rotate:Nn \l_myico_box { 40 } \box_scale:Nnn \l_myico_box {\ic_funco:}{\ic_funco:}
+\box_use:N \l_myico_box\llap { 
+\box_rotate:Nn \l_myico_box { 40 } \box_scale:Nnn \l_myico_box {\ic_funco:}{\ic_funco:}
+\box_use:N \l_myico_box
+}}}} \hspace{-\box_wd:N \l_myico_box} \box_use:N \l_myicov_box}
+xxx \ic_funcoz:nn {A}{d} ~xxx \ic_funcoz:nn {C}{e} ~xxx \ic_funcoz:nn {X}{y} ~xxx \ic_funcoz:nn {O}{p} ~xxx \ic_funcoz:nn {B}{w} ~xxx \ic_funcoz:nn {I}{o}
+\par xxx \ic_funcoz:nn {CAT}{dog} ~xxx \ic_funcoz:nn {Caterpillar}{} ~xxx \ic_funcoz:nn {C~~}{--} ~ \ic_funcoz:nn {O~~}{--}
+\ExplSyntaxOff
+\end{mybox}
+\bigskip
+
+
+
+%===================== 
+\begin{mybox}{Box 3}
+\ExplSyntaxOn
+\box_new:N \l_myicpz_box
+\box_new:N \l_myicpy_box
+\cs_set:Npn \ic_funcp:nn #1#2 { 
+\hbox_set:Nn \l_myicpz_box {  { #1 } }
+\hbox_set:Nn \l_myicpy_box {  { \color{#2}#1 } }
+ \box_use:N \l_myicpz_box
+ { \hspace{-\box_wd:N \l_myicpy_box} \hspace{0.43pt} \box_use:N \l_myicpy_box }
+}
+ xxx\Huge \ic_funcp:nn { C } { green }
+\NewDocumentCommand { \mycmdp } { m m } { \ic_funcp:nn { #1 } { #2 } }
+\ExplSyntaxOff
+  ~ and \mycmdp{cat}{red}  and \mycmdp{dog}{brown}
+\end{mybox}
+\bigskip
+
+
+
+
+
 
 %\tl_item:Nn
 
