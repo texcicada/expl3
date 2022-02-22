@@ -1,0 +1,186 @@
+\documentclass{article}
+\usepackage{xparse}
+\usepackage{fontspec}
+\newfontface\fontugaritic{Noto Sans Ugaritic}
+\newfontface\fontanatolian{Noto Sans Anatolian Hieroglyphs}
+\newfontface\fontcjk{Noto Serif JP}
+\newfontface\fontyi{Noto Sans Yi}
+%\setmainfont{Code2003}
+
+%========================================
+\begin{document}
+
+
+%===================== 
+\ExplSyntaxOn
+	\cs_generate_variant:Nn 
+			\tl_count_tokens:n 
+			{ V }
+	\seq_new:N 
+			\l_ic_translitq_seq
+	\seq_new:N 
+			\l_ic_translitqz_seq
+	\seq_new:N 
+			\l_ic_translitqy_seq
+	\tl_new:N 
+			\l_ic_translitqz_tl
+	\seq_new:N 
+			\l_ic_translitqyy_seq
+	\int_new:N 
+			\l_ic_translitqz_int
+	\int_new:N 
+			\l_ic_translitqy_int
+
+\NewDocumentCommand { \loadtranslitpairs } { +m } { 
+	\seq_clear:N 
+			\l_ic_translitq_seq 
+	\seq_set_split:Nnn 
+			\l_ic_translitq_seq 
+			{ , } 
+			{ #1 }
+
+	\seq_sort:Nn \l_ic_translitq_seq 
+		{
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+			\seq_clear:N 
+					\l_ic_translitqy_seq 
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_ic_translitqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_ic_translitqz_int 
+					{ 
+						\tl_count_tokens:V 
+								\l_ic_translitqz_tl 
+					}
+			\int_set:Nn 
+					\l_ic_translitqy_int 
+					{ 
+						\tl_count_tokens:V 
+						\l_ic_translitqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_ic_translitqz_int } < { \l_ic_translitqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn 
+			{ Noo }
+	\seq_new:N 
+			\l_ic_translit_seq
+	\seq_new:N 
+			\l_ic_translitz_seq
+	\tl_new:N 
+			\l_ic_translitz_tl
+	\tl_new:N 
+			\l_ic_translitx_tl
+
+%------------
+
+	\cs_set:Npn \ic_funcrz:n #1 { %replace
+			\seq_set_split:Nnn 
+					\l_ic_translitz_seq 
+					{ ; } 
+					{ #1 }
+			\tl_set:Nx 
+					\l_ic_translitz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitx_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{2} 
+					}
+			\tl_replace_all:Noo 
+					\l_ic_translit_tl  
+							{ \l_ic_translitz_tl } 
+							{ \l_ic_translitx_tl }
+	}
+	
+	\tl_new:N 
+			\l_ic_translit_tl
+\NewDocumentCommand { \translit } { +m } { 
+	\tl_set:Nn 
+			\l_ic_translit_tl 
+			{ #1 }
+		\seq_set_eq:NN 
+				\l_ic_translit_seq 
+				\l_ic_translitq_seq
+%\seq_use:Nnnn \l_ic_translit_seq { - } { - } { - } 
+	\tl_map_function:NN 
+			\l_ic_translit_seq 
+			\ic_funcrz:n
+	\tl_use:N 
+			\l_ic_translit_tl 
+
+	}
+	
+\ExplSyntaxOff
+
+
+
+
+  \loadtranslitpairs{a;𐎀,
+  b;𐎁,g;𐎂,k;𐎃,d;𐎄,h;𐎅,
+  w;𐎆,z;𐎇,hh;𐎈,tt;𐎉,y;𐎊,
+  kk;𐎋,sh;𐎌,l;𐎍,m;𐎎,dh;𐎏,
+	n;𐎐,zu;𐎑,s;𐎒,';𐎓,p;𐎔,
+	sa;𐎕,q;𐎖,r;𐎗,th;𐎘,gh;𐎙,
+	t;𐎚,i;𐎛,u;𐎜,ssu;𐎝,div;𐎟
+	}
+\fontugaritic
+	\translit{ugrtdiv}
+  \translit{rzussudiv}
+
+
+\loadtranslitpairs{u;𔐀 ,g; 𔐇 ,r; 𔐖 ,tt; 𔑥 }
+\fontanatolian 
+	\translit{ugrtt}
+
+
+\loadtranslitpairs{a;鸞,b;擄,c;鹿,d;縷}
+\fontcjk
+	\translit{abcd}
+
+
+
+
+\loadtranslitpairs{a;ꂐ,b;ꂡ,v;ꂲ,d;ꃃ}
+\fontyi
+	\translit{dvba}
+
+
+
+
+\end{document}

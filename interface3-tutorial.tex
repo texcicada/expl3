@@ -639,6 +639,77 @@ xxx \ic_funcoz:nn {A}{d} ~xxx \ic_funcoz:nn {C}{e} ~xxx \ic_funcoz:nn {X}{y} ~xx
 
 
 
+%===================== 
+\begin{mybox}{Sequence}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \tl_count_tokens:n { V }
+\seq_new:N \l_myicq_seq
+\seq_new:N \l_myicqz_seq
+\seq_new:N \l_myicqy_seq
+\tl_new:N \l_myicqz_tl
+\seq_new:N \l_myicqyy_seq
+\int_new:N \l_myicqz_int
+\int_new:N \l_myicqy_int
+\NewDocumentCommand { \mycmdq } { m } { 
+\seq_set_split:Nnn \l_myicq_seq { , } { #1 }
+\seq_use:Nnnn \l_myicq_seq { - } { - } { - } ~ unsorted\par
+\seq_sort:Nn \l_myicq_seq 
+{
+\seq_clear:N \l_myicqz_seq 
+\seq_clear:N \l_myicqy_seq 
+\seq_set_split:Nnn \l_myicqz_seq { ; } { ##1 }
+\seq_set_split:Nnn \l_myicqy_seq { ; } { ##2 }
+%\seq_show:N \l_myicqz_seq 
+\tl_set:Nx \l_myicqz_tl { \seq_item:Nn \l_myicqz_seq {1} }
+\tl_set:Nx \l_myicqy_tl { \seq_item:Nn \l_myicqy_seq {1} }
+%\tl_show:N \l_myicqz_tl  \tl_show:N \l_myicqy_tl
+\int_set:Nn \l_myicqz_int { \tl_count_tokens:V \l_myicqz_tl }
+\int_set:Nn \l_myicqy_int { \tl_count_tokens:V \l_myicqy_tl }
+%\int_show:N \l_myicqz_int 
+%%>>\seq_item:Nn \l_myicqz_seq {1}<<
+\int_compare:nNnTF { \l_myicqz_int } < { \l_myicqy_int }
+{ \sort_return_swapped: }
+{ \sort_return_same: }
+}
+\seq_use:Nnnn \l_myicq_seq { - } { - } { - } ~ sorted
+}
+\ExplSyntaxOff
+  \mycmdq{a;x,abv;y,ab;z,b;xyz,bb;i}
+\end{mybox}
+\bigskip
+
+
+
+
+
+%===================== 
+\begin{mybox}{Sequence 2}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \tl_replace_all:Nnn { Noo }
+\seq_new:N \l_myicr_seq
+\seq_new:N \l_myicrz_seq
+\tl_new:N \l_myicrz_tl
+\tl_new:N \l_myicrx_tl
+\seq_set_split:Nnn \l_myicr_seq { , } { abv;y,ab;z,bb;i, a;x,b;xyz }
+\cs_set:Npn \ic_funcrz:n #1 { %replace
+\seq_set_split:Nnn \l_myicrz_seq { ; } { #1 }
+\tl_set:Nx \l_myicrz_tl { \seq_item:Nn \l_myicrz_seq {1} }
+\tl_set:Nx \l_myicrx_tl { \seq_item:Nn \l_myicrz_seq {2} }
+\tl_replace_all:Noo \l_myicr_tl  { \l_myicrz_tl } { \l_myicrx_tl . }
+}
+\tl_new:N \l_myicr_tl
+\NewDocumentCommand { \mycmdr } { m } { 
+\tl_set:Nn \l_myicr_tl { #1 }
+\tl_map_function:NN \l_myicr_seq \ic_funcrz:n
+\tl_use:N \l_myicr_tl 
+}
+\ExplSyntaxOff
+  \mycmdr{aabvabbbba{}b}
+\end{mybox}
+\bigskip
+
+
+
 
 
 
