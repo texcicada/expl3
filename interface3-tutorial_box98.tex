@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,xparse}
+\tcbuselibrary{listings}
+\DeclareTCBListing{mybox}{ s O{} m }{%
+colback=red!3!white,
+colframe=red!75!blue,
+fonttitle=\sffamily\bfseries,
+bicolor,
+colbacklower=yellow!20,
+segmentation style={double=white,draw=blue,
+double distance=1pt,solid},
+listing options={style=tcblatex,numbers=left,numberstyle=\small\color{blue!75!black},numbersep=5pt},
+title=\getegcounter\ -- #3,#2}
+
+
+
+\ExplSyntaxOn
+%==============================
+\newcounter{ic_eg_count}[section]
+\cs_new:Nn \ic_get_egnum: {
+\refstepcounter{ic_eg_count}[\thesection.\theic_eg_count]
+}
+
+\cs_set_eq:NN \getegcounter \ic_get_egnum:
+\ExplSyntaxOff
+
+
+%========================================
+\begin{document}
+
+\section{Test}
+
+
+%===================== 
+\begin{mybox}{Box 4}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \box_new:N { c }
+\cs_set:Npn \ic_funcpp:n #1 { \box_new:c { l_myicppz#1_box }
+ \hbox_set:cn { l_myicppz#1_box } { Contents ~ #1 }
+ x\box_use:c { l_myicppz#1_box }y ~ : ~
+ \box_show:c { l_myicppz#1_box }
+}
+\cs_set:Nn \ic_funcppb:  {
+\int_step_function:nnnN { 97 } { 1 } { 99 } \ic_funcpp:n
+}
+\NewDocumentCommand { \mycmdppb } { } { \ic_funcppb: }
+%
+\cs_set:Npn \ic_funcpq:n #1 { \box_use:c { l_myicppz#1_box } }
+\NewDocumentCommand { \myboxnum } { m } {  \box_use:c { l_myicppz#1_box } }
+\ExplSyntaxOff
+  \mycmdppb
+  \par >>\myboxnum{98}<<
+\end{mybox}
+\bigskip
+
+
+
+
+
+\end{document}
+
+
+https://tex.stackexchange.com/questions/634837/how-to-create-numbered-named-saveboxes-in-a-foreach-loop/635084#635084

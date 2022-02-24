@@ -639,6 +639,34 @@ xxx \ic_funcoz:nn {A}{d} ~xxx \ic_funcoz:nn {C}{e} ~xxx \ic_funcoz:nn {X}{y} ~xx
 
 
 
+
+
+
+%===================== 
+\begin{mybox}{Box 4}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \box_new:N { c }
+\cs_set:Npn \ic_funcpp:n #1 { \box_new:c { l_myicppz#1_box }
+ \hbox_set:cn { l_myicppz#1_box } { Contents ~ #1 }
+ x\box_use:c { l_myicppz#1_box }y ~ : ~
+ \box_show:c { l_myicppz#1_box }
+}
+\cs_set:Nn \ic_funcppb:  {
+\int_step_function:nnnN { 97 } { 1 } { 99 } \ic_funcpp:n
+}
+\NewDocumentCommand { \mycmdppb } { } { \ic_funcppb: }
+%
+\cs_set:Npn \ic_funcpq:n #1 { \box_use:c { l_myicppz#1_box } }
+\NewDocumentCommand { \myboxnum } { m } {  \box_use:c { l_myicppz#1_box } }
+\ExplSyntaxOff
+  \mycmdppb
+  \par >>\myboxnum{98}<<
+\end{mybox}
+\bigskip
+
+
+
+
 %===================== 
 \begin{mybox}{Sequence}
 \ExplSyntaxOn
@@ -705,6 +733,54 @@ xxx \ic_funcoz:nn {A}{d} ~xxx \ic_funcoz:nn {C}{e} ~xxx \ic_funcoz:nn {X}{y} ~xx
 }
 \ExplSyntaxOff
   \mycmdr{aabvabbbba{}b}
+\end{mybox}
+\bigskip
+
+
+
+
+
+%===================== 
+\begin{mybox}{Property List}
+\ExplSyntaxOn
+\prop_new:N \l_myics_prop
+\tl_new:N \l_myics_tl
+\cs_set:Npn \ic_funcs:nn #1#2 {
+key=#1,value={\color{blue}#2} ;~
+}
+\NewDocumentCommand { \mycmdsz } { m } { 
+\prop_get:NnN \l_myics_prop { #1 } \l_myics_tl
+\tl_use:N \l_myics_tl
+%\tl_show:N \l_myics_tl
+~:~
+\prop_item:Nn \l_myics_prop { #1 }
+~::~
+\prop_map_function:NN \l_myics_prop \ic_funcs:nn
+}
+\NewDocumentCommand { \mycmds } { m } { 
+\prop_set_from_keyval:Nn \l_myics_prop { #1 }
+%\prop_show:N \l_myics_prop
+}
+\ExplSyntaxOff
+  \mycmds{alpha=^^^^03b1,beta=^^^^03b2,gamma=^^^^03b3,
+delta=^^^^03b4}
+  {\testfont\mycmdsz{delta}}
+\end{mybox}
+\bigskip
+
+
+
+
+%===================== 
+\begin{mybox}{Miscellaneous 1}
+\ExplSyntaxOn
+\cs_set:Npn \ic_funct:n #1 {
+{\Large\fbox{ \tl_to_str:n {#1}}}.
+}
+(a) ~ \textbackslash \cs_to_str:N \l_char_active_seq ~ = ~
+\seq_map_function:NN \l_char_active_seq \ic_funct:n
+\par (b) ~ \symbol{`a} \char_to_nfd:N q
+\ExplSyntaxOff
 \end{mybox}
 \bigskip
 

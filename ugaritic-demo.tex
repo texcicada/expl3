@@ -6,6 +6,7 @@
 \newfontface\fontcjk{Noto Serif JP}
 \newfontface\fontyi{Noto Sans Yi}
 %\setmainfont{Code2003}
+\newfontfamily\fontgen{Noto Serif}
 
 %========================================
 \begin{document}
@@ -26,6 +27,8 @@
 			\l_ic_translitqz_tl
 	\seq_new:N 
 			\l_ic_translitqyy_seq
+	\seq_new:N 
+			\l_ic_translitorig_seq
 	\int_new:N 
 			\l_ic_translitqz_int
 	\int_new:N 
@@ -38,6 +41,10 @@
 			\l_ic_translitq_seq 
 			{ , } 
 			{ #1 }
+
+	\seq_set_eq:NN 
+			\l_ic_translitorig_seq
+			\l_ic_translitq_seq
 
 	\seq_sort:Nn \l_ic_translitq_seq 
 		{
@@ -138,13 +145,139 @@
 				\l_ic_translit_seq 
 				\l_ic_translitq_seq
 %\seq_use:Nnnn \l_ic_translit_seq { - } { - } { - } 
-	\tl_map_function:NN 
+	\seq_map_function:NN 
 			\l_ic_translit_seq 
 			\ic_funcrz:n
 	\tl_use:N 
 			\l_ic_translit_tl 
 
 	}
+
+	
+%--------------
+	\cs_set:Npn \ic_func_listitems:n #1 { 
+			\seq_set_split:Nnn 
+					\l_ic_translitz_seq 
+					{ ; } 
+					{ #1 }
+			\tl_set:Nx 
+					\l_ic_translitz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitx_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{2} 
+					}
+		{ 
+			\usefont{T1}{lmr}{m}{n}
+			\tl_use:N \l_ic_translitz_tl
+			\ = ~
+		}
+		\tl_use:N \l_ic_translitx_tl
+		{ 
+			\usefont{T1}{lmr}{m}{n}
+			, ~
+			}
+}
+	
+%--------------
+\NewDocumentCommand { \listmyitems } {  } { 
+	\par
+	{
+		\usefont{T1}{lmr}{m}{n}
+		 Listing : ~
+		 }
+	\seq_map_function:NN 
+%			\l_ic_translit_seq 
+			\l_ic_translitorig_seq
+			\ic_func_listitems:n
+	{
+		\usefont{T1}{lmr}{m}{n}
+		 .
+		 }
+}	
+
+
+
+%--------------
+	\cs_set:Npn \ic_func_spaces:n #1 { 
+	#1 ~
+}
+
+%--------------
+	\tl_new:N 
+			\l_ic_spaces_tl
+\NewDocumentCommand { \insertspace } { m } { 
+	\tl_set:Nx 
+			\l_ic_spaces_tl 
+			{ #1 }
+	\tl_map_function:NN 
+			\l_ic_spaces_tl
+			\ic_func_spaces:n
+}	
+
+
+%--------------
+	\cs_set:Npn \ic_func_spacesi:n #1 { 
+	#1 ( \textit{#1} ) ~
+}
+%--------------
+%	\cs_generate_variant:Nn 
+%			\tl_map_function:NN 
+%			{ xN }
+
+%--------------
+%	\cs_set:Npn \ic_func_spacesio:o #1 { 
+%	#1 ( \textit{#1} ) ~
+%}
+
+%--------------
+	\tl_new:N 
+			\l_ic_spacesi_tl
+\NewDocumentCommand { \insertspacei } { m } { 
+	 \tl_set:Nn 
+			\l_ic_spacesi_tl 
+			{ #1 }
+%	\tl_show:N 
+%			\l_ic_spacesi_tl 
+	\tl_map_function:NN 
+			\l_ic_spacesi_tl 
+			\ic_func_spacesi:n
+%	\tl_show:N 
+%			\l_ic_spacesi_tl 
+}	
+
+%--------------
+	\tl_new:N 
+			\l_ic_mym_tl
+\NewDocumentCommand { \greektl } { m } { 
+\fontgen
+\loadtranslitpairs{alpha;^^^^03b1,beta;^^^^03b2,gamma;^^^^03b3,delta;^^^^03b4,
+schwa;^^^^0259,zhe;^^^^0436, bb;\textit{^^^^03b2},
+e;$E=mc^{2}$,
+cyra;абвгдежзийклмнопрстуфхцчшщъыьэюя,
+a;\insertspace{абвгдежзийклмнопрстуфхцчшщъыьэюя},
+aa;\textit{\greektl{a}},
+aaa;\insertspacei{абвгдежзийклмнопрстуфхцчшщъыьэюя},
+ah;{\fontanatolian 𔐀},
+ab;\greektl{bb},
+ac;\tl_set:Nx 
+			\l_ic_mym_tl
+			{\greektl{aa}}
+	\tl_map_function:NN 
+			\l_ic_mym_tl 
+			\ic_func_spacesi:n
+			,
+ak;A ~ second ~ time: ~\translit{e}
+}
+	\translit{#1}
+}	
 	
 \ExplSyntaxOff
 
@@ -163,22 +296,40 @@
 	\translit{ugrtdiv}
   \translit{rzussudiv}
 
+\greektl{bb} Centauri
+\greektl{e }
+\greektl{a} : \greektl{aa} :: \greektl{ab} 
+
+\greektl{ah}\greektl{aaa}\greektl{cyra}
+
+ac \greektl{ac} : \greektl{ak}
+
 
 \loadtranslitpairs{u;𔐀 ,g; 𔐇 ,r; 𔐖 ,tt; 𔑥 }
 \fontanatolian 
 	\translit{ugrtt}
-
+\listmyitems
 
 \loadtranslitpairs{a;鸞,b;擄,c;鹿,d;縷}
 \fontcjk
 	\translit{abcd}
-
+\listmyitems
 
 
 
 \loadtranslitpairs{a;ꂐ,b;ꂡ,v;ꂲ,d;ꃃ}
 \fontyi
 	\translit{dvba}
+\listmyitems
+
+
+\loadtranslitpairs{alpha;^^^^03b1,beta;^^^^03b2,gamma;^^^^03b3,delta;^^^^03b4,
+schwa;^^^^0259,zhe;^^^^0436}
+\fontgen
+	\translit{alphabetagammadelta zheschwa}
+\listmyitems
+
+
 
 
 
