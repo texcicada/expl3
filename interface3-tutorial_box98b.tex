@@ -1,0 +1,551 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\newfontface\fnoto{Noto Serif}[Colour=blue]
+\newfontface\fhiero{Noto Sans Egyptian Hieroglyphs}[Colour=blue]
+%\newfontface\fdecimal{Noto Sans}[Colour=black,Scale=0.5]
+
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,xparse}
+\tcbuselibrary{listings}
+
+\DeclareTCBListing{mybox}{ s O{} m }{%
+colback=red!3!white,
+colframe=red!75!blue,
+fonttitle=\sffamily\bfseries,
+bicolor,
+colbacklower=yellow!20,
+segmentation style={double=white,draw=blue,
+double distance=1pt,solid},
+listing options={style=tcblatex,numbers=left,numberstyle=\small\color{blue!75!black},numbersep=5pt},
+title=\getegcounter\ -- #3,#2}
+
+
+
+\ExplSyntaxOn
+%==============================
+\newcounter{ic_eg_count}[section]
+\cs_new:Nn \ic_get_egnum: {
+\refstepcounter{ic_eg_count}[\thesection.\theic_eg_count]
+}
+
+\cs_set_eq:NN \getegcounter \ic_get_egnum:
+\ExplSyntaxOff
+
+
+%========================================
+\begin{document}
+
+\section{Test}
+
+
+%===================== 
+%\begin{mybox}{Box 4b}
+\ExplSyntaxOn
+\box_new:N \l_ic_tmp_box
+\cs_set:Npn \ic_funcpp:n #1 { 
+		\cs_if_exist:cTF
+			{ l_myicppz#1_box }
+			{ }
+			{
+			\box_new:c { l_myicppz#1_box }
+			\box_new:c { l_ic_glyph#1_box }
+			}
+% \box_new:c { l_ic_decimal#1_box }
+% \hbox_set:cn { l_ic_decimal#1_box } { {\fdecimal\tiny\int_use:N \l_ic_boxnum_int}
+% }
+% \box_rotate:cn { l_ic_decimal#1_box } { -90 }
+ %
+ \int_set:Nn 
+ 			\l_ic_boxnum_int {#1}
+ %
+ \hbox_set:cn 
+ 			{ l_ic_glyph#1_box } % no frame 
+ 			{ \tl_use:N \l_ic_font_tl \Huge\symbol{#1} }
+ \hbox_set:cn 
+ 			{ l_myicppz#1_box } % with frame, and codepoint
+ 			{ 
+ 					\hbox_set:Nn \l_ic_tmp_box { \usefont{T1}{lmr}{m}{n}\scriptsize U+ \int_to_hex:n { #1 } }
+ 					\begin{tabular}{c}
+ 					\parbox
+ 					{ \box_wd:N \l_ic_tmp_box }
+ 					{\usefont{T1}{lmr}{m}{n}\scriptsize U+ \int_to_hex:n { #1 } 
+					\usefont{T1}{lmtt}{m}{n}\tiny\par\hfill #1\hfill\  }\\
+  					\fbox{ \box_use:c { l_ic_glyph#1_box } }\\
+%  \box_use:c { l_ic_decimal#1_box } 
+					 \end{tabular}% 
+				}}
+\cs_set:Npn 
+			\ic_funcppb:nn  
+					#1#2 
+					{
+ 						\int_step_function:nnnN { #1 } { 1 } { #2 } \ic_funcpp:n 
+					}
+\tl_new:N 
+			\l_ic_font_tl
+
+\NewDocumentCommand { \addmyboxes } { O{} m m } { 
+\tl_set:Nn \l_ic_font_tl {#1}
+%\tl_show:N \l_ic_font_tl
+\ic_funcppb:nn {#2}{#3}
+\tl_clear:N \l_ic_font_tl
+}
+%
+
+%-----------------------
+\int_new:N \l_ic_boxnum_int
+\tl_new:N \l_ic_boxnamea_tl
+\tl_new:N \l_ic_boxnameb_tl
+
+
+
+
+%----------------------- Print a glyph box by codepoint
+% * = print without a frame
+% #2 = option
+%          r = reversed
+% #3 = codepoint
+\NewDocumentCommand { \myboxnum } { s o m } {
+%#1#2#3::
+\IfBooleanTF	{#1}
+		{ \bool_set_true:N \l_ic_star_bool }
+		{ \bool_set_false:N \l_ic_star_bool }
+
+		\int_set:Nn 
+		\l_ic_boxnum_int {#3}
+%		\int_show:N
+%		\l_ic_boxnum_int 
+
+\tl_set:Nn 
+	\l_ic_boxnamea_tl
+	{
+			\bool_if:NTF
+				\l_ic_star_bool
+				{ l_ic_glyph } % no frame
+				{ l_myicppz }  % frame
+			\int_use:N \l_ic_boxnum_int 
+			_box 
+		}
+\tl_set:Nn 
+	\l_ic_boxnameb_tl % reversed
+	{
+			\bool_if:NTF
+				\l_ic_star_bool
+				{ l_ic_glyph } % no frame
+				{ l_myicppz }  % frame
+			\int_use:N \l_ic_boxnum_int 
+			r_box 
+		}
+
+%\tl_use:N 
+%	\l_ic_boxnamea_tl
+
+\IfNoValueTF{#2}{
+		\box_use:c 
+			{ 	% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+			\bool_if:NTF
+				\l_ic_star_bool
+				{ l_ic_glyph } % no frame
+				{ l_myicppz }  % frame
+			\int_use:N \l_ic_boxnum_int 
+			_box 
+			} 
+		}% no option
+		{%val=#2		
+		\str_if_eq:nnT
+			 { #2 } 
+			 { r }
+			 { 
+
+		\cs_if_exist:cTF
+			{ 
+%			l_myicppz 
+% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%
+%%			\int_use:N \l_ic_boxnum_int r_box 
+			\tl_use:N \l_ic_boxnameb_tl % reversed
+			}
+			{ }
+			{
+			\box_new:c { 
+%			l_myicppz 
+% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%
+%%			\int_use:N \l_ic_boxnum_int r_box 
+			\tl_use:N \l_ic_boxnameb_tl % reversed		
+			}
+
+			\box_set_eq:cc 
+				{ 
+%				l_myicppz 
+% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%
+%%				\int_use:N \l_ic_boxnum_int r_box 
+			\tl_use:N \l_ic_boxnameb_tl % reversed
+				}
+				{ 
+%%				l_myicppz 
+% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%%			\int_use:N \l_ic_boxnum_int 
+%%%			_box 
+%%%				<<<
+%%				\int_use:N \l_ic_boxnum_int _box 
+			\tl_use:N \l_ic_boxnamea_tl 
+				}
+				
+			 	\box_scale:cnn
+		{ 	% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%			\int_use:N \l_ic_boxnum_int 
+%%			r_box 
+			\tl_use:N \l_ic_boxnameb_tl % reversed
+			} 
+		{-1}{1}
+			}% end F exist
+		
+					 			\box_use:c 
+		{ 	% build the box name
+%			\IfBooleanTF 
+%				{#1} 
+%%			\bool_if:NTF
+%%				\l_ic_star_bool
+%%				{ l_ic_glyph } % no frame
+%%				{ l_myicppz }  % frame
+%%			\int_use:N \l_ic_boxnum_int 
+%%			r_box 
+			\tl_use:N \l_ic_boxnameb_tl % reversed
+			} 
+			 }%true r
+		 }%option specified
+			 % \box_scale:Nnn hboxi {hx-scalei} {hy-scalei}
+%%%%			 { \box_scale:Nnn }
+%		{
+%			}
+%%		\str_if_eq:nnT
+%%			 { #2 } 
+%%			 { r }
+%%			 { {-1} {1} } % reverse horizontally
+%%%%			 {-1} {1}
+
+
+}
+%
+
+%-----------------------
+\cs_set:Npn 
+			\ic_funcaddpropitem:nn  
+					#1#2 
+					{
+					% add an alias/codepoint pair
+					% to the list in that namespace
+					\prop_put:cnn
+					{ l_ic_alias \tl_use:N \l_ic_scriptnamespace_tl _prop }
+					{ #1 }
+					{ #2 }
+}
+%
+%----------------------- 
+\cs_set:Npn 
+			\ic_funcsetprop:nn  
+					#1#2 
+					{
+		% if the alias property list for that namespace already exists
+		\cs_if_exist:cTF
+			{ l_ic_alias#1_prop }
+			{ 
+					\tl_set:Nn \l_ic_scriptnamespace_tl { #1 }
+					% copy the iincoming list into a temp var
+						\prop_clear:N \l_tmpa_prop
+						\prop_set_from_keyval:Nn 
+							\l_tmpa_prop
+							{
+								#2
+							}
+					% then iterate through the pairs,
+					% adding them to the main alias list
+						\prop_map_function:NN
+							\l_tmpa_prop
+							\ic_funcaddpropitem:nn 
+			}
+			{ % otherwise
+			        % create the alias list for the namespace
+						\prop_new:c { l_ic_alias#1_prop }
+						
+						% and fill it.
+						\prop_set_from_keyval:cn 
+							{ l_ic_alias#1_prop }
+							{
+								#2
+							}
+			}
+					}
+
+					
+%----------------------- Add alias/codepoint pair(s) to the alias list
+% #1 = namespace
+% #2 = key=value comma-separated list
+\NewDocumentCommand { \setmyalias } { m m } {					
+		\ic_funcsetprop:nn {#1}{#2}
+}
+
+
+%----------------------- Display the alia's glyph in the namespace
+%  #1 = option
+%			r = reversed
+%  #2 = namespace
+%  #2 = key (alias)
+%  value (glyph codepoint) is retrieved, which is then given to the boxprinter
+\NewDocumentCommand { \myalias } { o m m } {				
+% the tl is also used downstream, in the iterator function
+	\tl_set:Nn \l_ic_scriptnamespace_tl { #2 }
+%	#1
+	\IfNoValueTF { #1 } 
+	{ %no option
+	\myboxnum*
+	{	
+%	\prop_get:NnN hproperty listi {hkeyi} htl vari
+%	If the hkeyi is not found in the hproperty listi then the htoken list
+%variablei is set to the special marker \q_no_value`
+
+%\prop_get:NnNTF hproperty listi {hkeyi} htoken list variablei
+%{htrue codei} {hfalse codei}
+		\prop_item:cn 
+			{ l_ic_alias \tl_use:N \l_ic_scriptnamespace_tl _prop }
+			{ #3 }
+%			If the hkeyi is
+%missing, this has an empty expansion.
+		}
+	} 
+	{ %option 
+	\myboxnum*
+	[#1]
+	{	
+		\prop_item:cn 
+			{ l_ic_alias \tl_use:N \l_ic_scriptnamespace_tl _prop }
+			{#3}
+		}
+   }
+}
+%
+%-----------------------
+\cs_set:Npn 
+			\ic_funclistalias:nn  
+					#1#2 % key, value
+					{
+					% display the alias
+						#1=
+					% display its matching glyph
+	\myboxnum*{	
+		\prop_item:cn 
+			{ l_ic_alias \tl_use:N \l_ic_scriptnamespace_tl _prop }
+			{ #1 }
+					}
+					% add a separator and some space
+				;\ \ 
+}
+
+%-----------------------
+\tl_new:N \l_ic_scriptnamespace_tl
+
+%-----------------------
+\NewDocumentCommand { \listallaliases } { m } {				
+% store the alias-list namespace: the tl is used in the iterator function
+	\tl_set:Nn \l_ic_scriptnamespace_tl { #1 }
+#1 : ~
+% iterate through the aliases in this namespace
+	\prop_map_function:cN 
+		{ l_ic_alias#1_prop } 
+		\ic_funclistalias:nn
+		.
+}
+
+
+%-----------------------
+\cs_set:Npn 
+			\ic_funcbl:n
+					#1
+					{
+							\cs_if_exist:cTF
+							{ 
+									\bool_if:NTF
+									\l_ic_star_bool
+												{ l_ic_glyph } % no frame
+												{ l_myicppz }  % frame
+												#1
+												 _box 
+
+							 }
+							{
+									\bool_if:NTF
+									\l_ic_star_bool
+									{ \myboxnum * { #1 } \ \ }
+									{ \myboxnum  { #1 } \ \ }
+							}
+							{ }
+}
+
+%-----------------------
+\bool_new:N \l_ic_star_bool
+%-----------------------
+\NewDocumentCommand { \listallboxes } { s m m } {				
+\IfBooleanTF	{#1}
+		{ \bool_set_true:N \l_ic_star_bool }
+		{ \bool_set_false:N \l_ic_star_bool }
+% iterate through the boxes in this range
+		\int_step_function:nnnN { #2 } { 1 } { #3 } \ic_funcbl:n
+}
+					
+\ExplSyntaxOff
+%  \addmyboxes[\fnoto]{`a}{`z}
+%  \par >>\myboxnum{`b}<<  >>\myboxnum{`z}<<
+%  \par xxx \myboxnum{`m} xxx
+%x  \addmyboxes[\fnoto]{1103}{1103} \myboxnum{1103}
+x  \addmyboxes[\fhiero]{`𓀀}{77951}
+% \myboxnum{77824} x 
+%
+%x\myboxnum*{77824}\myboxnum*{77951}\myboxnum*{77891}
+  
+  
+x  \myboxnum*[r]{77891} xxx \myboxnum*{77891} x  \myboxnum*[r]{77891} <>\myboxnum*{77891}
+
+x  \myboxnum[r]{77891} xxx \myboxnum{77891} x  \myboxnum[r]{77891} <>\myboxnum{77891}
+
+%%%x  \myboxnum[r]{77891} <>\myboxnum{77891}  
+%\end{mybox}
+%\bigskip
+
+		\setmyalias{eh}{%
+		a58=77891,%
+		a1=77824,%
+		d9=77951,%
+		a36=77865,%
+		a39=77868,%
+		d3=77944,%
+		}
+
+\noindent\myalias[r]{eh}{a58} digging stick \myalias{eh}{a58}
+
+\ \myalias[r]{eh}{a36} \myalias{eh}{a39}
+
+%%%
+%%%\noindent\listallaliases{eh}
+%%%
+%%%
+%%%\noindent\listallaliases{cyr}
+%%%
+%%% \addmyboxes[\fhiero]{77951}{77951}
+%%%x
+%%%\noindent\myalias{eh}{d9}
+%%%\addmyboxes[\fhiero]{77952}{77952}
+%%%		\setmyalias{eh}{%
+%%%		d10=77952,%
+%%%		}
+%%%\noindent\myalias{eh}{d10}
+%%%\noindent\listallaliases{eh}
+%%%
+%%%		\setmyalias{eh}{%
+%%%		d10=77950,%
+%%%		}
+%%%\noindent\myalias{eh}{d10}
+%%%\noindent\listallaliases{eh}
+%%%
+%%%\noindent\myalias[r]{eh}{a58}\myalias{eh}{a58}
+
+
+ \addmyboxes[\fnoto]{65}{65}
+  \addmyboxes[\fnoto]{913}{937}
+   \addmyboxes[\fnoto]{1040}{1040}
+		\setmyalias{lat}{%
+		A=65,%
+		}
+		\setmyalias{gr}{%
+		A=913,%
+		xx=930,%
+		s=931,%
+				t=932,%
+						u=933,%
+								phi=934,%
+										chi=935,%
+												psi=936,%
+														omega=937,%
+																}
+		\setmyalias{cyr}{%
+		A=1040,%
+		}
+\noindent\myalias{lat}{A}\myalias{gr}{A}\myalias{cyr}{A}
+
+\noindent\myboxnum{65}\myboxnum{913}\myboxnum{1040}
+
+x\myalias{gr}{xx}\listallaliases{gr}
+
+x\listallboxes{65}{65}
+
+x\listallboxes*{65}{65}
+
+1 -- \verb|\addmyboxes[\fhiero]{78069}{78069}|
+\addmyboxes[\fhiero]{78069}{78069}
+
+2 -- \verb|\myboxnum{78069}|
+\myboxnum{78069}
+
+3 -- \verb|\myboxnum[r]{78069}|
+\myboxnum[r]{78069}
+
+
+4 -- \verb|\myboxnum*{78069}|
+\myboxnum*{78069}
+
+5 -- \verb|\myboxnum*[r]{78069}|
+\myboxnum*[r]{78069}
+
+6 -- \verb|\setmyalias{eh}{e30=78069,}|
+\setmyalias{eh}{%
+		e30=78069,%
+		}
+%\listallaliases{eh}
+
+7 -- \verb|\myalias{eh}{e30}|
+\myalias{eh}{e30}
+
+8 -- \verb|\myalias[r]{eh}{e30}|
+\ \myalias[r]{eh}{e30}
+
+
+
+
+
+
+
+\end{document}
