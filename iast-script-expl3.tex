@@ -1,0 +1,1234 @@
+\documentclass{article}
+\usepackage{xparse}
+\usepackage{luacolor}
+%\usepackage{graphicx}
+\usepackage{showexpl}
+
+\usepackage{fontspec}
+\newfontface\fontdev[Script=Devanagari,Renderer=HarfBuzz]{Noto Serif Devanagari}
+\newfontfamily\fontlat{Noto Serif}
+\setmonofont{Noto Sans Mono}
+
+
+
+\newcommand\tl[2][]{{\usefont{T1}{lmr}{m}{n}\tiny#1: }{\ttfamily #2} $\mapsto$ \translit{#2}}
+
+
+
+%===================== 
+\ExplSyntaxOn
+	\cs_generate_variant:Nn 
+			\tl_count_tokens:n 
+			{ V }
+
+		\cs_generate_variant:Nn 
+			\seq_set_split:Nnn 
+			{ cno }
+	
+	\seq_new:N 
+			\l_ic_translitq_seq
+	\seq_new:N 
+			\l_ic_translitqz_seq
+	\seq_new:N 
+			\l_ic_translitqy_seq
+	\tl_new:N 
+			\l_ic_translitqz_tl
+	\seq_new:N 
+			\l_ic_translitqyy_seq
+	\int_new:N 
+			\l_ic_translitqz_int
+	\int_new:N 
+			\l_ic_translitqy_int
+
+%------------------
+	\cs_set:Npn \ic_funcsortseq:cn #1#2 { % 1=seq, 2=order (<:descending, >:ascending) 
+	\seq_sort:cn  { #1 } %\l_ic_translitq_seq 
+		{
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+			\seq_clear:N 
+					\l_ic_translitqy_seq 
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_ic_translitqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_ic_translitqz_int 
+					{ 
+						\tl_count_tokens:V 
+								\l_ic_translitqz_tl 
+					}
+			\int_set:Nn 
+					\l_ic_translitqy_int 
+					{ 
+						\tl_count_tokens:V 
+						\l_ic_translitqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_ic_translitqz_int } { #2 } { \l_ic_translitqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+%-------------------- Meta
+\NewDocumentCommand { \tll } { m m O{fontlat} O{fontdev} } { %1=control sequence name, 2=parameter,
+                                                     % 3=latin font, 4=devanagari font
+\use:c{#3} \textbackslash #1 \{ #2 \} & 
+\use:c{#4} \use:c{#1}{#2} &
+\footnotesize using ~ font: ~ \textbackslash #4 \\
+}
+
+
+
+
+%--------------------
+\NewDocumentCommand { \sortaseq } { m m } { 
+\ic_funcsortseq:cn { l_ic_translit #1 _seq } { #2 }
+%\seq_show:c { l_ic_translit #1 _seq }
+}
+
+%------------
+	\tl_new:N 
+			\l_ic_translittemp_tl 
+
+
+	\cs_set:Npn \ic_funcgeneric:n #1 { 
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+%%			\seq_clear:N 
+%%					\l_ic_translitqy_seq
+%%\exp_args:NNno
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ #1 }
+%%			\seq_set_split:Nnn 
+%%					\l_ic_translitqy_seq 
+%%					{ ; } 
+%%					{ 2 }
+%\seq_show:N \l_ic_translitqz_seq
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{2} 
+					}
+    
+			\tl_replace_all:Noo 
+					\l_ic_translittemp_tl
+							{ \l_ic_translitqz_tl } 
+							{ \l_ic_translitqy_tl }
+	
+	}
+
+
+
+
+
+%--------------------
+\NewDocumentCommand { \loadaseq } { m +m } { % 1=seq name, 2=data
+	\cs_if_free:cT
+			{ l_ic_translit #1 _seq }
+			{ \seq_new:c
+					{ l_ic_translit #1 _seq } 
+			}
+	\seq_clear:c 
+			{ l_ic_translit #1 _seq } 
+	\seq_set_split:cno 
+			{ l_ic_translit #1 _seq } 
+			{ , } 
+			{ #2 }
+	\cs_if_free:cT
+			{ ic_functranslit #1 :n }
+			{ \cs_new:cpn
+					{ ic_functranslit #1 :n }
+					##1
+					 { %=============================
+%					 Some ~ text. ~ ##1 
+
+%	\cs_if_free:cT
+%			{ { l_ic_translit temp _tl } }
+%			{ \tl_new:c { l_ic_translit temp _tl } }
+	\tl_clear:N 
+			\l_ic_translittemp_tl 
+	\tl_set:Nn 
+			\l_ic_translittemp_tl
+			{ ##1 }
+	\seq_map_function:cN 
+			{ l_ic_translit #1 _seq } 
+			\ic_funcgeneric:n
+%\tl_show:N \l_ic_translitiast_tl
+%%    \exp_args:No \translit { \l_ic_translittemp_tl }
+	\tl_use:N 
+			\l_ic_translittemp_tl
+
+					 } %============================= 
+           \cs_set_eq:cc
+           		{ translit #1 }
+					{ ic_functranslit #1 :n }
+			}
+
+
+}
+
+
+
+
+\NewDocumentCommand { \newtranslit } { m +m } { 
+   \loadaseq{#1}{#2}
+	\sortaseq{#1}{<}
+}
+
+
+\NewDocumentCommand { \loadtranslitpairs } { +m } { 
+   \loadaseq{q}{#1}
+	\sortaseq{q}{<}
+}
+
+
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn 
+			{ Noo }
+	\seq_new:N 
+			\l_ic_translit_seq
+%
+	\seq_new:N 
+			\l_ic_translitz_seq
+	\tl_new:N 
+			\l_ic_translitz_tl
+	\tl_new:N 
+			\l_ic_translitx_tl
+%
+%	\cs_generate_variant:Nn 
+%			\regex_replace_all:nnN 
+%			{ ooN }
+	\seq_new:N 
+			\l_ic_translitinit_seq
+	\seq_new:N 
+			\l_ic_translitzi_seq
+	\tl_new:N 
+			\l_ic_translitzi_tl
+% vowel signs
+	\tl_new:N 
+			\l_ic_translitxvs_tl
+	\seq_new:N 
+			\l_ic_translitvs_seq
+	\seq_new:N 
+			\l_ic_translitzvs_seq
+	\tl_new:N 
+			\l_ic_translitzvs_tl
+%	\tl_new:N 
+%			\l_ic_translitxvs_tl
+
+
+
+%------------
+
+	\cs_set:Npn \ic_funcinit:n #1 { %initial letter independant vowel
+			\seq_set_split:Nnn 
+					\l_ic_translitzi_seq 
+					{ ; } 
+					{ #1 }
+			\tl_set:Nx 
+					\l_ic_translitzi_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitzi_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitxi_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitzi_seq 
+								{2} 
+					}
+%			\tl_replace_all:Noo 
+%					\l_ic_translit_tl  
+%							{ \l_ic_translitzi_tl } 
+%							{ \l_ic_translitxi_tl }
+	\regex_replace_all:nnN 
+			{ ([\s])\u{l_ic_translitzi_tl } } 
+			{ \1 \u{l_ic_translitxi_tl}  } 
+			\l_ic_translit_tl	
+%\regex_replace_all:nnN { (\A)[^^^^0101] } 	{ \1आ } \l_ic_translit_tl		
+	\regex_replace_all:nnN 
+			{ (\A)\u{l_ic_translitzi_tl } } 
+			{ \1 \u{l_ic_translitxi_tl}  } 
+			\l_ic_translit_tl	
+%\tl_show:N \l_ic_translit_tl
+
+	}
+	
+	
+
+%------------
+
+	\cs_set:Npn \ic_funcputvs:n #1 { % dependant vowels: add to seq top/left
+			\seq_put_left:Nn 	\l_ic_translit_seq 	 { #1 }	
+	}
+	
+
+
+
+%------------
+	\tl_new:N 
+			\l_ic_translitiast_tl 
+
+
+	\cs_set:Npn \ic_funciast:n #1 { 
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+%			\seq_clear:N 
+%					\l_ic_translitqy_seq
+%%\exp_args:NNno
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ #1 }
+%%			\seq_set_split:Nnn 
+%%					\l_ic_translitqy_seq 
+%%					{ ; } 
+%%					{ ##2 }
+%\seq_show:N \l_ic_translitqz_seq
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{2} 
+					}
+    
+			\tl_replace_all:Noo 
+					\l_ic_translitiast_tl
+							{ \l_ic_translitqz_tl } 
+							{ \l_ic_translitqy_tl }
+	
+	}
+
+\NewDocumentCommand { \iast } { +m } { 
+	\tl_clear:N 
+			\l_ic_translitiast_tl
+	\tl_set:Nn 
+			\l_ic_translitiast_tl
+			{ #1 }
+	\seq_map_function:NN 
+			\l_ic_translitiast_seq 
+			\ic_funciast:n
+%\tl_show:N \l_ic_translitiast_tl
+    \exp_args:No \translit { \l_ic_translitiast_tl }
+}
+	
+	\seq_new:N 
+			\l_ic_translitiast_seq 
+\NewDocumentCommand { \loadiastmap } { +m } { 
+   \loadaseq{iast}{#1}
+	\sortaseq{iast}{<}
+
+}
+
+%=====================================
+
+%------------
+	\tl_new:N 
+			\l_ic_translitiastlat_tl 
+
+
+	\cs_set:Npn \ic_funciastlat:n #1 { 
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+%			\seq_clear:N 
+%					\l_ic_translitqy_seq
+%%\exp_args:NNno
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ #1 }
+%%			\seq_set_split:Nnn 
+%%					\l_ic_translitqy_seq 
+%%					{ ; } 
+%%					{ ##2 }
+%\seq_show:N \l_ic_translitqz_seq
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{2} 
+					}
+    
+			\tl_replace_all:Noo 
+					\l_ic_translitiastlat_tl
+							{ \l_ic_translitqz_tl } 
+							{ \l_ic_translitqy_tl }
+	
+	}
+
+\NewDocumentCommand { \iastlat } { +m } { 
+	\tl_clear:N 
+			\l_ic_translitiastlat_tl
+	\tl_set:Nn 
+			\l_ic_translitiastlat_tl
+			{ #1 }
+	\seq_map_function:NN 
+			\l_ic_translitiastlat_seq 
+			\ic_funciastlat:n
+%\tl_show:N \l_ic_translitiast_tl
+%    \exp_args:No \translit { \l_ic_translitiastlat_tl }
+		\tl_use:N \l_ic_translitiastlat_tl
+}
+	
+	\seq_new:N 
+			\l_ic_translitiastlat_seq 
+\NewDocumentCommand { \loadiastlatmap } { +m } { 
+   \loadaseq{iastlat}{#1}
+	\sortaseq{iastlat}{<}
+
+}
+
+
+%=====================================
+
+
+
+	
+\NewDocumentCommand { \loadtranslitinitpairs } { +m } { 
+   \loadaseq{init}{#1}
+	\sortaseq{init}{<}			
+			
+} % end initpairs ===========================
+
+
+
+
+
+\NewDocumentCommand { \loadtranslitvspairs } { +m } { 
+   \loadaseq{vs}{#1}
+   \sortaseq{vs}{>} % increasing order, because put left			
+} % vowel sign pairs ===========================
+
+
+	\cs_set:Npn \ic_funcrz:n #1 { %replace
+			\seq_set_split:Nnn 
+					\l_ic_translitz_seq 
+					{ ; } 
+					{ #1 }
+			\tl_set:Nx 
+					\l_ic_translitz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitx_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitz_seq 
+								{2} 
+					}
+			\tl_replace_all:Noo 
+					\l_ic_translit_tl  
+							{ \l_ic_translitz_tl } 
+							{ \l_ic_translitx_tl }
+	}
+	
+	
+	
+	\tl_new:N 
+			\l_ic_translit_tl
+\NewDocumentCommand { \translit } { +m } { 
+	\tl_set:Nn 
+			\l_ic_translit_tl 
+			{ #1 }
+		\seq_set_eq:NN 
+				\l_ic_translit_seq 
+				\l_ic_translitq_seq
+%\seq_use:Nnnn \l_ic_translit_seq { - } { - } { - } 
+
+
+%===========================================
+% Initial letters
+	\seq_map_function:NN 
+			\l_ic_translitinit_seq 
+			\ic_funcinit:n
+
+
+%===========================================
+% Put multi-char dependant vowels at start of sequence
+%===========================================
+% pass 1:
+	\seq_map_function:NN 
+			\l_ic_translitvs_seq 
+			\ic_funcputvs:n
+
+
+%===========================================
+% pass 1:
+	\seq_map_function:NN 
+			\l_ic_translit_seq 
+			\ic_funcrz:n
+
+
+%===========================================
+% Tidy up
+% halant:
+%		remove when followed by:
+%				- whitespace: \s
+%				- POSIX punctuation set
+%				- transliterated vowel
+%				- danda and double danda: ^^^^0964^^^^0965
+%				- end of token list: \z
+%         - ICB, CB: ^^^^0900 ^^^^0901
+				
+   \regex_replace_all:nnN { ^^^^094d([\s[:punct:]^^^^093a-^^^^094f^^^^0955-^^^^0957^^^^0962^^^^0963^^^^0964^^^^0965^^^^0900^^^^0901]) } 	{ \1 } \l_ic_translit_tl
+   \regex_replace_all:nnN { ^^^^094d(\z) } 	{ \1 } \l_ic_translit_tl
+%
+%	\regex_replace_all:nnN { ^^^^094d(\s) } 	{ \1 } \l_ic_translit_tl
+
+			
+			
+	\tl_use:N 
+			\l_ic_translit_tl 
+
+	}
+
+
+%------------
+
+	\cs_set:Npn \ic_funclist:n #1 { 
+			\seq_clear:N 
+					\l_ic_translitqz_seq 
+%			\seq_clear:N 
+%					\l_ic_translitqy_seq
+%%\exp_args:NNno
+			\seq_set_split:Nnn 
+					\l_ic_translitqz_seq 
+					{ ; } 
+					{ #1 }
+%%			\seq_set_split:Nnn 
+%%					\l_ic_translitqy_seq 
+%%					{ ; } 
+%%					{ ##2 }
+%\seq_show:N \l_ic_translitqz_seq
+			\tl_set:Nx 
+					\l_ic_translitqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_ic_translitqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_ic_translitqz_seq 
+								{2} 
+					}
+%\tl_show:N \l_ic_translitqz_tl
+%			\translit { #1 }	~
+			{ \fontlat \l_ic_translitqz_tl 
+			= } 
+			{ 
+			   \Large
+			   \tl_if_empty:NTF
+			   	\l_ic_translitprefixb_tl
+			   	{
+			   			\color{blue}
+			   			\l_ic_translitprefix_tl
+							\l_ic_translitprefixb_tl			   
+							\l_ic_translitqy_tl 
+			   	}
+			   	{
+			   		\tl_if_eq:NnTF 
+			   				\l_ic_translitqz_tl 
+			   				{ i }
+			   				{ % to handle when vowel sign comes first
+									\l_ic_translitprefixb_tl			   
+			   					\l_ic_translitprefix_tl
+								   \color{blue}
+									\l_ic_translitqy_tl 			   				
+			   				}
+			   				{
+								   \color{blue}
+			   					\l_ic_translitprefix_tl
+									\l_ic_translitprefixb_tl			   
+									\l_ic_translitqy_tl 			   				
+			   				}% end i F
+					}% end not empty
+			   	}% end RHS
+			\ \ \ 
+%			#1
+	}
+
+
+%---------------------------------------	
+\tl_new:N 
+		\l_ic_translitprefix_tl 
+\tl_new:N 
+		\l_ic_translitprefixb_tl 
+	
+%---------------------------------------
+\NewDocumentCommand { \listallinitpairs } {  } { 
+	\tl_set:Nn 
+			\l_ic_translitprefix_tl 
+			{ }
+	\tl_set:Nn 
+			\l_ic_translitprefixb_tl 
+			{ }
+	\seq_map_function:NN 
+			\l_ic_translitinit_seq 
+			\ic_funclist:n
+}
+
+%---------------------------------------
+\NewDocumentCommand { \listallvspairs } {  } { 
+	\tl_set:Nn 
+			\l_ic_translitprefix_tl 
+			{ \translit{m} }
+	\tl_set:Nn 
+			\l_ic_translitprefixb_tl 
+			{ \color{red} }
+	\seq_map_function:NN 
+			\l_ic_translitvs_seq 
+			\ic_funclist:n
+}
+
+
+%---------------------------------------
+\NewDocumentCommand { \listallmainpairs } {  } { 
+	\tl_set:Nn 
+			\l_ic_translitprefix_tl 
+			{ }
+	\tl_set:Nn 
+			\l_ic_translitprefixb_tl 
+			{ }
+	\seq_map_function:NN 
+			\l_ic_translit_seq 
+			\ic_funclist:n
+}
+
+
+%---------------------------------------
+\NewDocumentCommand { \listalliastpairs } {  } { 
+	\tl_set:Nn 
+			\l_ic_translitprefix_tl 
+			{ }
+	\tl_set:Nn 
+			\l_ic_translitprefixb_tl 
+			{ }
+	\seq_map_function:NN 
+			\l_ic_translitiast_seq 
+			\ic_funclist:n
+}
+
+
+%---------------------------------------
+\NewDocumentCommand { \listalliastlatpairs } {  } { 
+	\tl_set:Nn 
+			\l_ic_translitprefix_tl 
+			{ }
+	\tl_set:Nn 
+			\l_ic_translitprefixb_tl 
+			{ }
+	\seq_map_function:NN 
+			\l_ic_translitiastlat_seq 
+			\ic_funclist:n
+}
+
+	
+	
+%---------------------------------------
+\NewDocumentCommand { \lid } { m m } { 
+	\par	 --- \par{\fontlat #1}
+   \par{ \Huge \iast{#1} \par #2 }
+   }
+
+	
+\ExplSyntaxOff
+
+
+
+
+
+%========================================
+\loadtranslitpairs{ā; ा % CDM
+,ā; ा % precomposed
+,ICB;^^^^0900 % ऀ
+,CB;^^^^0901 % ँ
+,ANU;^^^^0902 % ं
+,VS;^^^^0903 % ः
+,ka;^^^^0915 % क
+,kha;^^^^0916 % ख
+,ga;^^^^0917 % ग
+,gha;^^^^0918 % घ
+,nga;^^^^0919 % ङ
+,ca;^^^^091a % च
+,cha;^^^^091b % छ
+,ja;^^^^091c % ज
+,jha;^^^^091d % झ
+,nya;^^^^091e % ञ
+,tta;^^^^091f % ट
+,ttha;^^^^0920 % ठ
+,dda;^^^^0921 % ड
+,ddha;^^^^0922 % ढ
+,nna;^^^^0923 % ण
+,ta;^^^^0924 % त
+,tha;^^^^0925 % थ
+,da;^^^^0926 % द
+,dha;^^^^0927 % ध
+,na;^^^^0928 % न
+,nnna;^^^^0929 % ऩ
+,pa;^^^^092a % प
+,pha;^^^^092b % फ
+,ba;^^^^092c % ब
+,bha;^^^^092d % भ
+,ma;^^^^092e % म
+,ya;^^^^092f % य
+,ra;^^^^0930 % र
+,rra;^^^^0931 % ऱ
+,la;^^^^0932 % ल
+,lla;^^^^0933 % ळ
+,llla;^^^^0934 % ऴ
+,va;^^^^0935 % व
+,sha;^^^^0936 % श
+,ssa;^^^^0937 % ष
+,sa;^^^^0938 % स
+,ha;^^^^0939 % ह
+,N;^^^^093c % ़
+,AVA;^^^^093d % ऽ
+,VR;^^^^094d % ्
+,OM;^^^^0950 % ॐ
+,UD;^^^^0951 % ॑
+,ANUD;^^^^0952 % ॒
+,GA;^^^^0953 % ॓
+,AC;^^^^0954 % ॔
+,qa;^^^^0958 % क़
+,khha;^^^^0959 % ख़
+,ghha;^^^^095a % ग़
+,za;^^^^095b % ज़
+,dddha;^^^^095c % ड़
+,rha;^^^^095d % ढ़
+,fa;^^^^095e % फ़
+,yya;^^^^095f % य़
+,D;^^^^0964 % ।
+,DD;^^^^0965 % ॥
+,0;^^^^0966 % 0
+,1;^^^^0967 % 1
+,2;^^^^0968 % 2
+,3;^^^^0969 % 3
+,4;^^^^096a % 4
+,5;^^^^096b % 5
+,6;^^^^096c % 6
+,7;^^^^096d % 7
+,8;^^^^096e % 8
+,9;^^^^096f % 9
+,ABBRV;^^^^0970 % ॰
+,DOT;^^^^0971 % ॱ
+,Mdda;^^^^0978 % ॸ
+,zha;^^^^0979 % ॹ
+,Hya;^^^^097a % ॺ
+,gga;^^^^097b % ॻ
+,jja;^^^^097c % ॼ
+,GS;^^^^097d % ॽ
+,ddda;^^^^097e % ॾ
+,bba;^^^^097f % ॿ
+%-----------------
+,k;^^^^0915^^^^094d % क
+,kh;^^^^0916^^^^094d % ख
+,g;^^^^0917^^^^094d % ग
+,gh;^^^^0918^^^^094d % घ
+,ng;^^^^0919^^^^094d % ङ
+,c;^^^^091a^^^^094d % च
+,ch;^^^^091b^^^^094d % छ
+,j;^^^^091c^^^^094d % ज
+,jh;^^^^091d^^^^094d % झ
+,ny;^^^^091e^^^^094d % ञ
+,tt;^^^^091f^^^^094d % ट
+,tth;^^^^0920^^^^094d % ठ
+,dd;^^^^0921^^^^094d % ड
+,ddh;^^^^0922^^^^094d % ढ
+,nn;^^^^0923^^^^094d % ण
+,t;^^^^0924^^^^094d % त
+,th;^^^^0925^^^^094d % थ
+,d;^^^^0926^^^^094d % द
+,dh;^^^^0927^^^^094d % ध
+,n;^^^^0928^^^^094d % न
+,nnn;^^^^0929^^^^094d % ऩ
+,p;^^^^092a^^^^094d % प
+,ph;^^^^092b^^^^094d % फ
+,b;^^^^092c^^^^094d % ब
+,bh;^^^^092d^^^^094d % भ
+,m;^^^^092e^^^^094d % म
+,y;^^^^092f^^^^094d % य
+,r;^^^^0930^^^^094d % र
+,rr;^^^^0931^^^^094d % ऱ
+,l;^^^^0932^^^^094d % ल
+,ll;^^^^0933^^^^094d % ळ
+,lll;^^^^0934^^^^094d % ऴ
+,v;^^^^0935^^^^094d % व
+,sh;^^^^0936^^^^094d % श
+,ss;^^^^0937^^^^094d % ष
+,s;^^^^0938^^^^094d % स
+,h;^^^^0939^^^^094d % ह
+,q;^^^^0958^^^^094d % क़
+,khh;^^^^0959^^^^094d % ख़
+,ghh;^^^^095a^^^^094d % ग़
+,z;^^^^095b^^^^094d % ज़
+,dddh;^^^^095c^^^^094d % ड़
+,rh;^^^^095d^^^^094d % ढ़
+,f;^^^^095e^^^^094d % फ़
+,yy;^^^^095f^^^^094d % य़
+,Mdd;^^^^0978^^^^094d % ॸ
+,zh;^^^^0979^^^^094d % ॹ
+,Hy;^^^^097a^^^^094d % ॺ	
+,gg;^^^^097b^^^^094d % ॻ
+,jj;^^^^097c^^^^094d % ॼ
+,ddd;^^^^097e^^^^094d % ॾ
+,bb;^^^^097f^^^^094d % ॿ
+%-----------------
+,xx;yy
+}
+
+
+
+%========================================
+\loadtranslitinitpairs{Sa;^^^^0904  %  ऄ
+,a;^^^^0905  %  अ
+,aa;^^^^0906  %  आ
+,i;^^^^0907  %  इ
+,ii;^^^^0908  %  ई
+,u;^^^^0909  %  उ
+,uu;^^^^090a  %  ऊ
+,R;^^^^090b % ऋ
+,L;^^^^090c % ऌ
+,Ce;^^^^090d  %  ऍ
+,Se;^^^^090e  %  ऎ
+,e;^^^^090f  %  ए
+,ai;^^^^0910  %  ऐ
+,Co;^^^^0911  %  ऑ
+,So;^^^^0912  %  ऒ
+,o;^^^^0913  %  ओ
+,au;^^^^0914  %  औ
+,RR;^^^^0960 % ॠ
+,LL;^^^^0961 % ॡ
+,Ca;^^^^0972  %  ॲ
+,oe;^^^^0973  %  ॳ
+,ooe;^^^^0974  %  ॴ
+,aw;^^^^0975  %  ॵ
+,ue;^^^^0976  %  ॶ
+,uue;^^^^0977  %  ॷ
+}
+
+
+
+%========================================
+\loadtranslitvspairs{oe;^^^^093a  %  ऺ
+,ooe;^^^^093b  %  ऻ
+,aa;^^^^093e  %  ा
+,i;^^^^093f  %  ि
+,ii;^^^^0940  %  ी
+,u;^^^^0941  %  ु
+,uu;^^^^0942  %  ू
+,R;^^^^0943 % ृ
+,RR;^^^^0944 % ॄ
+,Ce;^^^^0945  %  ॅ
+,Se;^^^^0946  %  ॆ
+,e;^^^^0947  %  े
+,ai;^^^^0948  %  ै
+,Co;^^^^0949  %  ॉ
+,So;^^^^094a  %  ॊ
+,o;^^^^094b  %  ो
+,au;^^^^094c  %  ौ
+,Pe;^^^^094e  %  ॎ
+,aw;^^^^094f  %  ॏ
+,Cle;^^^^0955  %  ॕ
+,ue;^^^^0956  %  ॖ
+,uue;^^^^0957  %  ॗ
+,L;^^^^0962 % ॢ
+,LL;^^^^0963 % ॣ
+}
+
+
+
+
+%========================================
+\loadiastmap{ā;aa
+,ī;ii
+,ū;uu
+,ṝ;RR
+,ḷ;L
+,ḹ;LL
+,ṃ;ANU
+,ḥ;VS
+,ô;CB
+,ḥ;VS
+,ŏ;So
+,ĕ;Se
+,ă;Sa
+,ê;Ce
+,ô;Co
+,';AVA
+,ṅ;ng
+,ñ;ny
+,ṭ;tt
+,ḍ;dd
+,ṇ;nn
+,ś;sh
+,ṣ;ss
+,k͟h;khh
+,ġ;ghh
+,ṛ;R
+,ḻ;lll
+,.;D
+%---
+,zwnj;^^^^200c
+%%---
+%,along;ā
+%,hdot;ḥ
+}
+
+
+%========================================
+\loadiastlatmap{along;ā
+,ilong;ī
+,ulong;ū
+,rdotbar;ṝ
+,ldot;ḷ
+,ldotbar;ḹ
+,mdot;ṃ
+,hdot;ḥ
+%,cb;ô^^^^0901
+,oshort;ŏ
+,eshort;ĕ
+,ashort;ă
+,ecb;ê
+,ocb;ô
+,quote;'
+,ng;ṅ
+,ny;ñ
+,tdot;ṭ
+,ddot;ḍ
+,ndot;ṇ
+,sacute;ś
+,sdot;ṣ
+,kh;k͟
+,gdot;ġ
+,rdot;ṛ
+,lbar;ḻ
+}
+
+
+
+
+%========================================
+\begin{document}
+
+\fontdev
+
+
+\tl{mala}
+
+
+\tl{stand.}
+
+\tl{pat pet pit}
+
+\tl{pot put paut}
+
+\tl{pait pawt}
+
+\tl{paat piit poet puut}
+
+
+\tl{pooet puet puuet}
+
+
+\tl{pting film}
+
+\tl{Cam Sam Sa
+a
+aa
+i
+ii
+u
+uu
+r
+l
+Ce
+Se
+e
+ai
+Co
+So
+o
+au
+rr
+ll
+Ca
+oe
+ooe
+aw
+ue
+uue
+}
+
+\tl{rkar}
+
+\tl{ma moe
+mooe
+maa
+mi
+mii
+mu
+muu
+mr
+mrr
+mCe
+mSe
+me
+mai
+mCo
+mSo
+mo
+mau
+mPe
+maw
+mCle
+mue
+muue
+ml
+mll
+}
+
+\tl{egbert khimmel 123456789 0}
+
+\tl{mICBma mCBma maANUmaVS haNhaAVA OM maUDmaANUDmaGAmaAC ma D ma DD}	
+
+\tl{Mddm Hym ggajjaGSbbebhbb}
+
+\tl{Mdda Hya}
+
+\tl{phali}
+
+\tl{Rm RRm mR mRR rada rrada}
+
+\tl{Lm LLm mL mLL lada llada lllada}
+
+\tl{felt film flimflam fllan}
+
+\tl{kuul banana sikada}
+
+\bigskip 
+{\fontlat IAST special letters: \iastlat{along
+ilong
+ulong
+rdotbar
+ldot
+ldotbar
+mdot
+hdot
+%cb
+%xxx
+oshort
+eshort
+ashort
+ecb
+ocb
+quote
+ng
+ny
+tdot
+ddot
+ndot
+sacute
+sdot
+kh
+gdot
+rdot
+lbar
+} 
+
+These map internally to: \listalliastpairs
+
+And iastlat mapping: \listalliastlatpairs
+}
+
+
+\bigskip {\fontlat List of independent vowel letters:}
+\listallinitpairs
+
+\bigskip {\fontlat List of vowel signs:} %\translit{ma}
+\listallvspairs
+
+\bigskip {\fontlat Main list:}
+\listallmainpairs
+
+%\fontlat
+\iast{ṭa}
+
+{\fontlat nāgārjunakṛtā paramārcanatriṃśikā}
+
+{
+\Huge
+\iast{nāgārjunakṛtā paramārcanatriṃśikā }
+
+%\includegraphics{nagar}
+
+नागार्जुनकृता परमार्चनत्रिंशिका
+}
+
+---
+
+{\fontlat atha paramārcanatriṃśikā nāgārjunakṛtā .}
+
+{
+\Huge
+
+\iast{atha paramārcanatriṃśikā nāgārjunakṛtā .}
+
+अथ परमार्चनत्रिंशिका नागार्जुनकृता ।
+}
+
+\lid{snānapūjanasamādhibhiḥ kramādyanmahātmabhiravāpyate padam }{स्नानपूजनसमाधिभिः क्रमाद्यन्महात्मभिरवाप्यते पदम् ।}
+
+
+\iast{kt kzwnjt ktzwnj}
+
+{\fontlat {along
+ilong
+ulong
+rdotbar
+ldot
+ldotbar
+mdot
+hdot
+%cb
+%xxx
+oshort
+eshort
+ashort
+ecb
+ocb
+quote
+ng
+ny
+tdot
+ddot
+ndot
+sacute
+sdot
+kh
+gdot
+rdot
+lbar
+} }
+
+
+
+{\fontlat \iastlat{along
+ilong
+ulong
+rdotbar
+ldot
+ldotbar
+mdot
+hdot
+%cb
+%xxx
+oshort
+eshort
+ashort
+ecb
+ocb
+quote
+ng
+ny
+tdot
+ddot
+ndot
+sacute
+sdot
+kh
+gdot
+rdot
+lbar
+} }
+
+
+{\fontlat \iastlat{nalonggalongrjunakrdottalong}}
+
+\translit{paalai vuu frawnsai?}
+
+\fontlat
+\section{Usage}
+
+
+\begin{tabular}{lll}
+\tll{translit}{a maa}
+\tll{iast}{nāgārjunakṛtā}
+\tll{iastlat}{rdotbar}[fontlat][fontlat]
+\end{tabular}
+
+\begin{LTXexample}
+\fontlat
+This is some text:
+\fontdev
+\iast{abc abugida.}
+\end{LTXexample}
+
+Create and use a custom transliteration \textit{xyz}:
+
+\begin{LTXexample}
+\newtranslit{xyz}{x;a
+,t;b
+,amacron;^^^^0101}
+
+\translitxyz{Qwerty x: t: amacron:}
+\end{LTXexample}
+
+
+\end{document}
