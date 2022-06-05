@@ -1,0 +1,2573 @@
+\documentclass{article}
+\usepackage{xparse}
+\usepackage{fontspec}
+
+
+% ===== tikz
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{matrix}
+\usepackage[american]{circuitikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{arrows,shapes}
+\usetikzlibrary{graphs,graphdrawing}
+\usetikzlibrary{patterns}
+\usetikzlibrary{quotes}
+\usepackage{tkz-euclide}
+\usetikzlibrary{intersections,angles}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{decorations.pathmorphing,patterns}
+\usepgfmodule{nonlineartransformations}
+\usetikzlibrary{fit}
+\usetikzlibrary{decorations.text,math}
+%\usepackage{tikz-dimline}
+\usepackage{tikz-cd}
+%
+\usegdlibrary{circular,layered}
+%
+\usepackage{pgfplots}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{statistics}
+%\usepackage{pst-eucl, multido}
+%
+\usepackage    {siunitx}
+\usepackage{pifont} % scissors: \ding{34}
+
+\usepackage{graphicx,lipsum}
+\usepackage{wrapfig}
+
+%\usepackage{musixtex,stackengine}
+\usepackage{tabularx}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{tabularray}
+\usepackage{tcolorbox}
+%\usepackage{pst-node}
+%%\usepackage{pgfplots}
+%%\usepgfplotslibrary{fillbetween}
+
+%\usepackage[table,xcdraw,svgnames]{xcolor}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{eso-pic}
+\usepackage{romanbar}
+%\usepackage[most,breakable]{tcolorbox}
+\usetikzlibrary{shapes.arrows}%,calc,fit}% <-- added fit
+\usepackage{fourier}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{language=[LaTeX]TeX,
+  basicstyle=\small\ttfamily}
+\usepackage{xhfill}% http://ctan.org/pkg/xhfill
+
+
+
+
+
+
+% +++++
+\newcommand\spiral{}% Just for safety so \def won't overwrite something
+\def\spiral[#1](#2)(#3:#4:#5){% \spiral[draw options](placement)(end angle:revolutions:final radius)
+\pgfmathsetmacro{\domain}{pi*#3/180+#4*2*pi}
+\draw [#1,thick,shift={(#2)}, domain=0:\domain,variable=\t,smooth,samples=int(\domain/0.08)] plot ({\t r}: {#5*\t/\domain})
+}
+% ===== 
+
+
+
+\ExplSyntaxOn
+
+
+\int_new:N \l_tlipsum_randompar_int 
+\int_new:N \g_tlipsum_parcount_int 
+%\int_new:N \c_one_int 
+%\int_set:Nn \c_one_int { 1 }
+\int_new:N \c_two_int 
+\int_set:Nn \c_two_int { 2 }
+\int_new:N \l_tlipsum_loopstart_int
+\int_new:N \l_tlipsum_loopstop_int
+
+\tl_new:N \l_tlipsum_mytemp_tl 
+\seq_new:N \l_tlipsum_mytemp_seq
+\tl_new:N \l_tlipsum_mytempa_tl 
+\tl_new:N \l_tlipsum_mytempb_tl 
+
+
+%======================
+%the attribution:
+\newcommand\assigntikzlipsuma[2]{
+	\expandafter\newcommand\csname tikzlipsumattr#1\endcsname{{\color{blue}#2}}
+}
+
+%======================
+%the text of the citation:
+\newcommand\assigntikzlipsumt[2]{
+	\expandafter\newcommand\csname tikzlipsumcite#1\endcsname{#2}
+}
+
+%======================
+%define attribution and citation:
+\NewDocumentCommand{ \setuptikzlipsum } { m +m } {
+	\int_gincr:N \g_tlipsum_parcount_int
+	\assigntikzlipsuma{ \int_use:N \g_tlipsum_parcount_int } { #1 }
+	\assigntikzlipsumt{ \int_use:N \g_tlipsum_parcount_int } { #2 }
+}
+
+
+%======================
+%citation:
+\newcommand\tlipsumprintapar[1]{
+						\cs:w tikzlipsumcite#1\cs_end:\par
+						\tlipsuma{#1}
+}
+
+
+%======================
+\NewDocumentCommand{ \tlipsum } { O{1} } {
+
+			\tl_set:Nn 
+							\l_tlipsum_mytemp_tl 
+							{#1}
+			\seq_set_split:NnV
+							\l_tlipsum_mytemp_seq
+							{-}
+							{ \l_tlipsum_mytemp_tl }
+
+%>>		\seq_count:N 
+%							\l_tlipsum_mytemp_seq
+%<<							
+		\int_compare:nNnTF
+							{ \seq_count:N 
+										\l_tlipsum_mytemp_seq
+										}
+										=
+										{ \c_one_int }
+					{
+						\tlipsumprintapar{#1}
+					}
+					{
+		\int_compare:nNnT % two only
+							{ \seq_count:N 
+										\l_tlipsum_mytemp_seq
+										}
+										=
+										{ \c_two_int }
+					{
+					
+						\seq_pop_left:NN
+										\l_tlipsum_mytemp_seq
+										\l_tlipsum_mytempa_tl 
+						\seq_pop_left:NN
+										\l_tlipsum_mytemp_seq
+										\l_tlipsum_mytempb_tl 
+%					\tl_use:N \l_tlipsum_mytempa_tl
+%					~
+%					\tl_use:N \l_tlipsum_mytempb_tl
+%					:~
+%					a ~ range
+					\int_set:Nn 
+									\l_tlipsum_loopstart_int 
+									{ \tl_use:N \l_tlipsum_mytempa_tl 	}
+					\int_set:Nn 
+									\l_tlipsum_loopstop_int					
+									{ \tl_use:N \l_tlipsum_mytempb_tl 	}
+									
+							\int_compare:nNnTF
+							{ \tl_use:N \l_tlipsum_mytempa_tl 	}
+										<
+							{ \tl_use:N \l_tlipsum_mytempb_tl 	}
+					{ %less than
+					\int_step_function:nnnN 
+							{ \l_tlipsum_loopstart_int } 
+							{ 1 } 
+							{ \l_tlipsum_loopstop_int } 
+							\tlipsumprintapar
+					}
+					{ %greater than
+					\int_step_function:nnnN 
+							{ \l_tlipsum_loopstart_int } 
+							{ -1 } 
+							{ \l_tlipsum_loopstop_int } 
+							\tlipsumprintapar
+													
+					}
+					
+					}					
+					}
+}
+
+
+%======================
+%random citation:
+\NewDocumentCommand{ \tlipsumr } {  } {
+ \int_set:Nn 
+ 				\l_tlipsum_randompar_int 
+ 				{ \int_rand:n { \int_use:N \g_tlipsum_parcount_int} }
+	\tlipsum [ \int_use:N \l_tlipsum_randompar_int ]
+}
+
+
+%======================
+%random citations:
+\NewDocumentCommand{ \tlipsumrr } {  } {
+% \int_set:Nn 
+% 				\l_tlipsum_randompar_int 
+% 				{ \int_rand:n { \int_use:N \g_tlipsum_parcount_int} }
+	\tlipsum [
+										 \int_rand:n { \int_use:N \g_tlipsum_parcount_int } 
+										 -
+										 \int_rand:n { \int_use:N \g_tlipsum_parcount_int }
+											]
+}
+
+%======================
+%attribution:
+\NewDocumentCommand{ \tlipsuma } { m } {
+	\cs:w tikzlipsumattr#1\cs_end: (#1)\par
+}
+
+
+%======================
+\NewDocumentCommand{ \tlipsummaxparcount } { } {
+	\int_use:N \g_tlipsum_parcount_int
+}
+
+
+
+
+
+
+
+%****************************************************
+%* slipsum main commands
+%****************************************************
+%--------------------
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ cno }
+%--------------------
+
+\int_new:N \g_slipsum_parcount_int 
+\int_new:N \l_slipsum_randompar_int 
+\int_new:N \l_slipsum_randomitem_int 
+
+%======================
+\NewDocumentCommand{ \firstitem } { } {
+	\int_use:N \c_one_int
+}
+
+%======================
+\NewDocumentCommand{ \slipsummaxparcount } { } {
+	\int_use:N \g_slipsum_parcount_int
+}
+
+
+\NewDocumentCommand { \athing } { } { <xxx>
+}
+
+
+
+
+\NewDocumentCommand { \slipsumloadaseq } { o m +m } { 
+% 1=namespace
+% 2=seq name
+% 3=data
+
+				
+%	namespace
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_slipsum_namespace_tl } 
+						{ \tl_gset:Nn \g_slipsum_namespace_tl { #1 } }
+
+%  each namespace/groupspace has its own counter
+	\cs_if_free:cT
+			{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _int }
+			{ 
+				\int_new:c
+						{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _int } 
+			}
+
+%  increment the counter
+			\int_gincr:c
+						{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _int } 
+
+%  store the counter value
+			\tl_set:Nx
+					\l_tmpa_tl
+					{ 
+						\int_use:c
+							{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _int }  
+					}
+%\tl_show:N
+%					\l_tmpa_tl
+
+
+%  create the sequence
+	\cs_if_free:cT
+			{ g_slipsum_rwe \g_slipsum_namespace_tl #2\l_tmpa_tl _seq }
+			{ \seq_new:c
+						{ g_slipsum_rwe \g_slipsum_namespace_tl #2\l_tmpa_tl _seq } 
+			}
+			
+%	clear it		
+	\seq_gclear:c 
+		{ g_slipsum_rwe \g_slipsum_namespace_tl #2\l_tmpa_tl _seq } 
+
+%  populate it
+	\seq_gset_split:cno 
+			{ g_slipsum_rwe \g_slipsum_namespace_tl #2\l_tmpa_tl _seq } 
+			{ . } 
+			{ #3 }
+
+%	\seq_show:c 
+%			{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _seq } 
+
+
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+ \tl_new:N 
+ 				\l_mytmpa_tl
+%--------------------
+\NewDocumentCommand { \slipsumprintitem } { o m m } { 
+% 1=namespace
+% 2=seq name
+% 3=item number
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_slipsum_namespace_tl } 
+						{ \tl_gset:Nn \g_slipsum_namespace_tl { #1 } }
+
+
+		\int_set:Nn \l_tmpa_int { #3 } 
+
+% \int_show:N 
+% 				\l_tmpa_int
+% \tl_show:N 
+% 				\l_tmpa_tl
+% \tl_show:N 
+% 				\l_tmpb_tl
+
+%			\group_begin:				
+%			\exp_args:Nx
+%			\seq_map_function:cN 
+%					{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _seq } 
+%					\sl_funcprintitem:n
+%		\group_end:
+
+	\tl_set:Nx 
+		\l_mytmpa_tl 
+		{ 
+			\seq_item:cn
+			{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _seq }
+			{ \int_use:N \l_tmpa_int }
+		}
+
+% \tl_show:N 
+% 				\l_mytmpa_tl
+
+	\tl_use:N 
+		\l_mytmpa_tl 
+		.
+% (#1/#2/#3)
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \slipsumprintitemr } { o m } { 
+% 1=namespace
+% 2=group space (first part of) seq name
+
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_slipsum_namespace_tl } 
+						{ \tl_gset:Nn \g_slipsum_namespace_tl { #1 } }
+
+	%random par num
+ \int_set:Nn 
+ 				\l_slipsum_randompar_int 
+ 				{ 
+ 						\int_rand:n 
+ 							{ 
+ 									\int_use:c
+											{ g_slipsum_rwe \g_slipsum_namespace_tl #2 _int } 							}
+					}
+	
+					
+%	\tlipsum [ \int_use:N \l_tlipsum_randompar_int ]
+ \tl_set:Nx 
+ 				\l_tmpa_tl
+ 				{ \int_use:N \l_slipsum_randompar_int }
+	
+
+
+	%random item step 1: num items in seq
+ \int_set:Nn 
+ 				\l_tmpa_int 
+ 				{ 
+ 					\seq_count:c 
+ 							{ g_slipsum_rwe \g_slipsum_namespace_tl #2\l_tmpa_tl _seq } 
+ 				 }
+ 				 
+% \tl_show:N 
+% 				\l_tmpa_tl
+% \int_show:N 
+% 				\l_tmpa_int 
+ 				 
+	%random item step 2: the random item
+
+ \int_set:Nn 
+ 				\l_slipsum_randomitem_int 
+ 				{ \int_rand:n { \int_use:N \l_tmpa_int } }
+
+ \tl_set:Nx 
+ 				\l_tmpb_tl
+ 				{ \int_use:N \l_slipsum_randomitem_int }
+
+ \tl_put_left:Nn 
+ 				\l_tmpa_tl
+ 				{ #2 }
+
+% \tl_show:N 
+% 				\l_tmpa_tl
+% \tl_show:N 
+% 				\l_tmpb_tl
+% \tl_show:N 
+% 				\g_slipsum_namespace_tl
+
+	% call the random item
+% 1=namespace
+% 2=group space name
+% 3=item number	
+%	\exp_args:Nxxx
+%		\slipsumprintitem[ \tl_use:N \g_slipsum_namespace_tl ]
+%		{ \tl_use:N \l_tmpa_tl }
+%		{ \tl_use:N \l_tmpb_tl }
+%%	>>		[ \tl_use:N \g_slipsum_namespace_tl ]
+%%			\{ \tl_use:N \l_tmpa_tl \}
+%%			\{ \tl_use:N \l_tmpb_tl \}<<
+		\slipsumprintitem 
+		[ #1 ] 
+		{ \tl_use:N \l_tmpa_tl } 
+		{ \tl_use:N \l_tmpb_tl }
+
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+\int_new:N \l_slipsum_numpars_int
+\int_new:N \l_slipsum_maxsent_int
+\int_new:N \l_slipsum_looppars_int
+\int_new:N \l_slipsum_loopsent_int
+\int_new:N \l_slipsum_numloopsent_int
+%--------------------
+\NewDocumentCommand { \slipsumprintitemrr } { o m m m } { 
+% 1=namespace
+% 2=group space (first part of) seq name
+% 3=num pars
+% 4=max num sentences per par
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_slipsum_namespace_tl } 
+						{ \tl_gset:Nn \g_slipsum_namespace_tl { #1 } }
+
+ \int_set:Nn 
+ 				\l_slipsum_numpars_int 
+ 				{ #3 }
+
+ \int_set:Nn 
+ 				\l_slipsum_maxsent_int 
+ 				{ #4 }
+
+	\int_set:Nn \l_slipsum_looppars_int { 1 }
+
+		\int_do_until:nNnn
+		{ \l_slipsum_looppars_int } > { \l_slipsum_numpars_int }
+		{
+				%-----
+				\int_set:Nn 
+							\l_slipsum_loopsent_int
+							{ 1 }
+				 \int_set:Nn 
+ 							\l_slipsum_numloopsent_int
+ 							{ \int_rand:n { \int_use:N \l_slipsum_maxsent_int  } }
+
+					\int_do_until:nNnn
+							{ \l_slipsum_loopsent_int } 
+							> 
+							{ \l_slipsum_numloopsent_int }
+							{
+								%=====
+									\slipsumprintitemr 
+											[ #1 ] 
+											{ #2 } 
+											\space
+								%=====
+								\int_incr:N \l_slipsum_loopsent_int
+							}	
+				%-----
+			\tex_par:D
+    \int_incr:N \l_slipsum_looppars_int
+		}
+
+
+}
+
+
+
+
+
+
+
+
+\ExplSyntaxOff
+
+
+
+
+
+%The texts:
+
+\setuptikzlipsum
+{ --- Skillmon: https://tex.stackexchange.com/questions/615054/how-can-i-draw-this-diagram-with-circle-rectangle-arrows }
+{
+\begin{tikzpicture}
+  \path
+    node[circle,draw,text width=6em,align=center]    (main){main}
+    (main.east)    ++(0.25,0) node[anchor=west]      (b)   {balance}
+    (b.north west) ++(0, 0.1) node[anchor=south west](w)   {withdraw}
+    (b.south west) ++(0,-0.1) node[anchor=north west](t)   {transfer}
+    ;
+  \draw[fill=darkgray]
+    (w.north east)      ++(.5, .5) coordinate(rtl)
+    (rtl|-t.south east) ++(.5,-.5) coordinate(rbr) rectangle (rtl)
+    ;
+  \path
+    (rbr) -- node[below]{Wall} (rtl|-rbr)
+    (rbr|-main) ++(2,0)
+    node[circle,draw,text width=6em,align=center](data){bank Account data}
+    (rtl)      ++(-1,0) node[anchor=south east,font=\bfseries]{Public}
+    (rtl-|rbr) ++( 1,0) node[anchor=south west,font=\bfseries]{Private}
+    ;
+  \foreach\x in{b,w,t}
+    \draw[->] (\x-|w.east) -- (\x-|data.west);
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Juan Castaño: https://tex.stackexchange.com/questions/615032/draw-zodiac-sign-leo }
+{
+\begin{tikzpicture}[line width=2mm]
+  \draw (0,0) circle (1);
+  \draw (30:1) to[out=120,in=270] (0.5,2) to[out=90,in=180] (1.5,3) to[out=0,in=90] (2.5,2) to [out=270,in=180] (2.5,-2) arc (270:315:1);
+\end{tikzpicture}
+}
+
+
+\setuptikzlipsum
+{ --- leandriis: https://tex.stackexchange.com/questions/615013/top-alignment-of-three-minipages-while-inserting-tikz-images }
+{
+\begin{figure}
+
+\begin{minipage}[c]{.45\linewidth}
+\centering
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}[c]{.1\linewidth}
+\centering
+\begin{tikzpicture}
+ \draw[dash pattern=on 3pt off 6pt] (0,0.0) -- (0,8);
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}[c]{.45\linewidth}
+\centering
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+
+\vspace*{1cm}
+
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A)              {A};
+  \node[pool] (B) [right=of A] {B};
+  \draw [<->] (A) -- (B);
+\end{tikzpicture}
+\end{minipage}
+
+\caption{Numerous images.}
+
+\end{figure}
+
+
+\begin{figure}
+
+\centering
+\begin{tikzpicture}[
+  pool/.style={
+    circle, draw=blue!50, fill=blue!20, thick,
+    inner sep=0pt, minimum size=10mm
+  }
+]
+  \node[pool] (A1)               {A};
+  \node[pool] (B1) [right=of A1] {B};
+  \draw [<->] (A1) -- (B1);
+
+  \node[pool] (A2) [below=of A1] {A};
+  \node[pool] (B2) [right=of A2] {B};
+  \draw [<->] (A2) -- (B2);
+  
+  \node[pool] (A3) [below=of A2] {A};
+  \node[pool] (B3) [right=of A3] {B};
+  \draw [<->] (A3) -- (B3);
+
+  \node[pool] (A4) [below=of A3] {A};
+  \node[pool] (B4) [right=of A4] {B};
+  \draw [<->] (A4) -- (B4);
+
+  \node[pool] (A5) [right=3cm of B1] {A};
+  \node[pool] (B5) [right=of A5] {B};
+  \draw [<->] (A5) -- (B5);
+
+  \node[pool] (A6) [below=of A5] {A};
+  \node[pool] (B6) [right=of A6] {B};
+  \draw [<->] (A6) -- (B6);
+  
+  \node[pool] (A7) [below=of A6] {A};
+  \node[pool] (B7) [right=of A7] {B};
+  \draw [<->] (A7) -- (B7);
+
+  \node[pool] (A8) [below=of A7] {A};
+  \node[pool] (B8) [right=of A8] {B};
+  \draw [<->] (A8) -- (B8); 
+
+  
+  \node (C1) at ($(B1.north)!0.5!(A5.north)$) {};
+  \node (C2) at ($(B4.south)!0.5!(A8.south)$) {};
+  \draw[dash pattern=on 3pt off 6pt] (C1) -- (C2); 
+\end{tikzpicture}
+
+\caption{Numerous images.}
+
+\end{figure}
+}
+
+\setuptikzlipsum
+{ --- leandriis: https://tex.stackexchange.com/questions/615028/backwards-arrows }
+{
+    \tikzset{main node/.style={circle, draw,minimum size=1cm,inner sep=01pt}}
+    \tikzset{outer node/.style={thin, black, rectangle, rounded corners, fill=white,draw,minimum width=2.25cm,minimum height = .75cm}}
+    \newcommand{\ff}{2.5cm}
+\begin{tikzpicture}
+  \node[main node] (1) {Center};
+  \foreach \a/\t in {0/Text, 30/Text, 60/Text, 120/Text, 150/Text, 180/Text}
+    \draw[-{Triangle[width=9pt,length=8pt]}, line width=4.5pt] (\a:\ff) node[outer node]{\t} to (1);           
+    \node(2)[outer node, below=1.5cm of 1]{Text};
+    \node(3)[outer node, below=1cm of 2]{TExt};
+    \draw[-{Triangle[width=9pt,length=8pt]}, line width=4.5pt] (1) -- (2) {} ;
+    \draw[-{Triangle[width=9pt,length=8pt]}, line width=4.5pt] (2)--(3) {} ;
+\end{tikzpicture}    
+}
+
+%\setuptikzlipsum
+%{ --- CarLaTeX: https://tex.stackexchange.com/questions/614982/array-cells-lose-balance-with-tikz }
+%{
+%\begin{figure}[!h]
+%\centering
+%\begin{tikzpicture} [nodes in empty cells,
+%      nodes={minimum size=10mm, text height=1.6ex, text depth=.4ex},
+%      row sep=-\pgflinewidth, column sep=-\pgflinewidth]
+%      border/.style={draw}
+%    
+%      \matrix(vector)[matrix of nodes,
+%          row 2/.style={nodes={draw=none, minimum width=0.4cm}},
+%          nodes={draw}]
+%      {
+%          $a_i$ & $4$ & $7$ & |[fill=lightgray, font=\itshape]|italic & \textbf{bold text} & $a[0]$ \\
+%          \small{i} & \small{0} & \small{1} & \small{2} & \small{3} & \small{4} \\
+%      };
+%\end{tikzpicture}
+%\caption{my caption}
+%\label{fig:arrayx}
+%\end{figure}
+%}
+
+
+\setuptikzlipsum
+{ --- Skillmon: https://tex.stackexchange.com/questions/614980/how-to-correctly-draw-an-amplifier-in-tikz }
+{
+\begin{tikzpicture}
+  \draw
+    (0,0) coordinate(vp-)
+      to[short,o-o] ++(1,0)   coordinate(vn-)
+      to[short,-*]  ++(2,0)   coordinate(gnd)
+    node[ground]{}
+      to[short,-*]  ++(1.2,0) coordinate(vcc)
+      to[short,-o]  ++(2,0)   coordinate(vo-)
+    (gnd)
+      to[battery,-o,v=$-V_{\mathrm{CC}}$] ++(0,1.5)
+      to[short,i_=$I_{\mathrm{C}-}$]      ++(0,0.5)
+    node[op amp, yscale=-1, anchor=up](amp){}
+    (amp.down)
+      to[short,-o,i<_=$I_{\mathrm{C}+}$]  ++(0,0.5)
+      to[short] ++(0,0.2) coordinate(tmp)
+      to[short] (tmp-|vcc)
+      to[battery,v=$+V_{\mathrm{CC}}$]   (vcc)
+    (amp.+)
+      to[short,-o, i<_=$i_{\mathrm{P}}$] (amp.+-|vp-)
+      to[open, v=$v_{\mathrm{P}}$]       (vp-)
+    (amp.-)
+      to[short,-o, i<_=$i_{\mathrm{N}}$] (amp.--|vn-)
+      to[open, v=$v_{\mathrm{N}}$]       (vn-)
+    (amp.out)
+      to[short,-o, i=$i_{\mathrm{O}}$]   (amp.out-|vo-)
+      to[open, v^=$v_{\mathrm{O}}$]      (vo-)
+    ;
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Black Mild: https://tex.stackexchange.com/questions/614900/tikz-create-a-double-edged-rectangle-for-subroutine-blocks }
+{
+\begin{tikzpicture}
+\tikzset{subroutine/.style={
+        rectangle split, rectangle split horizontal,
+        rectangle split parts=3, 
+        draw, minimum width=3cm,
+        minimum height=1.2cm,
+        outer sep=0}}   
+\path 
+(0,0) node[subroutine] {\nodepart{two}subroutine\nodepart{three}}
+(0,-1.5) node[subroutine,fill=yellow] {\nodepart{two}routine\nodepart{three}}
+;
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Lukas (+Sandy G): https://tex.stackexchange.com/questions/614898/tikz-arrow-points-in-wrong-direction }
+{
+\begin{tikzpicture}
+        % x-Achse
+        \draw [->] (-0.5,0) -- (9,0)% Linie
+            node [right] {Preis};% Label
+        % y-Achse
+        \draw [->] (0,-0.5) -- (0,9)% Linie
+            node [above] {Menge};% Label
+        % Graph
+        \draw (0,8) -- (3,7)% Linie 1
+            node [midway, above, sloped] {Nachfrage};% Label
+        \draw [teal] (3,7) -- (5,1)% Linie 2
+            node [teal, midway, right] {monopolistischer Bereich};% Label
+        \draw (5,1) -- (8,0);% Linie 3
+        % Menge
+        \draw [teal, dashed] (5,1) -- (5,0)% Linie
+            node [below] (M1) {\(M_1\)};% Label
+        \draw [teal, dashed] (3,7) -- (3,0)% Linie
+            node [below] (M2) {\(M_2\)};% Label
+        \draw [->, teal] (M1) -- (M2);
+        \draw [red, dashed] (1.5,7.5) -- (1.5,0)% Linie
+            node [below] (M3) {\(M_3\)};% Label
+        \draw [->, red] (M2) -- (M3);
+        % Preise
+        \draw [teal, dashed] (5,1) -- (0,1)% Linie
+            node [left] (P1) {\(P_1\)};% Label
+        \draw [teal, dashed] (3,7) -- (0,7)% Linie
+            node [left] (P2) {\(P_2\)};% Label
+        \draw [->, teal] (P1) -- (P2);
+        \draw [red, dashed] (1.5,7.5) -- (0,7.5)% Linie
+            node [left] (P3) {\(P_3\)};% Label
+%        \draw [->, red] (P2) -- (P3);
+\draw [->, red, shorten >=1.5mm, shorten <=2mm] (P2.center) -- (P3.center);
+    \end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Sigur: https://tex.stackexchange.com/questions/614895/how-can-i-get-the-12th-node-aligned-and-size-the-rest-properly }
+{
+\begin{tikzpicture}
+  \graph[
+    simple necklace layout,
+    node distance = 1cm,
+    nodes={circle,draw,minimum width=1cm}, % <-- added here
+    layered layout,
+    horizontal=1 to 3
+  ]
+  {
+    1->2->3->1;
+    3--4;
+    4->5->6->4;
+    6--7;
+    7->8->9->7;
+    9--10;
+    10->11->12[nudge down=5mm]->10;  % <-- added here
+    12--[bend right]11;
+  };
+\end{tikzpicture}
+}
+
+
+\setuptikzlipsum
+{ --- Bob: https://tex.stackexchange.com/questions/614845/plotting-in-polar-coordinates }
+{
+\begin{tikzpicture}
+\begin{polaraxis}
+    \addplot+[mark=none,domain=0:85,samples=600,color=black] 
+    {4*tan(x)*sec(x)}; 
+    \addplot+[mark=none,domain=95:175,samples=600,color=black] 
+    {4*tan(x)*sec(x)}; 
+% equivalent to (x,{sin(..)cos(..)}), i.e.
+% the expression is the RADIUS
+\end{polaraxis}
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- SebGlav: https://tex.stackexchange.com/questions/614827/fill-under-a-normal-distribution }
+{
+\tikzset{declare function={myGauss(\x,\y,\z)=exp(-(\x-\y)*(\x-\y)/(\z*\z));}}
+% this is a Gaussian centered at \y with a width controlled by \z
+    \begin{tikzpicture}
+        \def\mygaussian{plot[domain=0:5,variable=\x,samples=100] ({\x},{myGauss(\x,4.24,0.43)})}
+        \fill[cyan] (0,0)  \mygaussian -- (5,0) -- cycle ;
+        \draw \mygaussian;
+        
+        \draw [thick] (0,0)--(5,0);
+        \foreach \x in {0,...,5}
+        \draw[xshift=\x cm, thick] (0pt,-1pt)--(0pt,1pt) node[below] {$\x$};
+        
+    \end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- hpekristiansen: https://tex.stackexchange.com/questions/614826/plot-straight-lines-with-pgfplots-using-polaraxis-with-legend }
+{
+%\pgfplotsset{compat=1.18}
+ \begin{tikzpicture}
+    \begin{polaraxis}[
+        no marks,samples=1000,xmin=0,xmax=90,ymin=0,ymax=1,xtick = {0,22.5,45,68.5},xticklabels={,,},ytick={0,1},
+        major tick length=0pt,legend style={at={(0.9,0.9)},font=\footnotesize},
+        yticklabel style={anchor=north}
+        ] 
+        \addplot[domain=-1:0.2, data cs = polarrad,draw=blue, thick]   {0.01*exp(x/0.031)};
+        \addlegendentry{ blue legend};
+        \draw[red,thick] (0,0) -- (1:60);
+        \addlegendimage{line legend, red, thick};
+        \addlegendentry{red legend};
+        \addplot[red, thick] coordinates{(0,0) (60,1)};
+    \end{polaraxis}
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Bilal: https://tex.stackexchange.com/questions/614822/how-to-hatch-boxplot-in-tikz }
+{
+\begin{tikzpicture}
+  \begin{axis}
+    [
+    boxplot/draw direction=y,
+    ylabel={Time (minutes)},
+    height=6cm,
+    width=6cm,
+    ymin=0,ymax=11,
+    cycle list={{black},{red}},
+    xtick={1,2},
+    xticklabels={Phase 1, Phase 2},
+    ]
+    \addplot+[
+    pattern={north east lines},pattern color=black,
+    fill,fill opacity=0.2,
+    boxplot prepared={
+      median=2.59,
+      upper quartile=3.35,
+      lower quartile=2,
+      upper whisker=4.4,
+      lower whisker=1.1
+    },
+    ] coordinates {};
+    \addplot+[
+    pattern={north east lines},pattern color=red,
+    fill,fill opacity=0.2,
+    boxplot prepared={
+      median=6.57,
+      upper quartile=7.93,
+      lower quartile=5.93,
+      upper whisker=10.68,
+      lower whisker=4.03
+    },
+    ] coordinates {};
+  \end{axis}
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Zarko: https://tex.stackexchange.com/questions/614746/avoid-overlapping-of-the-vertical-line-of-arrow-and-path-label-in-tikz }
+{
+\tikzset{
+LM/.style = {very thin,
+        {Bar[]Stealth}-%
+        {Stealth[]Bar}
+            },
+% other common sty definitions like
+every edge quotes/.append style= {font=\footnotesize}
+        }
+\begin{tikzpicture}
+    \draw [LM] (0,0) to ["$B=10$"] (1,0);
+\end{tikzpicture}
+}
+
+%\setuptikzlipsum
+%{ --- hpekristiansen: https://tex.stackexchange.com/questions/614746/avoid-overlapping-of-the-vertical-line-of-arrow-and-path-label-in-tikz }
+%{
+%\begin{tikzpicture}
+%\dimline[extension start length=0 cm, extension end length=0 cm,label style={above=0.5ex}] { (0,-0.85)} {(1,-0.85)}{$B = 10$};
+%\end{tikzpicture}
+%}
+
+
+\setuptikzlipsum
+{ --- hpekristiansen: https://tex.stackexchange.com/questions/614730/fill-the-area-between-two-arcs-and-x-axis-between-two-circles }
+{
+\begin{tikzpicture}[scale=0.5]%9
+%frames
+\draw[thick,->] (0,0) coordinate (origin) -- (23,0) coordinate (a1) node[right]{$x$}; % x-axis
+\draw[thick,->] (origin) -- (0,20) coordinate (a2) node[above]{$y$}; % y-axis
+\draw[name path=lline,thick] (origin) -- (60:22.25) coordinate (a3) node[anchor=south west]{$l$}; % l-line
+
+%circle 1
+\coordinate (CC1) at (1.7299,1){};
+\coordinate[label={[red]below:$C_1$}] (C1) at (1.7299,0){};
+\tkzDrawPoint[red,scale=2pt](CC1)
+\tkzDrawCircle[name path=circle1,red](CC1,C1);
+\draw[thick,red](C1)--(CC1) node[right,pos=.5]{1};
+\draw[name intersections={of=lline and circle1}] (intersection-1) coordinate (A1);
+\draw[thick,red](A1)--(CC1) node[above,pos=.5]{1};
+
+%circle 2
+\coordinate (CC2) at (5.19690701,3){};
+\coordinate[label={[blue]below:$C_2$}] (C2) at (5.19690701,0){};
+\tkzDrawPoint[blue,scale=2pt](CC2)
+\tkzDrawCircle[name path=circle2,blue](CC2,C2);
+\draw[thick,blue](C2)--(CC2) node[right,pos=.5]{3};
+\draw[name intersections={of=lline and circle2}] (intersection-1) coordinate (A2);
+\draw[thick,blue](A2)--(CC2) node[above,pos=.5]{3};
+
+%% circle 1 and circle 2 point of contact
+\draw[name intersections={of=circle1 and circle2}] (intersection-1) coordinate (A3);
+
+%fill
+\begin{scope}
+\clip (CC1) circle[radius=1] (CC1) -- (CC2) -- (C2) -- (C1);
+\clip (CC2) circle[radius=3] (CC1) -- (CC2) -- (C2) -- (C1);
+\fill[magenta] (CC1) -- (CC2) -- (C2) -- (C1);
+\end{scope}
+
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Jasper Habicht: https://tex.stackexchange.com/questions/614730/fill-the-area-between-two-arcs-and-x-axis-between-two-circles }
+{
+\begin{tikzpicture}[scale=0.5]%9
+%frames
+\draw[name path=xline,thick,->] (0,0) coordinate (origin) -- (23,0) coordinate (a1) node[right]{$x$}; % x-axis
+\draw[thick,->] (origin) -- (0,20) coordinate (a2) node[above]{$y$}; % y-axis
+\draw[name path=lline,thick] (origin) -- (60:22.25) coordinate (a3) node[anchor=south west]{$l$}; % l-line
+
+%circle 1
+\coordinate (CC1) at (1.7299,1){};
+\coordinate[label={[red]below:$C_1$}] (C1) at (1.7299,0){};
+\tkzDrawPoint[red,scale=2pt](CC1)
+\tkzDrawCircle[name path=circle1,red](CC1,C1);
+\draw[thick,red](C1)--(CC1) node[right,pos=.5]{1};
+\draw[name intersections={of=lline and circle1}] (intersection-1) coordinate (A1);
+\draw[thick,red](A1)--(CC1) node[above,pos=.5]{1};
+
+%circle 2
+\coordinate (CC2) at (5.19690701,3){};
+\coordinate[label={[blue]below:$C_2$}] (C2) at (5.19690701,0){};
+\tkzDrawPoint[blue,scale=2pt](CC2)
+\tkzDrawCircle[name path=circle2,blue](CC2,C2);
+\draw[thick,blue](C2)--(CC2) node[right,pos=.5]{3};
+\draw[name intersections={of=lline and circle2}] (intersection-1) coordinate (A2);
+\draw[thick,blue](A2)--(CC2) node[above,pos=.5]{3};
+
+%% circle 1 and circle 2 point of contact
+\draw[name intersections={of=circle1 and circle2}] (intersection-1) coordinate (A3);
+
+%section color
+\tkzGetPointCoord(A3){Aiii}
+\tkzGetPointCoord(C2){Cii}
+\tkzCalcLength[cm](C1,CC1)\tkzGetLength{rCi}  % or use `1` directly
+\tkzCalcLength[cm](C2,CC2)\tkzGetLength{rCii} % or use `3` directly
+\fill[purple] (C1) arc (-90:{atan(\Aiiiy/\Aiiix)}:\rCi) arc ({atan(\Aiiiy/\Aiiix)+180}:270:\rCii) -- cycle;
+
+%\fill[red] (5,0.10) circle (2pt) (3.5,0.81) circle (2pt);
+\end{tikzpicture}
+}
+
+
+
+\setuptikzlipsum
+{ --- Juan Castaño: https://tex.stackexchange.com/questions/614730/fill-the-area-between-two-arcs-and-x-axis-between-two-circles }
+{
+\begin{tikzpicture}[line cap=round,line join=round]
+% axes, tangent
+\draw (0,6) |- (8,0);
+\draw (0,0) -- (60:7);
+% circles
+\foreach\i/\j in {1/red,2/blue}
+{
+  \pgfmathtruncatemacro\r{2*\i-1} % circle radius
+  \pgfmathsetmacro\x{\r/tan(30)}  % circle center x
+  \coordinate (T\i) at (\x,0);    % tangent point (below) 
+  \coordinate (C\i) at (\x,\r);   % center
+  \draw[\j,fill=white] (C\i) circle (\r);
+  \fill[\j] (C\i) circle (1pt);
+  \draw[\j] (60:\x) -- (C\i) node [midway, above] {$\r$} -- (T\i) 
+                             node [midway, right] {$\r$} node [below] {$C_\i$}; 
+}
+% filling (two options, comment one of them)
+\begin{scope}[on background layer]
+\fill[magenta] (T1) -- (C1) -- (C2) -- (T2) -- cycle;         % fills a trapecium behind the circles
+%\fill[green]   (T1) arc (-90:30:1) arc (210:270:3) -- cycle;  % fills exactly the desired area
+\end{scope}
+\end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- SebGlav: https://tex.stackexchange.com/questions/614630/line-below-the-figure }
+{
+\tikzset{
+    measure/.style = {thin,
+            {Bar[width=2.2mm]Latex[]}-%
+            {Latex[]Bar[width=2.2mm]},
+                }
+    }
+\begin{tikzpicture}[thick,font=\sffamily]
+        \def\angleI{10} % tilt angle
+        \def\angleB{42} % B angle
+        \def\a{6}
+        
+        \pgfmathsetmacro\b{0.5*\a/cos(\angleB)}
+        \path   (0,0) coordinate (B) 
+                (\angleI:\a) coordinate (C)
+                ($(B)+(\angleI+\angleB:\b)$) coordinate (A)
+                ($(B)!0.5!(C)$) coordinate (H);
+        \draw   (A) node[above]{A} -- (B) node[midway,sloped,red]{\large $|$}  node[left]{B} -- (C) node[near end,above,cyan]{y} node[right]{C} -- (A) node[midway,sloped,red]{\large $|$} -- cycle
+                (A) -- (H) node[midway,right,cyan]{z} ;
+        \draw[red] pic [draw,angle radius=3mm] {right angle=A--H--B};
+        
+        \draw[purple] pic [draw] {angle=C--B--A} node [xshift=8mm,yshift=4mm] at (B) {\angleB$^\circ$};
+        
+        \draw[measure,cyan]  ($(B)!5mm!-90:(C)$) -- ($(C)!5mm! 90:(B)$) node[midway,sloped,fill=white]{120};
+    \end{tikzpicture}
+}
+
+\setuptikzlipsum
+{ --- Roland: https://tex.stackexchange.com/questions/614630/line-below-the-figure }
+{
+\newcommand{\decoRule}{\rule{\textwidth}{0.6pt}}
+\begin{tikzpicture}[scale=0.3,line join=round]
+\def\yb{13}
+\def\ac{42} % angle C
+\pgfmathsetmacro\x{\yb*tan(\ac)}
+\pgfmathsetmacro\h{\yb/cos(\ac)} % hypothenuse
+\coordinate [label=below:$\textcolor{white}F$] (A) at (0,0);
+\coordinate [label=above:$\textcolor{white}B$](B) at (0,\yb);
+\coordinate [label=below:$\textcolor{white}G$](C) at (-\yb,0);
+\draw[thick] (A) -- node[right]        {\color{blue} $z$}
+                          (B) -- node[sloped,above] {\color{white}hypotenuse = \num{\h}}
+                          (C) -- node[sloped,below] {\color{white}\text{opposite} $= FG$} cycle;
+                          \draw[thick] (B) -- node[sloped]        {\color{blue}$|$}
+                          (C) -- cycle;
+\def\yt{13}
+\def\ac{42} % angle C
+\pgfmathsetmacro\x{\yb*tan(\ac)}
+\pgfmathsetmacro\h{\yb/cos(\ac)} % hypothenuse
+\coordinate [label=below:$\textcolor{white}F$] (A) at (0,0);
+\coordinate [label=above:$\textcolor{white}B$](D) at (0,\yt);
+\coordinate [label=below:$\textcolor{white}G$](E) at (\yt,0);
+\coordinate [label=below:$\textcolor{white}G$](m) at (\yt,-2cm);
+\coordinate [label=below:$\textcolor{white}G$](n) at (-\yt,-2cm);
+\coordinate [label=below:$\textcolor{blue}{120}$](H) at (0,-2cm);
+\draw[thick] (A) -- node[right]        {\color{blue} $z$}
+                          (D) -- node[sloped,above] {\color{white}hypotenuse = \num{\h}}
+                          (E) -- node[sloped,below] {\color{blue}$y$} cycle;
+                          \draw[thick] (D) -- node[sloped]        {\color{blue}$|$}
+                          (E) -- cycle;
+\draw[thick](m)--(H)--(n)--cycle;
+% angles, with angles library
+\draw[thick] pic [draw] {angle=A--C--B} node [above,xshift=.8cm,yshift=0cm] at (C) {\ang{\ac}};
+\draw[thick] pic [draw,angle radius=4mm] {right angle=B--A--C};
+\end{tikzpicture}\par
+\decoRule
+}
+
+\setuptikzlipsum
+{ --- Roland: https://tex.stackexchange.com/questions/614575/inverted-list-like-structure-in-latex-using-tikz }
+{
+ \begin{tikzpicture}
+        
+        \node (A) at (1.5, 5.5) {};
+        \node (B) at (1.5, 4.5) {};
+        \node (C) at (1.5, 3.5) {};
+        \node (D) at (1.5, 2.5) {};
+        \node (E) at (1.5, 1.5) {};
+        \node (F) at (1.5, 0.5) {};
+        \node (G) at (1.5, -0.5){};
+        
+        \node (A1) at (4.5, 6.5) {A};
+        \node (B1) at (4.5, 5.5) {B};
+        \node (C1) at (4.5, 4.5) {C};
+        \node (D1) at (4.5, 3.5) {D};
+        \node (E1) at (4.5, 2.5) {E};
+        \node (F1) at (4.5, 1.5) {F};
+        \node (G1) at (4.5, 0.5) {G};
+    
+        \draw[->,dashed]
+        (A) edge[bend left]  (A1)
+        (B) edge[bend left]  (B1)
+        (C) edge[bend left]  (C1)
+        (D) edge[bend left]  (D1)
+        (E) edge[bend left]  (E1)
+        (F) edge[bend left]  (F1)
+        (G) edge[bend left]  (G1);
+        
+        
+        
+        \draw[shift={(0,-1)}] (0,0) grid (2,8);
+        \foreach \x in {0,1,...,6} {
+        \fill (1.5,\x-0.5) circle(0.2);
+        }
+
+        \draw[shift={(4,0)}] (0,0) grid (4,8);
+        \foreach \x in {0,1,...,5} {
+        }
+    
+    \end{tikzpicture}
+}
+
+
+\setuptikzlipsum
+{ --- Juan Castaño: https://tex.stackexchange.com/questions/614369/domino-for-maths }
+{
+\begin{tikzpicture}[scale=0.3]
+\draw[dashed] (0,0) -- (-1,0) node [left] {\ding{34}};
+\pic at (0,0)     {domino={$x^2+4x+4=0$}{$(x+1)^2=0$}{0}};
+\pic at (\W,0)    {domino={$x^2-x+6=0$}{$(x+2)^2=0$}{0}};
+\pic at (2*\W,0)  {domino={$2x^2-6x-20=0$}{$(x+2)(x+5)=0$}{1}};
+\pic at (3*\W,0)  {domino={$x^2+x-6=0$}{$3(x-1)(x+1)=0$}{0}};
+\pic at (0,\H)    {domino={$x^2-x-6=0$}{$(x-2)(x+3)=0$}{1}};
+\pic at (\W,\H)   {domino={$x^2+2x+1=0$}{$(x-3)(x+2)=0$}{0}};
+\pic at (2*\W,\H) {domino={$x^2+4x-21=0$}{\sffamily Die Gleichung lässt sich nicth in Linearfaktoren zerlegen}{1}};
+\pic at (3*\W,\H) {domino={$x^2+7x+10=0$}{$(x+7)(x-3)=0$}{0}};
+\end{tikzpicture}
+}
+
+
+%\setuptikzlipsum
+%{ --- Caramdir: https://tex.stackexchange.com/questions/29147/spiral-spring-in-tikz }
+%{
+%% +++++
+%\def\W{4}    % domino width
+%\def\H{5.5}  % domino height
+%\def\w{2.75} % (horizontal) thin rectangle width
+%\def\h{0.2}  % (horizontal) thin rectangle height
+%\def\tw{2.8} % text width
+%
+%\tikzset
+%{%
+%    pics/domino/.style n args={3}{
+%    % USAGE:
+%    % #1 = top text
+%    % #2 = bottom text
+%    % #3 = bottom thin rectangle, 0 bottom / 1 left
+%    code={%
+%      \draw[line width=0.4mm] (0,0) rectangle (\W,\H);
+%      \draw (0,0.5*\H) -- (\W,0.5*\H);
+%      \node[text width=\tw cm,align=center] at (0.5*\W,0.75*\H) {#1};
+%      \node[text width=\tw cm,align=center] at (0.5*\W,0.25*\H) {#2};
+%      \draw (0,\H-\h) -| (\w,\H);
+%      \ifnum#3 = 0
+%        \draw (0,\h) -| (\w,0);
+%      \else
+%        \draw (\W-\h,0) -- (\W-\h,0.5*\H);
+%      \fi
+%    }},
+%}
+%
+%\begin{tikzpicture}
+%    \draw [domain=0:25.1327,variable=\t,smooth,samples=75]
+%        plot ({\t r}: {0.002*\t*\t});
+%\end{tikzpicture}
+%}
+
+\setuptikzlipsum
+{ --- Guilherme Zanotelli: https://tex.stackexchange.com/questions/29147/spiral-spring-in-tikz }
+{
+%\newcommand\spiral{}% Just for safety so \def won't overwrite something
+%\def\spiral[#1](#2)(#3:#4:#5){% \spiral[draw options](placement)(end angle:revolutions:final radius)
+%\pgfmathsetmacro{\domain}{pi*#3/180+#4*2*pi}
+%\draw [#1,shift={(#2)}, domain=0:\domain,variable=\t,smooth,samples=int(\domain/0.08)] plot ({\t r}: {#5*\t/\domain})
+%}
+\begin{tikzpicture}[scale=0.3]%%
+\spiral[red](0,0)(0:6:6);
+\spiral[blue](0,0)(0:6:-6);
+\spiral[blue](-12,0)(0:6:6);
+\spiral[red](12,0)(0:6:-6);
+\spiral[blue](-12,0)(90:2:-2.25);
+\spiral[red](12,0)(90:2:2.25);
+\end{tikzpicture}
+}
+
+
+
+
+\setuptikzlipsum
+{ --- Tom: https://tex.stackexchange.com/questions/646538/making-an-image-into-a-lettrine }
+{
+\newcommand{\addstuff}[3]{\tikz[remember picture]{
+##1
+\node[inner sep=0pt](current content){##3};
+##2
+}}
+\newcommand{\mydpletter}[8][-5pt]{%
+\begin{wrapfigure}[##2]{l}{0.2\linewidth}
+\vspace{##1}
+\addstuff{
+\clip (0,0) ellipse [x radius=0.5\linewidth, y radius=##3];
+}{
+\node [inner sep=0pt] at (0,0) {\scalebox{##4}{##5}};
+}{\includegraphics[width=\linewidth]{##6}}
+\end{wrapfigure}
+{\noindent\hbox{\textsc{\textbf{##7 }}}##8\par}
+}
+
+%\mydpletter[vertical pos]{Drop lines num}{ellipse y radius}{Scale font size}{Drop letter}{image}{Append text}{Par contents}
+{
+\Large
+\mydpletter[-2pt]{3}{25pt}{4}{\color{red!70}A}{example-image-plain}{In Small Caps}{\lipsum[1]}
+}
+}
+
+
+
+
+
+
+
+\setuptikzlipsum
+{ --- Steven B. Segletes: https://tex.stackexchange.com/questions/646535/how-to-replace-notes-by-icons }
+{
+\def\useanchorwidth{T}
+\setstackgap{L}{-1.6pt}
+\renewcommand\stacktype{L}
+
+\begin{music}
+\instrumentnumber{1}
+\setstaffs1{2}
+\startpiece
+\makeatletter
+\def\@ight{\stackon{\char"8}{\color{red}\normalfont\scriptsize
+   \kern6pt x}}%
+\makeatother
+  \notes \zh{ceg}|\zh{j} \en
+  \notes \zh{fhj}|\zh{j} \en
+  \notes \zh{gik}|\zh{k} \en
+\makeatletter
+\def\@ight{\stackon{\char"8}{\color{cyan}\normalfont\scriptsize
+   \kern6pt w}}%
+\makeatother
+  \notes \zh{ceg}|\zh{l} \en
+  \notes \zh{fhj}|\zh{m} \en
+  \notes \zh{gik}|\zh{n} \en
+\makeatletter
+\def\@ight{\char"8}%
+\makeatother
+  \notes \zh{ceg}|\zh{n} \en
+  \notes \zh{fhj}|\zh{o} \en
+  \notes \zh{gik}|\zh{p} \en
+\endpiece
+\end{music}
+}
+
+
+
+
+%\setuptikzlipsum
+%{ --- egreg: https://tex.stackexchange.com/questions/646532/basic-diagxy-example-fails }
+%{
+%\bfig\square[A`B`C`D;f`g`h`k]\efig
+%}
+
+
+
+
+\setuptikzlipsum
+{ --- Mico: https://tex.stackexchange.com/questions/646501/equal-spaces-between-my-entries-in-my-column }
+{
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcommand\CO{\mathcal{O}}
+\DeclarePairedDelimiter\inner\langle\rangle
+%% table 2 uses a 'tabular*' environment
+\begin{table}[!h]
+\setlength\tabcolsep{0pt} % default: 6pt
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{$}c<{$} *{4}{S[table-format=-1.0]}}
+%\toprule
+\hline
+  w\lambda \in \CO_\lambda & 
+  {$\pm(\lambda_1,\lambda_2)$} & 
+  {$\pm (-\lambda_1,\lambda_1+\lambda_2)$} & 
+  {$\pm (\lambda_1+2\lambda_2,-\lambda_2)$} & 
+  {$\pm(\lambda_1 + 2\lambda_2,-\lambda_1-\lambda_2)$} \\
+%\midrule
+\hline
+\sigma^{(0)}(w) & 1 &  1 &  1 &  1 \\
+\sigma^{(1)}(w) & 1 & -1 & -1 &  1 \\
+\sigma^{(2)}(w) & 1 & -1 &  1 & -1 \\
+\sigma^{(3)}(w) & 1 &  1 & -1 & -1 \\
+%\bottomrule
+\hline
+\end{tabular*}
+
+\caption{Same table as above, but with \texttt{tabular*} instead of \texttt{tabularx}}
+\label{signes de C2 tabularstar}
+\end{table}
+}
+
+\setuptikzlipsum
+{ --- Ulrike Fischer: https://tex.stackexchange.com/questions/646495/tcolorbox-inside-tabularray-leading-to-0s }
+{{
+%\usepackage{tabularray}
+%\usepackage{tcolorbox}
+\begin{tblr}{h{4cm}h{4cm}h{4cm}}
+      \begin{tcolorbox}[nobeforeafter,width=3.5cm,colback=white,colframe=black] test \end{tcolorbox}
+    & \begin{tcolorbox}[nobeforeafter,width=3.5cm,colback=white,colframe=black] test \end{tcolorbox}
+    & \begin{tcolorbox}[nobeforeafter,width=3.5cm,colback=white,colframe=black] test \end{tcolorbox}
+\end{tblr}
+}}
+
+
+
+\setuptikzlipsum
+{ --- Vincent: https://tex.stackexchange.com/questions/646486/add-text-to-the-numbering-of-equations }
+{{
+
+\newenvironment{labelledequation}[1]{%
+    \begin{equation}
+    \refstepcounter{equation}
+    \tag{\theequation{} ##1}
+}{\end{equation}\ignorespacesafterend}
+\newenvironment{labelledequation*}[1]{%
+    \begin{equation}
+    \tag{\theequation{} ##1}
+}{\end{equation}\ignorespacesafterend}
+%\begin{document}
+some text
+\begin{labelledequation}{EM}
+\label{eqEM}
+a^2 + b^2 = c^2.
+\end{labelledequation}
+some more text
+\begin{labelledequation*}{GM}
+\label{eqGM}
+a^2 + b^2 = c^2.
+\end{labelledequation*}
+references to the equations work! \eqref{eqEM} and \eqref{eqGM}
+}}
+
+
+
+\setuptikzlipsum
+{ --- Mico: https://tex.stackexchange.com/questions/646486/add-text-to-the-numbering-of-equations }
+{{
+\counterwithin{equation}{section} % just for this example
+
+%\begin{document}
+\stepcounter{section}    % just for this example
+
+Some text
+\begin{equation}
+a^2 + b^2 = c^2 \tag{1.1 EM} \label{eq:em}
+\end{equation}
+
+More text
+\begin{equation}
+A^2 + b^2 = c^2 \tag{1.1 GR} \label{eq:gr}
+\end{equation}
+
+Still more text
+\stepcounter{equation} % let the internal 'equation' counter catch up
+\begin{equation}
+A^2 + b^2 = c^2 \label{eq:still}
+\end{equation}
+
+Referring to Eq.\ \eqref{eq:gr} one can see \dots
+
+}}
+
+
+
+\setuptikzlipsum
+{ --- egreg: https://tex.stackexchange.com/questions/646486/add-text-to-the-numbering-of-equations }
+{{
+\numberwithin{equation}{section}
+
+\newcounter{namedsubequations}
+\newenvironment{namedsubequations}
+ {%
+  \subequations
+  \stepcounter{namedsubequations}%
+  \label{namedsubequations@\thenamedsubequations}%
+ }
+ {\endsubequations\ignorespacesafterend}
+\newcommand{\addname}[1]{\tag{\ref{namedsubequations@\thenamedsubequations} ##1}}
+
+%\begin{document}
+
+\section{Test}
+
+\begin{namedsubequations}
+Some text
+\begin{equation}\label{eq:EM}
+a^2+b^2=c^2 \addname{EM}
+\end{equation}
+More text
+\begin{equation}\label{eq:GR}
+a^2+b^2=c^2 \addname{GR}
+\end{equation}
+\end{namedsubequations}
+Still more text
+\begin{equation}\label{eq:again}
+a^2+b^2=c^2
+\end{equation}
+
+\eqref{eq:EM} and \eqref{eq:GR} and \eqref{eq:again}
+
+}}
+
+
+
+%%\setuptikzlipsum
+%%{ --- Bernard: https://tex.stackexchange.com/questions/646483/real-projective-plane-with-tikz-pstricks }
+%%{{
+%%%  \usepackage{pst-node}
+%%%
+%%%    \begin{document}
+%%
+%%    \psset{unit=1cm} 
+%%    \begin{pspicture}(0,0)(2,2)
+%%    \pnodes(0,0){O}(0,2){P}(2,2){Q}(2,0){R}
+%%    \psframe[fillstyle=solid, fillcolor=blue!14, linewidth=0pt](O)(Q)
+%%    \psset{arrows=->, arrowinset=0.12, linecolor=blue, labelsep=1pt}
+%%    \ncline{O}{P}\nbput{B}\ncline{Q}{R}\nbput{B}
+%%    \psset{linecolor=red}
+%%    \ncline{P}{Q}\nbput{A}\ncline{R}{O}\nbput{A}
+%%    \end{pspicture}
+%%}}
+
+
+
+
+%%\setuptikzlipsum
+%%{ --- kabenyuk: https://tex.stackexchange.com/questions/646464/draw-and-shade-a-region-in-mathbbr2-parametrised-by-functions }
+%%{{
+%%%\usepackage{pgfplots}
+%%%\usepgfplotslibrary{fillbetween}
+%%%%\pgfplotsset{compat=1.18}
+%%%\begin{document}
+%%        \begin{tikzpicture}
+%%            \begin{axis}[ 
+%%                xmax=1.1,
+%%                axis lines=center,
+%%                xlabel=$x$,
+%%                xlabel style={at={(axis description cs:1.01,0.0)},anchor=north},
+%%                ylabel = $y$
+%%                ]
+%%                \addplot [name path=A,domain=0:1, smooth] {2*x-x^3};
+%%                \addplot [name path=B,domain=0:1, smooth] {x-x^2};
+%%                \draw [thick] (1,0) -- (1,1);
+%%                \addplot[gray!20] fill between[of=A and B];
+%%            \end{axis}
+%%        \end{tikzpicture}
+%%}}
+
+
+
+
+\setuptikzlipsum
+{ --- Steven B. Segletes: https://tex.stackexchange.com/questions/646462/how-to-add-a-hint-arrow-up-down-at-the-reference-for-direction-in-which-to-loo }
+{{
+\let\svlabel\label
+\renewcommand\label[1]{\expandafter\gdef\csname##1\endcsname{}%
+  \svlabel{##1}}
+\let\svref\ref
+\renewcommand\ref[1]{\ifcsname##1\endcsname$\uparrow$\else$\downarrow$\fi
+  \svref{##1}}
+%\begin{document}
+I make reference to Fig \ref{fg:myfig}, which follows.
+\begin{figure}[ht]
+\centering
+\framebox(100,100){}
+\caption{myfig}
+\label{fg:myfig}
+\end{figure}
+
+I make reference to Fig \ref{fg:myfig}, which precedes.
+
+}}
+
+
+
+
+
+
+%\setuptikzlipsum
+%{ --- Zarko: https://tex.stackexchange.com/questions/646460/align-the-text-vertically-centered-in-the-cell-of-table }
+%{{
+%%\usepackage[table,xcdraw]{xcolor}
+%%\usepackage{tabularray}
+%\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+%\NewTableCommand\SCC[1]{\SetCell{bg=##1}}
+%
+%%\begin{document}
+%    \begin{table}[ht]
+%    \centering
+%\begin{tblr}{hline{1-Z}={1-3,5-5}{solid},
+%             vlines,
+%             cell{1}{1-3,5} = {font=\bfseries, bg= ballblue},
+%             colspec = {*{2}{Q[l, m, wd=20mm, font=\bfseries]}
+%                             Q[j, wd=50mm]
+%                             Q[c]                             Q[c, m, wd=20mm]},
+%             vspan=even
+%             }
+%Range   
+%    &   lorem ipsum  
+%        &   lorem ipsum
+%            &   &   lorem ipsum     \\
+%lorems
+%    & \textbf{454}  
+%        &\SetCell[r=3]{j}
+%            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor"
+%            &   &\SCC{yellow}   280-560         \\
+%loremsas
+%    & 456
+%        &   &   &\SCC{magenta}  280             \\
+%loremsd
+%    &232
+%        &   &   &\SCC{green}    560             \\
+%\end{tblr}
+%    \end{table}
+%}}
+
+
+
+\setuptikzlipsum
+{ --- Black Mild: https://tex.stackexchange.com/questions/646099/3d-rectangles-in-tikz }
+{{
+%\usetikzlibrary{calc}
+%\begin{document}
+\begin{tikzpicture}[declare function={a=2.5;}]
+\colorlet{inside}{orange!50}
+\colorlet{outside}{gray!50}
+\path
+(0,0)     coordinate (A) +(90:a) coordinate (At)
+(-1.5,-1) coordinate (B) +(90:a) coordinate (Bt)        
+(2.5,-.5) coordinate (D) +(90:a) coordinate (Dt)
+($(B)+(D)-(A)$) coordinate (C) +(90:a) coordinate (Ct)
+;
+% visible inside surfaces
+\draw[top color=inside,bottom color=inside!30!black]  % a bit dark ^^ 
+(A)--(D)--(Dt)--(At)--cycle
+(A)--(B)--(Bt)--(At)--cycle
+;
+% visible outside surfaces
+\draw[fill=outside] 
+(C)--(B)--(Bt)--(Ct)--cycle
+(C)--(D)--(Dt)--(Ct)--cycle
+;
+
+% visible inside upper surfaces
+\draw[fill=inside!80]
+(At)--(Bt)--([turn]-100:1.2) coordinate (Bs)--($(Bs)+(At)-(Bt)$)--cycle
+(Bt)--(Ct)--([turn]-100:1.2) coordinate (Cs)--($(Cs)+(Bt)-(Ct)$)--cycle
+(Ct)--(Dt)--([turn]-105:1.3) coordinate (Ds)--($(Ds)+(Ct)-(Dt)$)--cycle
+(Dt)--(At)--([turn]-110:1.3) coordinate (As)--($(As)+(Dt)-(At)$)--cycle
+;
+\end{tikzpicture}
+}}
+
+
+
+
+
+
+%%\setuptikzlipsum
+%%{ --- Rmano: https://tex.stackexchange.com/questions/646090/how-to-draw-coil-with-varying-compression }
+%%{{
+%%%\usepackage{tikz}
+%%%\usetikzlibrary{decorations.pathmorphing,patterns}
+%%%\usepgfmodule{nonlineartransformations}
+%%\makeatletter
+%%\def\mytransformation{%
+%%    \pgfmathsetmacro{\myX}{\pgf@x + 2*cos(\pgf@x*8)}%
+%%    % no need to change y --- let's comment this out
+%%    % \pgfmathsetmacro{\myY}{\pgf@y}
+%%    \setlength{\pgf@x}{\myX pt}%
+%%    % \setlength{\pgf@y}{\myY pt}
+%%}
+%%\makeatother
+%%%\begin{document}
+%%\begin{tikzpicture}
+%%    \begin{scope}
+%%        \pgftransformnonlinear{\mytransformation}
+%%        \draw[decoration={aspect=0.3, segment length=2mm, amplitude=4mm,coil},decorate]
+%%            (0,0) -- (10,0);
+%%    \end{scope}
+%%\end{tikzpicture}
+%%}}
+
+
+
+
+%%\setuptikzlipsum
+%%{ --- Raffaele Santoro: https://tex.stackexchange.com/questions/646090/how-to-draw-coil-with-varying-compression }
+%%{{
+%%\makeatletter
+%%\def\mytransformation{%
+%%\pgfmathsetmacro{\myX}{\pgf@x + 2*cos(\pgf@x*8)}
+%%%\pgfmathsetmacro{\myY}{\pgf@y}
+%%\setlength{\pgf@x}{\myX pt}
+%%%\setlength{\pgf@y}{\myY pt}
+%%}
+%%\makeatother
+%%%\begin{document}
+%%    \begin{tikzpicture}
+%%        \begin{scope}
+%%            \pgftransformnonlinear{\mytransformation}
+%%            \draw[cyan,line width=1pt,decoration={aspect=0.3, segment length=2.5mm, amplitude=4mm,coil},decorate]
+%%                (0,0) -- (10,0);
+%%        \end{scope}
+%%        \draw (0,-.5) -- (10,-.5);
+%%         \foreach \i in {0,.1,...,10}
+%%        \draw[line width=.2pt] (\i,-.5)--(\i,-.6);
+%%        \foreach \i in {0.5,1.5,...,9.5}
+%%        \draw[line width=.4pt] (\i,-.5)--(\i,-.7)  node[below] {\tiny $\i$};
+%%            \foreach \i in {0,1,...,10}
+%%                \draw[line width=.8pt] (\i,-.5)--(\i,-.8) node[below] {\footnotesize \bfseries $\i$};
+%%        \node at (5,-1.3) () {\footnotesize cm};
+%%        \draw[line width=.05pt]  (.57,.6)--(.57,-.4)
+%%                    (2.09,.6)--(2.09,-.4)
+%%                    (3.61,.6)--(3.61,-.4)
+%%                    (5.13,.6)--(5.13,-.4)
+%%                    (6.65,.6)--(6.65,-.4)
+%%                    (8.17,.6)--(8.17,-.4)
+%%                    (9.685,.6)--(9.685,-.4)
+%%                    (.57,.6)--(9.685,.6);
+%%       \foreach \i in {1.3,2.82,4.34,5.86,7.38,8.9}
+%%            \node[fill=white] at (\i,.6) () {\tiny $\lambda=1.52$};
+%%    \end{tikzpicture}
+%%}}
+
+
+
+
+
+
+%%\setuptikzlipsum
+%%{ --- Zarko: https://tex.stackexchange.com/questions/646082/how-can-i-add-a-figure-inside-a-tikz-matrix }
+%%{{
+%%%\usepackage{tikz}
+%%%\usetikzlibrary{backgrounds, fit, matrix, positioning}
+%%\tikzset{
+%%    1/.style={fill=red!30},
+%%    2/.style={fill=blue!30},
+%%    3/.style={fill=orange!30},
+%%    4/.style={fill=green!30},
+%%    5/.style={fill=red},
+%%every edge/.style = {draw, thick, -stealth},
+%%    box/.style={draw=red, rounded corners,
+%%            text width=24mm, minimum height=12mm,
+%%            align=center, font=\sffamily},
+%%  FIT/.style args = {##1/##2}{draw, rounded corners, dashed, fill=yellow!30,
+%%            inner xsep=1em, inner ysep=2em, yshift=1em,
+%%            label={[anchor=north]north:##1},
+%%            fit=##2}
+%%}
+%%%\usepackage[export]{adjustbox}
+%%%\begin{document}
+%%    \begin{figure}
+%%    \centering
+%%\begin{tikzpicture}
+%%\matrix (m) [matrix of nodes,
+%%             column sep=3.5em, row sep=0.5cm,
+%%             nodes={box, anchor=center},
+%%             row 1/.style={nodes={2}},
+%%             row 2/.style={nodes={3}},
+%%             row 3/.style={nodes={4}}
+%%             ]
+%%{
+%%Social Methods  & Technical Methods \\
+%%Social Data     & Technical Data    \\
+%%Social Analysis & Technical analysis\\
+%%};
+%%    \begin{scope}[on background layer]
+%%\node (F1) [FIT=Social design/(m-1-1)(m-3-1)] {};
+%%\node (F2) [FIT=Technical design/(m-1-2)(m-3-2)]    {};
+%%    \end{scope}
+%%\node (F3)  [FIT=/(m-1-1)(m-3-1), yshift=-1em, inner sep=0pt] {};
+%%\node (model)   [box, text width=32mm,
+%%                 above=22mm of m]  {Socio-technical theory or model};
+%%% arrows
+%%\foreach \X in {1,2}
+%%{
+%%\draw   (model)   edge (F\X)
+%%        (m-1-\X)  edge (m-2-\X) 
+%%        (m-2-\X)  edge (m-3-\X);
+%%}
+%%\draw   (m-3-1.east)    edge (m-3-1.south -| F1.east) 
+%%        (m-3-2.west)    edge (m-3-2.south -| F2.west) 
+%%        (m-1-2)         edge (m-2-1);
+%%% image in clip
+%%\path[clip]
+%%    (F3.south west) |- (F3.north east) |- (F3.south east);
+%%\node at (F3) {\includegraphics[scale=1.3]{example-image-duck}};
+%%
+%%\end{tikzpicture}
+%%\caption{A conceptual model for socio-technical research (reproduced from
+%%    \dots).}
+%%\label{fig:socio-technical model}
+%%    \end{figure}
+%%}}
+
+
+
+
+\setuptikzlipsum
+{ --- Zarko: https://tex.stackexchange.com/questions/646052/remove-indentation }
+{{
+%\usepackage{geometry}
+%\usepackage{enumitem}
+%\usepackage{xcolor}
+\newcounter{descriptcount}
+
+\setlength{\parindent}{0pt}
+
+%\begin{document}
+\begin{enumerate}[label=\bfseries\Alph*,wide]
+\item\textbf{Introduction}
+    \begin{description}[before={\setcounter{descriptcount}{0}},%
+                        font=\color{gray}\normalfont%
+                             \stepcounter{descriptcount}\thedescriptcount.~,
+                        topsep=5mm,itemsep=3mm,parsep=3mm,
+                        wide
+                             ]
+        \item[Purpose]~
+
+        This procedure describes the risk management method that must be applied:
+        Within the framework of the processes control,
+        Within the framework of the process of product realization.
+
+        The Quality System Risk management is a systematic process for
+        identification, assessment, control, communication and review of
+        risks to the quality system processes. It is just acknowledging
+        that risk happens, and taking measures to ensure we are completely
+        prepared for it.
+
+        \item[Field of application]~
+
+        This procedure applies to all process and product risk analyses
+        conducted within DxxMxx.
+
+        \item[Definitions]~
+
+        \textbf{Risk Analysis}
+        Use of available information to identify hazardous phenomena
+        and estimate the risk
+
+        \textbf{Damage}
+        Physical injury or damage to the health of persons, or damage
+        to property or the environment
+
+        \textbf{Severity}
+        Measure of the possible consequences of a dangerous phenomenon
+    \end{description}
+\end{enumerate}
+}}
+
+
+
+%%\setuptikzlipsum
+%%{ --- Tom: https://tex.stackexchange.com/questions/646032/how-to-make-vertical-space-around-fancyvrb-symmetric }
+%%{
+%%%\usepackage{lipsum}
+%%%\usepackage{fancyvrb}
+%%\fvset{listparameters=\setlength{\topsep}{0pt}\setlength{\parsep}{0pt}}
+%%%\showoutput
+%%%\begin{document}
+%%
+%%Here is some text.
+%%
+%%\begin{Verbatim}%[frame=single]
+%%some code
+%%\end{Verbatim}
+%%
+%%which continues later.
+%%
+%%Here is some text.
+%%\vspace{5.05556pt}
+%%%\begin{Verbatim}[frame=single]
+%%%some code
+%%%\end{Verbatim}
+%%which continues later.
+%%}
+%%
+
+
+
+
+
+
+
+
+%%%\setuptikzlipsum
+%%%{ --- Unknown: https://tex.stackexchange.com/questions/646125/drawing-colored-balls-in-urn }
+%%%{{
+%%%%\usepackage[utf8]{inputenc}
+%%%%\usepackage{amsmath,amssymb,amsfonts,tikz}
+%%%%\usepackage[paperheight=5in,paperwidth=10in,left=2cm,right=1cm,top=1.5cm,bottom=2.5cm]{geometry}
+%%%%\usepackage{varwidth}
+%%%%\usepackage{mathrsfs}
+%%%\definecolor{col4}{RGB}{72, 114, 198}
+%%%\definecolor{col1}{RGB}{32, 114, 98}
+%%%\definecolor{col2}{RGB}{32, 58, 95 }
+%%%\definecolor{col3}{RGB}{45, 85, 155}
+%%%%\everymath{\displaystyle}
+%%%%\usepackage[varbb]{newpxmath}
+%%%%\usepackage{dsfont}
+%%%
+%%%%\usepackage{ifthen}% <-- added
+%%%
+%%%\newcommand*\mycirc[1]{%
+%%%\begin{tikzpicture}[baseline=(C.base)]
+%%%\node[draw,circle,inner sep=1pt,minimum size=3ex](C) {##1};
+%%%\end{tikzpicture}}
+%%%%\usepackage{romanbar}
+%%%%\pagestyle{empty}
+%%%%\usepackage[most,breakable]{tcolorbox}
+%%%%\usetikzlibrary{shapes.arrows,calc,fit}% <-- added fit
+%%%\newtcolorbox{mybox}[1][]{%
+%%%enhanced,interior code app={\fill[line width=1pt,col1] ( [yshift=-1cm]frame.north east)to[out=140,in=60]( [xshift=-2cm]frame.south east)--++(2cm,0)--cycle;},width=17.7cm,arc=0pt,outer arc=0pt ,colback=white,colframe=blue,
+%%%frame code app={\fill[line width=0.2pt,col1]( frame.north west)rectangle (frame.south east);}
+%%%}
+%%%\linespread{1.3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%\usepackage{eso-pic}
+%%%%%%\AddToShipoutPictureBG{\ifnum\value{page}=1
+%%%\begin{tikzpicture}[remember picture,overlay]
+%%%\fill[col1]([yshift=1cm]current page.south west)rectangle(current page.south east) ;
+%%%\node[circle,draw=white,line width=2pt,minimum size=0.3cm,fill=col1]at([yshift=0.9cm]current page.south){{\thepage}};
+%%%\node[anchor=north west,rectangle,fill=col1!85,rotate=90,inner sep=0.3cm,](A)at([yshift=1.5cm]current page.south west){{\large \textbf{\color{white}Les probabilités}}};
+%%%\end{tikzpicture}
+%%%%\else
+%%%\begin{tikzpicture}[remember picture,overlay]
+%%%\fill[col1]([yshift=-0.5cm]current page.north west)rectangle(current page.north east) ;
+%%%\fill[col1]([yshift=1cm]current page.south west)rectangle(current page.south east) ;
+%%%\node[circle,draw=white,line width=2pt,minimum size=0.3cm,fill=col1]at([yshift=0.9cm]current page.south){{\thepage}};
+%%%\node[anchor=north west,rectangle,fill=col1!85,rotate=90,inner sep=0.3cm,](A)at([yshift=1.5cm]current page.south west){{\large \textbf{\color{white}Les probabilités}}};
+%%%\end{tikzpicture}
+%%%%%%\fi 
+%%%%%%}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%\newtcolorbox[auto counter ]{Exercice}[2][]{
+%%%enhanced,top=0.5cm,bottom=0.5cm,
+%%%overlay app={\draw[col1,line width=0.5cm] (frame.south west)--(frame.north west);
+%%%\node[rectangle,fill=violet,inner xsep=0.3cm, anchor=south east] at([xshift=-0.3cm]frame.north east){\textbf{\color{white}##1}};},
+%%%colback=white,colbacktitle=white,breakable,after=\vskip1cm,
+%%%fonttitle=\bfseries,coltitle=col1,colframe=col1,
+%%%attach boxed title to top left={xshift=0.5cm,yshift=-0.25mm-\tcboxedtitleheight/2,yshifttext=2mm-\tcboxedtitleheight/2},
+%%%title={\textbf{Exercice n$^{\circ}$\thetcbcounter :}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%\newcommand*\cir[1]{\tikz[baseline=(char.base)]{%
+%%%\node[shape=circle,fill=col4,draw=col1,minimum size=0.6cm,inner sep=2pt] (char) {\color{white}##1};}}
+%%%\newcommand*\mycir[1]{\tikz[baseline=(char.base)]{%
+%%%\node[shape=circle,fill=yellow, draw=col1,minimum size=0.6cm,inner sep=2pt] (char) {\color{col4}##1};}}
+%%%%\usepackage{enumitem}
+%%%%\begin{document}
+%%%\begin{Exercice}[Examen National $2015$ Normale]{}
+%%%Une urne $\mathbb{U}_{1}$ contient $7$ boules :  {\color{red} $4$ rouges} et  {\color{ForestGreen} $3$ vertes} (indiscernables au toucher)
+%%%
+%%%Une urne $\mathbb{U}_{2}$ contient $5$ boules :  {\color{red} $3$ rouges} et  {\color{ForestGreen} $2$ vertes} (indiscernables au toucher)
+%%%
+%%%%%% added urnes
+%%%\vspace{.25cm}
+%%%\hspace{1cm}
+%%%% nouveau: dessiner les urnes avec des boules
+%%%\newcommand\drawBoule[2]{%
+%%%    \ifthenelse{\equal{##1}{R}} {
+%%%        \node[boule=red] at (##2) {$##1$};
+%%%    }{
+%%%        \node[boule=ForestGreen] at (##2) {$##1$};
+%%%    }
+%%%}
+%%%\begin{tikzpicture}[
+%%%    scale=.75,
+%%%    boule/.style={
+%%%        circle,draw,
+%%%        inner sep=2pt,
+%%%        fill=##1,
+%%%        text=white,
+%%%        font=\footnotesize
+%%%    }
+%%%]
+%%%    \begin{scope}[local bounding box=urne1]
+%%%        \foreach \content [count=\c] in {R,V,V} {
+%%%            \drawBoule{\content}{.8*\c + .4,0}
+%%%        }
+%%%        \foreach \content [count=\c] in {R,V,R,R} {
+%%%            \drawBoule{\content}{.8*\c,-3/4}
+%%%        }
+%%%    \end{scope}
+%%%    \draw ([xshift=-.15cm] urne1.north west) |- ([xshift=.15cm, yshift=-.15cm] urne1.south east) -- ([xshift=.15cm] urne1.north east);
+%%%    \node[xshift=1cm] at (urne1.east) {urne $U_1$};
+%%%
+%%%    \begin{scope}[xshift=8cm]
+%%%        \begin{scope}[local bounding box=urne2]
+%%%            \foreach \content [count=\c] in {V,R} {
+%%%                \drawBoule{\content}{.8*\c + .4,0}
+%%%            }
+%%%            \foreach \content [count=\c] in {R,R,V} {
+%%%                \drawBoule{\content}{.8*\c,-3/4}
+%%%            }
+%%%        \end{scope}
+%%%        \draw ([xshift=-.15cm] urne2.north west) |- ([xshift=.15cm, yshift=-.15cm] urne2.south east) -- ([xshift=.15cm] urne2.north east);
+%%%        \node[xshift=1cm] at (urne2.east) {urne $U_2$};
+%%%    \end{scope}
+%%%\end{tikzpicture}
+%%%\vspace{.25cm}
+%%%%%%
+%%%
+%%%{\color{red}{\protect\cir{{\Large  \Romanbar{1} }}}} On considère l'expérience suivante : On tire au hasard et simultanément trois boules de l'urne $U_{1}$.
+%%%
+%%%Soit l'événement $\mathcal{A}$ : "obtenir une boule {\color{red} rouge} et deux boules {\color{ForestGreen} vertes}"
+%%%
+%%%\hspace{0.25cm} et l'événement $\mathcal{B}$ : "obtenir trois boules de la même couleur"
+%%%
+%%%\hspace{1cm} {\color{blue} $\Rightarrow$} Montrer que $\mathds{P}\left ( \mathcal{A} \right )=\frac{12}{35}$ et $\mathds{P}\left ( \mathcal{B} \right )=\frac{1}{7}$
+%%%
+%%%{\color{red}{\protect\cir{{\Large  \Romanbar{2} }}}} On considère l'expérience suivante : On tire au hasard et en même temps deux boules de $\mathbb{U}_{1}$, puis on tire au hasard une boule de $\mathbb{U}_{2}$
+%%%
+%%%Soit l'événement $\mathcal{C}$ : "obtenir trois boules {\color{red} rouges}"
+%%%
+%%%\hspace{1cm} {\color{blue} $\Rightarrow$} Montrer que $\mathds{P}\left ( \mathcal{C} \right )=\frac{6}{35}$
+%%%\end{Exercice}
+%%%}}
+
+
+%\setuptikzlipsum
+%{ --- name: url }
+%{{
+%
+%}}
+
+
+
+
+
+
+
+\setuptikzlipsum
+{ --- MS-SPO: https://tex.stackexchange.com/questions/646122/how-to-draw-neural-networks-from-parameters }
+{{
+%\usetikzlibrary{arrows.meta}% <<< for arrow shapes
+
+\newcommand\NN[6]{% x, y, size, layers, nodeColor, lineColor
+ % see webpage \tikzstyle{mynode}=[thin,draw=#5,fill=white,circle,minimum size=#3]%
+ % see comment \tikzset{mynode/.style={thin,draw=#5,fill=white,circle,minimum size=#3}}%
+ \begin{tikzpicture}[x=##1cm,y=##2cm,
+                     mynode/.style={thin,draw=##5,fill=white,circle,minimum size=##3}]%
+   \foreach \N [count=\lay,remember={\N as \Nprev (initially 0);}]%
+               in {##4}{ % loop over layers%
+    \foreach \i [evaluate={\y=\N/2-\i; \x=\lay; \prev=int(\lay-1);}]%
+                 in {1,...,\N}{ % loop over nodes%
+      \node[mynode] (N\lay-\i) at (\x,\y) {};%
+      \ifnum\Nprev>0 % connect to previous layer%
+        \foreach \j in {1,...,\Nprev}{ % loop over nodes in previous layer
+          \draw[thin,-{Latex[]}, draw=##6] (N\prev-\j) --(N\lay-\i);%
+        }%
+      \fi%
+    }%
+   }%
+ \end{tikzpicture}%
+}
+
+%\begin{document}
+    %   x, y,size, layers,  nodeColor, lineColor
+    \NN{2}{2}{10}{4,2,5,3,2}{black}{black!50}
+    
+    \NN{2}{2}{20}{5,4,3,2}{blue}{red!50}
+    
+}}
+
+
+
+
+\setuptikzlipsum
+{ --- jasedit: https://tex.stackexchange.com/questions/32711/totally-sweet-horizontal-rules-in-latex }
+{{
+
+
+Everything I've ever read defines a custom command for fancy graphical paragraph separators. Nothing in latex adds bedknobs or any fancy decorations, and I can't find any packages which add such functionality.
+
+The example I've seen is typically:
+
+\newcommand{\parasep}{\begin{center}*\hspace{6em}*\hspace{6em}*\end{center}}
+\parasep
+
+Obviously from here you could replace the asterisks with something more visually appealing.
+
+}}
+
+
+\setuptikzlipsum
+{ --- dreamlax*: https://tex.stackexchange.com/questions/32711/totally-sweet-horizontal-rules-in-latex }
+{{
+In TeX, there is a primitive command \textbackslash leaders which is able to take an hbox and replicate it as many times as necessary to fill a specific amount of glue (which can be the entire with of the page if necessary). Each box that it lays down will stick to a vertical grid, so that boxes laid directly below will be in-line with the ones above (so they don't appear out of sync). This technique is commonly used for tables of contents.
+
+You can supply your own custom graphic and box to have a repeating pattern used as a line.
+%\usepackage{graphicx}
+%
+%\newcommand{\nicehline}{%
+%%    \par\noindent
+%    \leavevmode\leaders\hbox to 1in{\includegraphics[scale=0.1]{example-image-duck}}\hfill
+%%    \par
+%}
+Lorem ipsum dolor sit amet. %\includegraphics[scale=0.1]{example-image-duck}\dotfill
+%
+%\ \nicehline
+
+\noindent xx    \leavevmode\leaders\hbox to 1in{\includegraphics[scale=0.1]{example-image-duck}}\hfill xx
+    
+Lorem ipsum dolor sit amet.
+
+Of course, you'll need to supply your own somethingnice.png, or alternatively use a dingbat. 
+}}
+
+
+
+\setuptikzlipsum
+{ --- Gonzalo Medina: https://tex.stackexchange.com/questions/32711/totally-sweet-horizontal-rules-in-latex (from 2009, heavily modified)}
+{{
+%\usepackage{fourier}
+%\usepackage[nopar]{lipsum}
+
+%%\newfontfamily{\webo}{WebOMintsGD}[
+%%  Extension=.pfb,
+%%]
+
+\newfontfamily{\webo}{FourierOrns}[NFSSFamily=webo]
+\newcommand{\Webo}[1]{{\webo##1}}
+
+%\begin{document}
+
+Some text in the default font
+
+\Webo{ABCDEFG}
+
+\newcommand\deco[2]{%
+  \par\vspace{1ex}
+  \begin{center}
+  \fontsize{##1}{##1}\usefont{U}{webo}{m}{n}##2
+  \end{center}
+  \vspace*{1ex}\par
+}
+
+\newcounter{mytimes}
+\newcommand\OPpattern{%
+\loop
+\ifnum\value{mytimes}<7\relax
+\stepcounter{mytimes}%
+\rotatebox{90}{E}\raisebox{8pt}{\rotatebox{270}{F}}%
+\repeat}
+
+%\begin{document}
+
+\lipsum[2] 
+\deco{10pt}{\Webo{IJKLIJKL}}
+\lipsum[2] 
+\deco{16pt}{\Webo{CDCDCDCDC}}
+\lipsum[2] 
+\deco{10pt}{\Webo{PQQPQQPQQP}}
+\lipsum[2] 
+\deco{10pt}{\Webo{D D D D D}}
+\lipsum[2] 
+\deco{10pt}{\Webo{FGFGFGFGFG}}
+\lipsum[2] 
+\deco{14pt}{\OPpattern}
+\lipsum[2] 
+\deco{12pt}{\Webo{MMMMMMMMMMMMMMMMM}}
+\lipsum[2] 
+}}
+
+
+
+\setuptikzlipsum
+{ --- Werner: https://tex.stackexchange.com/questions/32711/totally-sweet-horizontal-rules-in-latex }
+{{
+%\usepackage{listings}% http://ctan.org/pkg/listings
+%\lstset{language=[LaTeX]TeX,
+%  basicstyle=\small\ttfamily}
+%%\usepackage{xcolor}% http://ctan.org/pkg/xcolor | Loaded by listings
+%\usepackage{xhfill}% http://ctan.org/pkg/xhfill
+
+\setlength{\parindent}{0pt}% Just for this example
+\newcommand{\xfill}[2][1ex]{{%
+  \dimen0=##2\advance\dimen0 by ##1
+  \leaders\hrule height \dimen0 depth -##1\hfill%
+}}
+\newcommand{\xfilll}[2][1ex]{%
+  \dimen0=##2\advance\dimen0 by ##1%
+  \leaders\hrule height \dimen0 depth -##1\hfill%
+}
+
+%\begin{document}
+blah\xfilll{1pt}blub
+%\begin{lstlisting}
+%blah\xfilll{1pt}blub
+%\end{lstlisting}
+\bigskip
+
+blah\xfilll[0pt]{4pt}blub
+%\begin{lstlisting}
+%blah\xfilll[0pt]{4pt}blub
+%\end{lstlisting}
+\bigskip
+
+blah\xfilll[-12pt]{12pt}blub
+%\begin{lstlisting}
+%blah\xfilll[-12pt]{12pt}blub
+%\end{lstlisting}
+\bigskip
+
+blah\xrfill{1pt}[blue]blub blah\xrfill{2pt}[cyan]blub
+%\begin{lstlisting}
+%blah\xrfill{1pt}[blue]blub blah\xrfill{2pt}[cyan]blub
+%\end{lstlisting}
+\bigskip
+
+laber\xrfill[0pt]{4pt}[green]blub blub
+%\begin{lstlisting}
+%laber\xrfill[0pt]{4pt}[green]blub blub
+%\end{lstlisting}
+\bigskip
+
+blah\xrfill[-1ex]{1pt}[red]blub
+%\begin{lstlisting}
+%blah\xrfill[-1ex]{1pt}[red]blub
+%\end{lstlisting}
+\bigskip
+
+blah \xhrulefill{cyan}{1cm} blub
+%\begin{lstlisting}
+%blah \xhrulefill{cyan}{1cm} blub
+%\end{lstlisting}
+\bigskip
+
+blah \xhrectanglefill{0.5cm}{1pt} blubber
+%\begin{lstlisting}
+%blah \xhrectanglefill{0.5cm}{1pt} blubber
+%\end{lstlisting}
+\bigskip
+
+blah\xdotfill{1pt}[blue]blah\xdotfill{2pt}[red]blub
+%\begin{lstlisting}
+%blah\xdotfill{1pt}[blue]blah\xdotfill{2pt}[red]blub
+%\end{lstlisting}
+}}
+
+
+
+\setuptikzlipsum
+{ --- [GOM] Peter Wilson: https://tex.stackexchange.com/questions/637920/how-to-make-frame-decorations-bigger }
+{{
+
+With tildes
+\[
+\tilde{g}_{ij} \frac{\delta \tilde{x}^i}{\delta x^k} \frac{\delta \tilde{x}^j}{\delta x^l}
+\]
+}}
+
+
+
+\setuptikzlipsum
+{ --- Teddy van Jerry*: https://tex.stackexchange.com/questions/636895/style-the-first-few-characters-of-text-along-a-path }
+{{
+%\usetikzlibrary{decorations.text,calc,math}
+\begin{tikzpicture}[
+    scale=10,
+    decoration={
+        text effects along path,
+%        text={{\color{red}0}{\color{red}1}{\color{red}2}3456789ABCDEF},
+        text={0123456789ABCDEF},
+        text effects/.cd,
+        character count=\i, character total=\n,
+        character 1/.style={text={red}},
+        character 2/.style={text={red}},
+        character 3/.style={text={red}},
+        characters={text along path,
+                    evaluate={\c=(\n-\i)+1;},
+                    scale=7.5*\c/\n,
+        }
+        }
+    ]
+    \draw[decorate,
+%    text effects={character 4/.append={scale=4,text={blue!20}}}
+    ]
+          plot (0,0) -- (2,0);
+\end{tikzpicture}
+}}
+
+%\setuptikzlipsum
+%{ --- name: url }
+%{{
+%
+%}}
+
+
+
+
+
+
+\slipsumloadaseq[s]{par}{
+A.B.C.}
+
+
+\slipsumloadaseq[s]{par}{
+I do not think it's easily done. All shape's paths are drawn in the background, in independent paths. I am studying a (possible) hook system to allow this kind of thing, but it's still in its infancy. But I will look at it, but many shapes have subpaths and that makes adding a generic hook to everywhere is quite difficult. Thinking.
+}
+
+
+
+
+\slipsumloadaseq[s]{par}{
+Unfortunately, I suspect that this is almost impossible.
+\athing components are (basically) written as \textbackslash behindbackground elements of the shape. That means that they are drawn with an independent path, stroked independently. That is needed for most (or, at least, a lot of) components because we need to have subpaths with different thicknesses, dashing, arrows, and sometimes colors; and those properties can't be mixed in a single path in TikZ.
+So there are normally different paths in the component drawing commands, and decorations have to be applied (if I got that correctly) path by path.
+I am adding a kind-of hook system to circuitikz (hooks are fashionable in LaTeX recently!) but those are just at the start and end of the shape drawing because each shape has a different drawing pattern. I tried to use them to force decoration, to no avail.
+I will continue thinking about it, but for now the answer is that no, it's not possible.
+}
+
+\slipsumloadaseq[test]{testpar}{
+I've combed various forums and come up with a solution that works to address all five questions. Please see the code below for comments and explanations.
+}
+
+\slipsumloadaseq[s]{par}{
+The glossary-superragged style reserves 0.6\textbackslash hsize for the description text. Using enumitem we can set the label width to 0.4\textbackslash hsize and indent the description this far, as follows.}
+
+
+
+\slipsumloadaseq[wiki]{par}{
+The Thurnby and Scraptoft railway station (which connected to the Great Northern Railway) closed to passenger traffic in the mid-1950s. Seaside excursions and freight continued to use the line until around 1964, and in the early part of 1965 the track was lifted and the bridge across the road on Station Road was demolished. 
+This replaced the discontinued train service which had run previously, known as the workers' service. The Hungarton service was maintained until around 1981. A school service numbered S21 was operated for a few years in the later 1960s / early 1970s as a mornings only Scraptoft Green - Somerby Road School run. Oddly, no return afternoon facility ever existed. BMMO also ran its more regular services into Leicester originally numbered L29 from around 1930 - renumbered 93 (1972) and 79 / 89 (1980) also until 1972 a Service L15 to Oadby, Wigston and Enderby. Into the mid 1980s and 1990s a more frequent mini-bus service was established by the successor of BMMO, renamed Midland Fox in the de-regulation era, numbered M2, later 52, the high frequency being attributed to the Leicester Polytechnic / De Montford University Scraptoft Campus site, however the campus has since closed and been replaced with a housing development and the current service is being operated by Arriva Midlands as a Service 56 on a much reduced frequency, with no services in the evenings or on Sundays. 
+}
+
+
+\slipsumloadaseq[wiki]{par}{
+El Goli Metro Station is a station on Tabriz Metro Line 1 next to Tabriz Southern Freeway and opened on 27 August 2015. It is the southeastern terminus of line 1 with a depot located next to the station. The next station to the North is Sahand Metro Station.
+}
+
+
+
+\slipsumloadaseq[wiki]{par}{
+In 1927, he moved with his family to Itanhaém. The family wanted to invest in the cultivation and marketing of bananas, for the land and climate are extremely favorable for this. In 1930 Harry's mother, Lois Forssell, built the municipality's first factory making banana products.
+State champion and one of the top freestyle swimmers in the country in the 1930s, Forssell got good results and was selected for the Brazilian team that participated in the 1932 Summer Olympics in Los Angeles. He did not win a medal but retains the distinction of having been the first man from Itanhaém to have participated in the Olympics.
+After his achievements as a sportsman, Forssell ran for mayor of Itanhaém in 1947 and was the first mayor elected by direct vote of the people in the city's history. He took office in 1948, when all the assets of the prefecture were the penitentiary (which also functioned as chamber), a cart, and a donkey. The city had just four or five employees. Despite this precarious situation, Forssell oversaw construction of the Benedito Calixto school which replaced the old, crumbling elementary school, then still in use. The new school was inaugurated in December 1951. He enabled the arrival of the first public telephone in the municipality. It opened in 1949, with a call to the State Governor. During his government, city had emancipated[clarification needed]. His first term was from 1948 to 1951. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Robert Henry Rice (17 Sep 1903 – 20 May 1994), was an American submarine commander during World War II who was awarded the Navy Cross twice. He reached the rank of Vice Admiral in the United States Navy[4][5][6][7][8]. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Géraldine Girod (born 24 February 1970 in Chamonix) is a French curler.[4]
+She participated in the demonstration curling events at the 1992 Winter Olympics, where the French women's team finished in seventh place. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Sphinx Hill (62°11′S 58°27′WCoordinates: 62°11′S 58°27′W) is a conspicuous, isolated black hill, 145 m, standing 1{.}5 nautical miles (2{.}8 km) north-northwest of Demay Point on King George Island, South Shetland Islands. First charted by the French Antarctic Expedition under Charcot, 1908–10. The descriptive name was given by the United Kingdom Antarctic Place-Names Committee (UK-APC) following a survey by Lieutenant Commander F{.}W{.} Hunt, Royal Navy, in 1951–52. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Shuremy Felomina (born 4 March 1995) is a Curaçaoan professional footballer who plays as a centre back for Real Lunet.[1] 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+In July 2003, Barclays took over Monument, the United Kingdom branch of the U.S. bank Providian, when it was sold off due to financial irregularities of its American parent company.[7] Barclaycard sold the Monument business and premises to CompuCredit Holdings Corporation in April 2007.[8]
+In March 2011, Barclays announced that it would be buying the British credit card business of Egg from Citigroup for an undisclosed price. At the time of the announcement, Barclays claimed that the credit card assets consisted of 1{.}15 million accounts with approximately £2{.}3bn of gross receivables.[9] They intended to integrate those customers within their own credit card arm.
+At the time of the announcement, Citi said it was "committed to working with Barclays on a seamless transfer of the customer accounts, ensuring continuation of the high level of service to which customers are accustomed".[10] 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Khilkhet Thana (Bengali: খিলক্ষেত থানা) is a thana (sub-district) of Dhaka, Bangladesh. It was created in 2005[2].
+Khilkhet Thana has a total area of 15{.}88 square kilometres (6{.}13 sq mi)[1]. It is bounded on the east by the Turag River (across which lies Rupganj Upazila of Narayanganj District). It borders Dhakshinkhan and Uttar Khan thanas to the north, Badda Thana to the south, Cantonment Thana to the west, and Biman Bandar Thana to the northwest[2]. Nearest residential area of Khilkhet thana building is Nikunja-1 and Nikunja-2.
+Administration of Khilkhet Thana was established on 27 June in 2005 [3] that consists of south parts of Badda thana. Before, this area was under the administration of Badda thana.
+According to the 2011 Bangladesh census, Khilkhet Thana had 31,141 households and a population of 130,053, all of whom lived in urban areas. 8{.}6\% of the population was under the age of 5. The literacy rate (age 7 and over) was 73{.}8\%, compared to the national average of 51{.}8\%[1][4].
+Khilkhet Thana consists of part of Dhaka North City Corporation Ward No{.} 17, part of Dakshinkhan Union, and [Dumni Union][2].
+Here most of the people are in touch with education. There are two colleges in this thana. They are: Kurmitola High School and College, located at Khilkhet and Amirjan College located at Dumni.[5] Kurmitola High School and College, popularly known as Khilkhet High School is the epicenter of modern education in these entire area which was established in 1948, while Amirjan College was established in 2012. Most of the students in this area take higher secondary education here. Again because of being very close to modern Dhaka, there is every chance to receive education from another renowned colleges of Dhaka City.
+There are a number of schools in this thana. According to Dhaka Education Board institute website[6] this thana have 5 high schools: Jan-E-Alam Sarker High School, Barua Alauddin Dewan High School, Dumni High School, Amirjan High School and Talna Ruhul Amin Khan High School. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Motomarine S{.}A{.} is a Greek shipbuilding company located in Koropi, Greece. It was founded in 1962 (originally as Lambro Boats by Aristotelis Zeis), and its range includes pleasure boats, as well as modern coastal patrol vessels. Motomarine has been for many years the main supplier of the Greek Coast Guard, while exporting its products to a number of countries around the world. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+The W0KIE Satellite Radio Network (/ˈwʊki/) was a mostly talk radio network, listenable via C-band satellite. It operated, almost continuously, from 1996 to 2007. (It was named after the amateur radio callsign of its owner.)
+The programming was of a less structured nature than traditional talk radio. There was special emphasis on programming for amateur radio operators, satellite TV enthusiasts and the sight impaired.
+Although not the primary focus of the network, some show hosts did play music \textemdash\ a lot of which was not heard on traditional radio. Comedy and plays \textemdash\ old and new \textemdash\ were also often featured.
+The format was reminiscent of free-form programming heard during the formative years of FM radio. 
+}
+
+
+
+\slipsumloadaseq[wiki]{par}{
+L'île Air Force fait partie de l'archipel arctique canadien du Nunavut, dans la région du Qikiqtaaluk, au sud-ouest de l'île de Baffin.
+La première mention écrite de l'île, comme celles des îles voisines du Prince-Charles et Foley, en 1948, est faite par un pilote de la Royal Canadian Air Force (RCAF), Albert-Ernest Tomkinson, pilotant un Avro Lancaster. L'île est nommée en reconnaissance de l'exploration de l'archipel arctique canadien par l'armée de l'air canadienne. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Jean de Comines (Jean de Cumenis), premier comte-évêque du Puy, est né vers 1230. Second fils du sire Baudouin de Comines et de son épouse Agnès d'Aigremont, il appartient à l'une des plus grandes familles nobles du comté de Flandre dont sortira plus tard le chroniqueur Philippe de Comines.
+Nommé à l'évêché du Puy en avril 1296 par le pape Boniface VIII, il ne fait son entrée dans cette ville qu'un an plus tard, le 25 août 1297. C'est un personnage politique important, « spécialiste des moyens illégaux de défendre le pouvoir légal », faisant partie du Conseil du roi de France Philippe IV le Bel qu'il assiste dans l'affaire des Templiers. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+La niche avec statuette d'Uchizy est un lieu situé à Uchizy, dans le département de Saône-et-Loire, en France. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Deifontes est une commune de la communauté autonome d'Andalousie, dans la province de Grenade, en Espagne. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+An-Nâsir Faraj ben Barquq (1389-1412) est un sultan mamelouk burjite qui règne en Égypte de 1399 à 1412 avec une éclipse de deux mois en 1405 pendant laquelle il est remplacé par son frère Al-Mansûr Abd al-Azîz. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Le 20 juin 1399, âgé seulement de dix ans, il succède son père Barquq. Lors de son avènement, l'Égypte mamelouk est menacée d'un côté par les Ottomans qui ont pris Malatya en Cilicie et par Tamerlan qui envoie un ultimatum à Faradj pour qu’il se reconnaisse son vassal et lui livre les transfuges qui s’étaient réfugiés en Égypte et en Syrie. Celui-ci refuse et se prépare à la guerre1.
+À l'intérieur, les factions s'affrontent entre les partisans d'Itmich, lieutenant général, et le puissant émir Yachbak. Ce dernier l'emporte et Itmich doit se réfugier en Syrie où le gouverneur de Damas Sayf al-din Tanibak al-Hasani a fait sécession et marche sur le Caire. Dans le même temps diverses séditions éclatent en haute Égypte. Faraj marche contre les rebelles de Syrie, et les bat près de Gaza, après avoir acheté les services des émirs2.
+En octobre 1400 Tamerlan marche sur Alep et bât l'armée mamelouk le 30. La ville est pillée pendant trois jours. Faraj avance en Syrie, remporte quelques succès, mais refuse de négocier la paix. Le 25 décembre, il est battu devant Damas. Il abandonne la ville à l'annonce d'une sédition au Caire le 8 janvier 14013. Tamerlan repart le 19 mars 1401 après avoir mis le pays à sac et la Syrie retombe aux mains des mamelouks.
+Rentré au Caire, Faraj doit affronter de nouveau la guerre civile. En 1404 deux émirs, Yachbak et le Chaykh al-Muhammudi menacent sérieusement Faradj en Syrie mais sont finalement vaincu. Le 21 septembre 1405 une nouvelle sédition dépose le sultan, qui doit fuir et est remplacé par son frère Abd al-Azîz. Yachbak replace Faradj sur le trône au bout de deux mois et demi. Le parti de Yachbak triomphe et lui-même devient lieutenant général du sultanat.
+Pendant ces évènements, un émir rebelle, Djakam, se fait proclamer sultan à Alep et étend sa domination sur toute la Syrie. Faradj se rend à Alep et Damas, sans pouvoir rétablir la paix. Djakam est finalement tué en luttant contre les Turcomans d'Amid. Faradj revient de nouveau en Syrie, et entre à Damas. Il fait emprisonner Yachbak et le Chaykh al-Muhammudi, serviteurs peu fidèles. Mais les deux officiers s'évadent et se retournent contre le sultan, rassemblant un parti puissant. La guerre civile continue jusqu'au 7 mai 1412 quand Faraj, abandonné par ses troupes, est déposé et assassiné à Damas. Le Chaykh al-Muhammudî lui succède après un court interrègne de quelques mois pendant lequel le calife abbasside Al-Musta`in bi-llah Abû al-Fadhl est nommé sultan.
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Le scrutin est organisé avec cinq mois d'avance sur le terme de la IXe législature. Il se tient dans le contexte d'une crise économique majeure et voit le président du gouvernement José Luis Rodríguez Zapatero, issu du Parti socialiste et au pouvoir depuis avril 2004, se retirer de la vie politique. Six mois auparavant, les élections municipales et des parlements autonomes ont donné une large victoire au Parti populaire, qui s'est imposé dans des bastions historiques de la gauche.
+Les résultats montrent une déroute historique des socialistes conduits par l'ancien ministre de l'Intérieur Alfredo Pérez Rubalcaba, largement devancés par les conservateurs du chef de l'opposition Mariano Rajoy. Ils marquent également une forte progression des partis du centre droit et de droite, qui remportent ensemble la majorité des suffrages exprimés, une première depuis 2000.
+Un mois plus tard, Mariano Rajoy est effectivement investi président du gouvernement et forme l'exécutif le plus réduit de l'histoire post-franquiste. En février 2012, Alfredo Pérez Rubalcaba prend la succession de José Luis Rodríguez Zapatero au secrétariat général du Parti socialiste après avoir défait l'ex-ministre de la Défense Carme Chacón lors du congrès socialiste. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+(16362) 1979 MJ4 est un astéroïde de la ceinture principale d'astéroïdes de 7,422 km de diamètre découvert en 1979.
+(16362) 1979 MJ4 a été découvert le 25 juin 1979 à l'observatoire de Siding Spring, situé près de Coonabarabran, en Nouvelle-Galles du Sud, en Australie, par Eleanor Francis Helin et S. J. Bus.
+L'orbite de cet astéroïde est caractérisée par un demi-grand axe de 2,58 UA, un périhélie de 2,09 UA, une excentricité de 0,19 et une inclinaison de 12,88° par rapport à l'écliptique1. Du fait de ces caractéristiques, à savoir un demi-grand axe compris entre 2 et 3,2 UA et un périhélie supérieur à 1,666 UA, il est classé, selon la JPL Small-Body Database, comme objet de la ceinture principale d'astéroïdes1.
+(16362) 1979 MJ4 a une magnitude absolue (H) de 14,4 et un albédo estimé à 0,073, ce qui permet de calculer un diamètre de 7,422 km. Ces résultats ont été obtenus grâce aux observations du Wide-Field Infrared Survey Explorer (WISE), un télescope spatial américain mis en orbite en 2009 et observant l'ensemble du ciel dans l'infrarouge, et publiés en 2011 dans un article présentant les premiers résultats concernant les astéroïdes de la ceinture principale3. 
+}
+
+
+
+
+\slipsumloadaseq[wiki]{par}{
+Le Pool Getafe est un club féminin espagnol de basket-ball basé à Getafe (Madrid). Le club a appartenu à la Liga Femenina, soit le plus haut niveau du championnat espagnol. 
+}
+
+
+
+
+%\slipsumloadaseq[wiki]{par}{
+%}
+
+
+
+
+
+
+%---------------------------------------------------------
+\begin{document}
+%\tlipsummaxparcount\ quotes stored.\par
+
+%\tlipsum[3-6]
+\tlipsum[\tlipsummaxparcount]
+
+%\tlipsumr
+
+%\tlipsumrr
+
+
+
+Lipsum text\par\bigskip
+
+\slipsumprintitem[s]{par1}{1}
+\slipsumprintitem[s]{par2}{3}
+%\slipsumprintitem[s]{par\slipsummaxparcount}{\firstitem}
+%
+\slipsumprintitemr[s]{par}
+\slipsumprintitemr[test]{testpar}
+\slipsumprintitemr[test]{testpar}
+
+\slipsumprintitemr[wiki]{par}
+\slipsumprintitemr[wiki]{par}
+\slipsumprintitemr[wiki]{par}
+\slipsumprintitemr[wiki]{par}
+\slipsumprintitemr[wiki]{par}
+
+\slipsumprintitemrr[wiki]{par}{7}{5}
+
+>>\slipsumprintitemrr[wiki]{par}{3}{7}
+
+
+\end{document}
