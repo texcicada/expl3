@@ -1,0 +1,2451 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+\usepackage{xparse}
+\usepackage{tikz} % before gb4e
+\usepackage{gb4e}
+%\usepackage{enumitem}
+\usepackage{etoolbox} % patch
+%\usepackage{tabularx}
+\usepackage{calc} % widthof
+
+%https://tex.stackexchange.com/questions/425424/boxed-text-and-underline-within-the-gb4e-environment/425467#425467
+% answered Apr 8, 2018 at 13:51
+%user avatar
+%Alan Munn
+%\usepackage{tikz}
+\newcommand*{\tkzmk}[1]{\tikz[remember picture,overlay] \node (#1) {};}
+\newcommand*{\tkzuline}[2]{\tikz[overlay,remember picture]{ \draw (#1.south) -- (#2.south);}}
+\newcommand*{\UL}{\tkzmk{1}}
+\newcommand*{\LU}{\tkzmk{2}}
+\newcommand*{\gluline}{\tkzuline{1}{2}}
+
+\newfontface\fug{Noto Sans Ugaritic}
+\newfontface\fsym{Symbola}
+\DeclareTextFontCommand\textsym{\fsym}
+\newcommand\speech{\ \textsym{🕪}}
+\newcommand\writing{\ \textsym{🖉}}
+\newcommand\uplb{\textup{(}}
+\newcommand\uprb{\textup{)}}
+\newcommand\uplq{\textup{`}}
+\newcommand\uprq{\textup{'}}
+\newcommand\uplqq{\textup{``}}
+\newcommand\uprqq{\textup{''}}
+\newcommand\emphe{\emph{e}}
+\newcommand\subi{\textsubscript{i}}
+\newcommand\backoneline{\\[-\baselineskip]}
+\newcommand\backonelineb{\vskip{-\baselineskip}}
+\newcommand\emphx{\emph{x}}
+\newcommand\bffbox[1]{\fbox{\textbf{#1}}}
+\newcommand\bffcolorbox[1]{\fcolorbox{black}{\bffcolor}{\textbf{#1}}}
+\newcommand\bffcolor{blue!15}
+\newcommand\llaphash{\llap{\#}}
+\newcommand\llapstar{\llap{*}}
+
+
+
+
+
+%squiggle
+\newcommand\squiggle{%
+\begin{center}
+{\usefont{U}{lasy}{m}{n}\char58\char58\char58\char58\char58\char58\char58\char58\char58}
+\end{center}
+}
+%-------------------------------------------------------------
+\ExplSyntaxOn
+
+
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ cno }
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ coo }
+
+		\cs_generate_variant:Nn 
+			\seq_item:Nn 
+			{ cn }
+
+		\cs_generate_variant:Nn 
+		\regex_match:nnT
+		{ nvT }
+		
+		
+\tl_new:N \g_fc_namespace_tl % O-
+\int_new:N \g_gloss_licount_int
+\int_new:N \g_gloss_wordcount_int
+\int_new:N \g_gloss_wordsonthisline_int
+\tl_new:N \g_fc_wnamespace_tl
+\tl_new:N \g_fc_mylinenum_tl
+\tl_new:N \g_gloss_currentline_tl
+\tl_new:N \g_gloss_currentword_tl
+\tl_new:N \g_gloss_parentline_tl
+
+%------------------
+%****************************************************
+%* procedures
+%****************************************************
+%------------------
+\tl_new:N \g__gloss_intoseqname_tl
+\tl_new:N \g__gloss_fromseqname_tl
+%\tl_new:N \g__gloss_intoseqwhat_tl
+%\tl_new:N \g__gloss_intoseqbywhat_tl
+\int_new:N \g__gloss_clausecount_int
+\int_new:N \g__gloss_clauseloop_int
+\tl_new:N \g__gloss_clauseloop_tl
+
+\int_new:N \g__gloss_basenamecount_int
+\int_new:N \g__gloss_basenameloop_int
+\tl_new:N \g__gloss_basenameloop_tl
+
+\int_new:N \g__gloss_wordloop_int
+\tl_new:N \g__gloss_wordloop_tl
+
+\int_new:N \g__gloss_maxlinecount_int
+\int_new:N \g__gloss_maxwordcount_int
+
+\bool_new:N \g__gloss_vpar_bool
+\int_new:N \g__gloss_vpar_int
+
+\bool_new:N \g__gloss_keepdotpos_bool
+\bool_set_true:N \g__gloss_keepdotpos_bool
+
+\bool_new:N \g__gloss_numberedwords_bool
+\bool_set_false:N \g__gloss_numberedwords_bool
+
+\bool_new:N \g__gloss_glosstrans_bool
+\bool_new:N \g__gloss_formattedvbox_bool
+
+
+	% 1=from seq base name
+\tl_new:N \g__gloss_frombasename_tl
+	% 2=base name loop start
+\int_new:N \g__gloss_basenamestart_int
+	% 3=base name loop finish
+\int_new:N \g__gloss_basenamefinish_int
+	% 4=words seq 1 (words to box)
+\tl_new:N \g__gloss_wordstobox_tl
+
+
+
+
+%-----------------------------
+	\cs_set:Npn \gl_functexttransall:n #1 { 
+
+	\tl_set:Nx
+				\l_tmpc_tl
+			{
+														\seq_item:cn
+																{ g_gloss_current_seq }
+																{ #1 }
+
+			}
+
+
+
+
+				
+	%		:command;	 > \command	
+		\regex_replace_all:nnN
+				{ (\:)(\w+)(;) }
+				{ \c{\2}  }
+				\l_tmpc_tl
+	
+%%	%		:command	> 	\command
+%%		\regex_replace_all:nnN
+%%				{ (\:)(\w+) }
+%%				{ \c{\2}  }
+%%				\l_tmpc_tl
+				
+										\tex_space:D
+										
+%										\\
+								\int_compare:nNnTF
+								  { #1 } = { 2 }
+								  {
+								   \tl_if_empty:NTF
+								  		\g_gloss_parentline_tl 
+								  		{ } %do nothing - line is empty
+								  		{ \\ }
+								  }
+								  { \\ }		
+										
+										
+	\tl_use:N
+				\l_tmpc_tl
+}
+
+
+%-----------------------------
+	\cs_set:Npn \gl_functexttrans:n #1 { 
+
+	\tl_set:Nx
+				\l_tmpc_tl
+			{
+														\seq_item:cn
+																{ g_gloss_glossglosses \int_use:N \g__gloss_maxlinecount_int _seq }
+																{ #1 }
+
+			}
+
+
+
+
+				
+	%		:command;	 > \command	
+		\regex_replace_all:nnN
+				{ (\:)(\w+)(;) }
+				{ \c{\2}  }
+				\l_tmpc_tl
+	
+%%	%		:command	> 	\command
+%%		\regex_replace_all:nnN
+%%				{ (\:)(\w+) }
+%%				{ \c{\2}  }
+%%				\l_tmpc_tl
+				
+										\tex_space:D
+										\\
+	\tl_use:N
+				\l_tmpc_tl
+}
+
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcgtoutbox:  { 
+ 	% ===============================
+	% The dim is: 
+	%							{ g_gloss_wordwidth\g__gloss_wordloop_tl _dim }
+
+ 	% ===============================
+  % set each nth word to widest width
+
+%\int_show:N \g__gloss_basenamecount_int
+
+
+	\int_set:Nn
+			\l_tmpa_int
+			{ 1 }
+ 	\int_do_until:nNnn % for each line
+ 		{ \l_tmpa_int } > { \g__gloss_basenamecount_int } 
+ 					{
+	%+++
+	%+++
+	
+%	\int_show:N \g__gloss_basenamecount_int
+%\seq_show:c
+%				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+	
+ 	 				\int_set:Nn
+					\l_tmpb_int
+					{ 1 }
+ 					\int_do_until:nNnn % for each word
+ 					{ \l_tmpb_int } > { \seq_count:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq } } 	%%%
+ 				{
+%---start
+\tl_gset:Nx \g_gloss_currentline_tl { \int_use:N \l_tmpa_int }
+\tl_gset:Nx \g_gloss_currentword_tl { \int_use:N \l_tmpb_int }
+
+%\box_show:c
+%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+
+
+\box_gset_wd:cn
+			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+			{ 
+					\dim_use:c
+							{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+			}
+%%			x
+%					\dim_use:c
+%							{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+% output: wfw:
+	\box_use:c %=
+			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+	\tex_space:D %=
+	\tex_space:D %=
+
+			
+				\int_incr:N 
+						\l_tmpb_int
+
+					} 	
+					
+% output: trans lines:
+	\seq_set_eq:Nc
+	  \g_gloss_current_seq 
+	  { g_gloss_glossglosses\g_gloss_currentline_tl _seq }
+	 \tl_gset:Nx
+	     \g_gloss_parentline_tl 
+	     {
+	        \seq_item:cn
+	        { g_gloss_glossglosses\g_gloss_currentline_tl _seq }
+	        { 1 }
+	     }
+		\gl_functranoutall:
+
+%%%\g_gloss_glossglosses4_seq
+%%4 = line number
+%%items 2+ are translations
+
+			\\ %=
+						\int_incr:N 
+								\l_tmpa_int
+		} 	
+
+}
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcregexmeta:  { 
+% regex meta commands
+		\bool_if:NTF
+		\g__gloss_keepdotpos_bool
+		{
+%    .text  >  .{\mfsposformat text}
+		\regex_replace_all:nnN
+				{ (\.)(\w+) }
+				{ \1 \cB\{ \c{mfsposformat} \2 \cE\} }
+				\l_tmpc_tl
+		}
+		{
+%    .text  >  {\mfsposformat text}
+		\regex_replace_all:nnN
+				{ (\.)(\w+) }
+				{ \cB\{ \c{mfsposformat} \2 \cE\} }
+				\l_tmpc_tl
+			}
+			
+
+	%		word::command;	 > \command	{word}
+		\regex_replace_all:nnN
+				{ (\w+)(\:\:)(\w+)(;) }
+				{ \c{\3} \cB\{ \1 \cE\}  }
+				\l_tmpc_tl
+			
+
+			
+%		:command;	 > \command	
+		\regex_replace_all:nnN
+				{ (\:)(\w+)(;) }
+				{ \c{\2}  }
+				\l_tmpc_tl
+				
+%		:command	> 	\command
+		\regex_replace_all:nnN
+				{ (\:)(\w+) }
+				{ \c{\2}  }
+				\l_tmpc_tl
+				
+
+		\regex_match:nvT
+				{ \+ }
+				{ l_tmpc_tl } 
+				{ \int_set_eq:NN 
+							\g__gloss_vpar_int 
+							\g__gloss_wordloop_int }
+%				{ \bool_set_true:N \g__gloss_vpar_bool } 
+%				{ \bool_set_false:N \g__gloss_vpar_bool }
+%				 \int_show:N 
+%							\g__gloss_vpar_int 
+				
+		\regex_replace_all:nnN
+				{ \+ }
+				{  }
+				\l_tmpc_tl
+
+
+}
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcstacktheboxes:  { 
+% stack the boxes
+
+\tex_space:D %=
+
+
+%\int_set:Nn \g__gloss_vpar_int { 0 }
+
+% outer loop
+	\int_set:Nn
+			\g__gloss_clauseloop_int
+			{ 1 }
+
+	\int_set:Nn
+			\g__gloss_wordloop_int
+			{ 1 }
+
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_wordloop_int } > { \seq_count:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq } } 
+ 	 {
+	
+	
+
+% loop start
+
+\int_set:Nn 
+		\g__gloss_basenamecount_int
+		{ 
+				\int_use:N \g__gloss_basenamefinish_int	
+		}	
+	\int_set:Nn
+			\g__gloss_basenameloop_int
+			{ \int_use:N \g__gloss_basenamestart_int }
+
+\vbox_set_top:Nn
+		\l__vpair_box
+		{ %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				% stack all the words			
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_basenameloop_int } > { \g__gloss_basenamecount_int } 
+
+ 	 {
+
+\tl_gset:Nx
+	 \g__gloss_fromseqname_tl 
+	 { 
+	 		\tl_use:N \g__gloss_frombasename_tl 
+	 		\int_use:N \g__gloss_basenameloop_int
+	 }
+	 
+\tl_gset:Nx \g__gloss_intoseqname_tl 
+		{ 
+	 		\tl_use:N \g__gloss_frombasename_tl 
+	 		\int_use:N \g__gloss_basenameloop_int
+			\tl_use:N \g__gloss_wordstobox_tl
+		}
+
+\int_gset:Nn 
+		\g__gloss_clausecount_int
+		{ 
+				\seq_count:c
+						{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }		
+		}
+
+
+\tl_gset:Nx
+		\g__gloss_wordloop_tl
+		{ \int_use:N \g__gloss_wordloop_int }
+
+%\vskip-.32cm\hskip.01cm\vtop{
+	\box_use:c
+{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl\g__gloss_wordloop_tl _box }
+%}
+
+		%============================
+		\int_incr:N
+					\g__gloss_basenameloop_int
+		} % loop finish
+		
+		} %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  %store the width of the vbox:		
+		\dim_set:Nn \l_tmpa_dim {\box_wd:N \l__vpair_box}
+%		\dim_use:N \l_tmpa_dim
+
+	\cs_if_free:cT
+			{ g_gloss_wordwidth\g__gloss_wordloop_tl _dim }
+			{ \dim_new:c
+					{ g_gloss_wordwidth\g__gloss_wordloop_tl _dim }
+				}
+		
+		\dim_gset_eq:cN
+					{ g_gloss_wordwidth\g__gloss_wordloop_tl _dim }
+					\l_tmpa_dim
+		
+		
+%if stacked:		
+		\bool_if:NF
+		\g__gloss_glosstrans_bool
+		{ 
+\hbox_set:Nn
+		\l__hunit_box
+		{
+				\bool_if:NTF
+						\g__gloss_formattedvbox_bool
+							{
+								\colorbox{blue!12}{ % \phantom{yl}
+										\box_use:N %=
+											\l__vpair_box
+										} %end colorbox
+								} %end true
+								{ %false
+										\box_use:N %=
+											\l__vpair_box
+								} %end false
+					} 	% end box_set
+
+
+
+		\box_use:N %=
+				\l__hunit_box 
+				
+
+						\int_compare:nNnTF
+							{ \g__gloss_vpar_int  } = { \g__gloss_wordloop_int }
+							{
+									\\ % insert new line if xxx+ was in the wfw line
+									\int_set:Nn \g__gloss_vpar_int { 0 }
+							}
+				{
+							\tex_space:D %=
+							\tex_space:D %=		
+				}
+
+			} %end if-stacked				
+							 
+
+
+				
+		\int_incr:N
+					\g__gloss_wordloop_int
+		} % outer loop finish
+
+}
+
+\seq_new:N \g_gloss_current_seq
+%------------------
+	\cs_set:Npn \gl_functranoutall:  { 
+ 			\int_compare:nNnT
+							{ \seq_count:c
+									{ g_gloss_current_seq }
+%									{ g_gloss_glossglosses1_seq }
+									} > { 1 }
+							{
+%								\smallskip
+								\int_step_function:nnnN
+										{ 2 } 
+										{ 1 } 
+										{ \seq_count:c
+									{ g_gloss_current_seq } } 
+										  \gl_functexttransall:n
+											}
+	 
+}
+
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_functranout:  { 
+ 			\int_compare:nNnT
+							{ \seq_count:c
+									{ g_gloss_glossglosses \int_use:N \g__gloss_maxlinecount_int _seq }
+							 } > { 1 }
+							{
+								\smallskip
+								\int_step_function:nnnN
+										{ 2 } 
+										{ 1 } 
+										{ \seq_count:c
+									{ g_gloss_glossglosses \int_use:N \g__gloss_maxlinecount_int _seq } } 
+										  \gl_functexttrans:n
+											}
+	 
+}
+
+
+%------------------
+	\cs_set:Npn \gl_funcboxall:nnnn #1#2#3#4 { 
+	% 1=from seq base name
+	% 2=base name loop start
+	% 3=base name loop finish
+	% 4=words seq 1 (words to box)
+	
+	% 1=from seq base name
+\tl_gset:Nx \g__gloss_frombasename_tl { #1 }
+	% 2=base name loop start
+\int_gset:Nn\g__gloss_basenamestart_int { #2 }
+	% 3=base name loop finish
+\int_gset:Nn \g__gloss_basenamefinish_int  { #3 }
+	% 4=words seq 1 (words to box)
+\tl_gset:Nx \g__gloss_wordstobox_tl { #4 }
+	
+	
+	
+%%				{glosses}
+%%				{1}
+%%				{\int_use:N
+%%						\g__gloss_clausecount_int
+%%						}
+%%				{words1}
+	
+	
+	
+% outer loop
+\int_set:Nn 
+		\g__gloss_basenamecount_int
+		{ 
+				#3		
+		}	
+	\int_set:Nn
+			\g__gloss_basenameloop_int
+			{ #2 }
+			
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_basenameloop_int } > { \g__gloss_basenamecount_int } 
+ 	 {
+	
+	
+\tl_set:Nx
+	 \g__gloss_fromseqname_tl 
+	 { 
+	 		#1 
+	 		\int_use:N \g__gloss_basenameloop_int
+	 }
+	 
+\tl_set:Nx \g__gloss_intoseqname_tl 
+		{ 
+	 		#1 
+	 		\int_use:N \g__gloss_basenameloop_int
+			#4
+		}
+
+%\tl_show:N \g__gloss_fromseqname_tl 
+%\tl_show:N \g__gloss_intoseqname_tl 
+
+\int_set:Nn 
+		\g__gloss_clausecount_int
+		{ 
+				\seq_count:c
+						{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }		
+		}
+
+% loop start
+
+	\int_set:Nn
+			\g__gloss_clauseloop_int
+			{ 1 }
+% 	\int_do_until:nNnn 
+% 		{ \g__gloss_clauseloop_int } > { \g__gloss_clausecount_int } 
+% 	 {
+
+	\int_set:Nn
+			\g__gloss_wordloop_int
+			{ 1 }
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_wordloop_int } > { \seq_count:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq } } 
+ 	 {
+
+%---
+			\int_compare:nNnT
+							{ \g__gloss_wordloop_int } > { \g__gloss_maxwordcount_int }
+							{
+				 	 				\int_set:Nn
+											\g__gloss_maxwordcount_int
+											{ \g__gloss_wordloop_int }
+					}
+%---
+
+\tl_set:Nx
+		\g__gloss_basenameloop_tl
+		{ \int_use:N \g__gloss_basenameloop_int }
+
+
+\tl_set:Nx
+		\g__gloss_wordloop_tl
+		{ \int_use:N \g__gloss_wordloop_int }
+
+\cs_if_free:cT
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl\g__gloss_wordloop_tl _box }
+		{ \box_new:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl\g__gloss_wordloop_tl _box }
+		}
+%---
+%{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+\cs_if_free:cT
+		{ g_gloss_line\g__gloss_basenameloop_tl word\g__gloss_wordloop_tl _box }
+		{ \box_new:c
+				{ g_gloss_line\g__gloss_basenameloop_tl word\g__gloss_wordloop_tl _box }
+		}
+
+
+
+	\tl_gset:Nx
+				\l_tmpc_tl
+			{
+				\seq_item:cn
+							{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl  _seq }
+							{ \int_use:N \g__gloss_wordloop_int }
+				}
+				
+				
+%-------------------------------------------
+%vvv
+		\gl_funcregexmeta:
+
+
+					\tl_put_right:Nn
+							\l_tmpc_tl
+							{ \strut } % for even coloured stack boxes
+
+				
+	\hbox_gset:cn 
+			{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl\g__gloss_wordloop_tl _box }
+			{
+			
+%xxx
+
+			
+%						\int_compare:nNnT
+%							{ \g__gloss_basenameloop_int } = { 1 }
+%							{
+%									\glfirstlineformat
+%							}
+					\int_case:nnTF { \g__gloss_basenameloop_int }
+					{
+					{ 1 } { \glfirstlineformat }
+					} { % true
+					    %
+					}
+					{ } % false
+
+
+					\tl_use:N
+							\l_tmpc_tl
+							
+					\bool_if:NT
+						\g__gloss_numberedwords_bool
+						{
+							\group_begin:
+							\upshape
+							\normalcolor
+							\textsuperscript {	\int_use:N \g__gloss_wordloop_int }
+							\group_end:
+							}
+	
+			}
+
+	\box_set_eq:cc 
+{ g_gloss_line\g__gloss_basenameloop_tl word\g__gloss_wordloop_tl _box }
+			{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl\g__gloss_wordloop_tl _box }
+
+%	\box_show:c 
+%{ g_gloss_line\g__gloss_basenameloop_tl word\g__gloss_wordloop_tl _box }
+
+
+		%============================
+		
+		\int_incr:N
+					\g__gloss_wordloop_int
+					
+		} % loop finish
+
+
+		\int_incr:N
+					\g__gloss_basenameloop_int
+					
+		} % outer loop finish
+
+
+%+++++++++++++++++++++++++
+\gl_funcstacktheboxes:
+
+
+%+++++++++++++++++++++++++
+	\bool_if:NT
+		\g__gloss_glosstrans_bool
+		{ 
+				%output (all) trans:
+				\gl_funcgtoutbox:
+			}				
+
+
+% :\g_gloss_glossglosses4_seq
+% if itemcount > 1 then translation(s)
+% \g__gloss_maxlinecount_int
+
+
+	\bool_if:NF
+		\g__gloss_glosstrans_bool
+		{ 
+				%output the (last line) trans:
+				\gl_functranout:
+			}				
+}
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcsplitloopseq:nnnnn #1#2#3#4#5 { 
+	% 1=from seq base name
+	% 2=base name loop start
+	% 3=base name loop finish
+	% 4=by what
+	% 5=into seq
+	
+% outer loop
+\int_set:Nn 
+		\g__gloss_basenamecount_int
+		{ 
+				#3		
+		}	
+	\int_set:Nn
+			\g__gloss_basenameloop_int
+			{ #2 }
+			
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_basenameloop_int } > { \g__gloss_basenamecount_int } 
+ 	 {
+	
+	
+\tl_set:Nx
+	 \g__gloss_fromseqname_tl 
+	 { 
+	 		#1 
+	 		\int_use:N \g__gloss_basenameloop_int
+	 }
+	 
+\tl_set:Nx \g__gloss_intoseqname_tl 
+		{ 
+	 		#1 
+	 		\int_use:N \g__gloss_basenameloop_int
+			#5 
+		}
+
+%\tl_show:N \g__gloss_fromseqname_tl 
+%\tl_show:N \g__gloss_intoseqname_tl 
+
+\int_set:Nn 
+		\g__gloss_clausecount_int
+		{ 
+				\seq_count:c
+						{ g_gloss_ \g_fc_namespace_tl \g__gloss_fromseqname_tl _seq }		
+		}
+
+% loop start
+
+	\int_set:Nn
+			\g__gloss_clauseloop_int
+			{ 1 }
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_clauseloop_int } > { \g__gloss_clausecount_int } 
+ 	 {
+
+\tl_set:Nx
+		\g__gloss_clauseloop_tl
+		{ \int_use:N \g__gloss_clauseloop_int }
+
+\cs_if_free:cT
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+		{ \seq_new:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+		}
+
+	\seq_gclear:c 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+
+			\exp_args:Nnnx
+	\seq_gset_split:coo 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+			{ #4 } % separator
+			{ 
+				\seq_item:cn
+							{ g_gloss_ \g_fc_namespace_tl \g__gloss_fromseqname_tl  _seq }
+							{ \int_use:N \g__gloss_clauseloop_int }
+			 }
+
+%%%	\seq_show:c 
+%%%		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+		
+%		%=
+%		\tex_par:D
+%		\g_fc_namespace_tl |
+%		\g__gloss_intoseqname_tl |
+%		\g__gloss_clauseloop_tl |
+%		=
+%		\seq_use:cn
+%		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+%		{ / }		
+		
+		%--------------------------------
+		
+		
+		%============================
+		
+		\int_incr:N
+					\g__gloss_clauseloop_int
+					
+		} % loop finish
+
+
+		\int_incr:N
+					\g__gloss_basenameloop_int
+					
+		} % outer loop finish
+
+}
+
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcsplitseq:nnn #1#2#3 { 
+	% 1=from seq
+	% 2=by what
+	% 3=into seq
+	
+\tl_set:Nx \g__gloss_fromseqname_tl { #1 }
+\tl_set:Nx \g__gloss_intoseqname_tl { #3 }
+
+%\tl_show:N \g__gloss_fromseqname_tl 
+%\tl_show:N \g__gloss_intoseqname_tl 
+
+\int_set:Nn 
+		\g__gloss_clausecount_int
+		{ 
+				\seq_count:c
+						{ g_gloss_ \g_fc_namespace_tl \g__gloss_fromseqname_tl _seq }		
+		}
+
+% loop start
+
+	\int_set:Nn
+			\g__gloss_clauseloop_int
+			{ 1 }
+ 	\int_do_until:nNnn 
+ 		{ \g__gloss_clauseloop_int } > { \g__gloss_clausecount_int } 
+ 	 {
+
+\tl_set:Nx
+		\g__gloss_clauseloop_tl
+		{ \int_use:N \g__gloss_clauseloop_int }
+
+\cs_if_free:cT
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+		{ \seq_new:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+		}
+
+	\seq_gclear:c 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+
+			\exp_args:Nnnx
+	\seq_gset_split:coo 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+			{ #2 } 
+			{ 
+				\seq_item:cn
+							{ g_gloss_ \g_fc_namespace_tl \g__gloss_fromseqname_tl  _seq }
+							{ \int_use:N \g__gloss_clauseloop_int }
+			 }
+
+%%	\seq_show:c 
+%%		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl \g__gloss_clauseloop_tl _seq }
+%==>\g_gloss_glossglosses4_seq
+		
+		\int_incr:N
+					\g__gloss_clauseloop_int
+					
+		} % loop finish
+
+}
+
+
+
+
+
+
+
+%------------------
+	\cs_set:Npn \gl_funcsplit:nnn #1#2#3 { 
+	% 1=into seq
+	% 2=what
+	% 3=by what
+
+\tl_set:Nx \g__gloss_intoseqname_tl { #1 }
+\tl_set:Nx \g__gloss_intoseqwhat_tl { #2 }
+\tl_set:Nx \g__gloss_intoseqbywhat_tl { #3 }
+
+%\tl_show:N \g__gloss_intoseqname_tl 
+%\tl_show:N \g__gloss_intoseqwhat_tl 
+%\tl_show:N \g__gloss_intoseqbywhat_tl 
+
+
+
+\cs_if_free:cT
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+		{ \seq_new:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+		}
+
+	\seq_gclear:c 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+
+%			\exp_args:Nnnx
+	\seq_gset_split:coo 
+		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+			{ #3 } 
+			{ #2 }
+
+%%%	\seq_show:c 
+%%%		{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }
+
+\int_set:Nn 
+		\g__gloss_maxlinecount_int
+		{
+			\seq_count:c
+				{ g_gloss_ \g_fc_namespace_tl \g__gloss_intoseqname_tl _seq }	
+		}
+
+}
+
+
+
+%****************************************************
+%* main commands
+%****************************************************
+%--------------------
+\NewDocumentCommand { \glinlinesbase } { o m m +m } { 
+	% 1=namespace
+	% 2=seq
+	% 3=sep
+	% 4=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+\int_set:Nn \g__gloss_maxlinecount_int { 0 }
+	% split into input lines
+	\gl_funcsplit:nnn {#2inlines}{#4}{#3}
+	% 1=into seq
+	% 2=what
+	% 3=by what
+	\gl_funcsplitseq:nnn 
+			{#2inlines}
+			{glt}
+			{glosses}
+%\int_show:N \g__gloss_maxlinecount_int
+
+%\int_show:N
+%		\g__gloss_clausecount_int
+%	\gl_funcsplitseq:nnn {glosses1}{~}{xxx}
+	\gl_funcsplitloopseq:nnnnn 
+				{glosses}
+				{1}
+				{
+						\int_use:N
+							\g__gloss_maxlinecount_int
+					}
+				{~}
+				{words}
+%				\int_show:N
+%						\g__gloss_clausecount_int
+\int_set:Nn \g__gloss_maxwordcount_int { 0 }
+
+	\gl_funcboxall:nnnn 
+				{glosses}
+				{1}
+				{
+						\int_use:N
+							\g__gloss_maxlinecount_int
+						}
+				{words1}
+%\int_show:N \g__gloss_maxwordcount_int
+
+				
+
+}
+
+
+
+
+
+%--------------------
+\NewDocumentCommand { \glinlines } { s +m } { 
+	% 1==gloss/trans print choice
+	% 2==data
+    \IfBooleanTF {#1} 
+    { \bool_set_true:N  \g__gloss_glosstrans_bool } 
+    { \bool_set_false:N  \g__gloss_glosstrans_bool }
+    
+		\glinlinesbase[gloss]{ex2a}{*/}{#2}
+}
+
+
+%--------------------
+\NewDocumentCommand { \glinlinesnote } { +m m } { 
+	% 1==data
+	% 2==note
+	
+\begin{minipage}[t]{\linewidth-3em-\widthof{(#2)}}
+			\glinlines{#1}
+\end{minipage} 
+\hfill
+\begin{minipage}[t]{\widthof{(#2)}}
+ (#2)
+\end{minipage}
+
+}
+
+
+
+
+
+
+%--------------------
+\NewDocumentCommand { \glfirstlineformat } { } { 
+			
+}
+%--------------------
+\NewDocumentCommand { \glsetfirstlineformat } { m } { 
+			\renewcommand{\glfirstlineformat}{#1}
+}
+
+%--------------------
+\NewDocumentCommand { \mfspreformat } { } { 
+			\makebox[1.2in]{}
+}
+%--------------------
+\NewDocumentCommand { \mfssetpreformat } { m } { 
+			\renewcommand{\mfspreformat}{#1}
+}
+%--------------------
+\NewDocumentCommand { \mfsposformat } { } { 
+			\scshape
+}
+%--------------------
+\NewDocumentCommand { \mfssetposformat } { m } { 
+			\renewcommand{\mfsposformat}{#1}
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \mfskeepdotposon } { } { 
+			\bool_gset_true:N \g__gloss_keepdotpos_bool
+}
+
+%--------------------
+\NewDocumentCommand { \mfskeepdotposoff } { } { 
+			\bool_gset_false:N \g__gloss_keepdotpos_bool
+}
+
+
+
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsglosstranson } { } { 
+			\bool_gset_true:N \g__gloss_glosstrans_bool
+}
+
+%--------------------
+\NewDocumentCommand { \mfsglosstransoff } { } { 
+			\bool_gset_false:N \g__gloss_glosstrans_bool
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsformattedvboxon } { } { 
+			\bool_gset_true:N \g__gloss_formattedvbox_bool
+}
+
+%--------------------
+\NewDocumentCommand { \mfsformattedvboxoff } { } { 
+			\bool_gset_false:N \g__gloss_formattedvbox_bool
+}
+
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsnumberedwordson } { } { 
+			\bool_gset_true:N \g__gloss_numberedwords_bool
+}
+
+%--------------------
+\NewDocumentCommand { \mfsnumberedwordsoff } { } { 
+			\bool_gset_false:N \g__gloss_numberedwords_bool
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsloadwords } { o m +m } { 
+% 1=namespace
+% 2=line number
+% 3=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_wnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_wnamespace_tl { #1 } }
+
+
+	\cs_if_free:cT
+			{ g_fc_line \g_fc_wnamespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+			}
+	\seq_gclear:c 
+			{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+			\exp_args:Nnnx
+	\seq_gset_split:cno 
+			{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+			{ ~ } 
+			{ #3 }
+
+%	\seq_show:c 
+%			{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+
+	\int_gset:Nn
+			\g_gloss_wordcount_int
+			{
+					\seq_count:c 
+							{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+				
+			}
+
+% word ``registers''
+	\cs_if_free:cT
+			{ g_fc_line \g_fc_wnamespace_tl #2 wordcount_int }
+			{ \int_new:c
+					{ g_fc_line \g_fc_wnamespace_tl #2 wordcount_int } 
+			}
+	\int_gset:cn
+			{ g_fc_line \g_fc_wnamespace_tl #2 wordcount_int }
+			{
+					\seq_count:c 
+							{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+				
+			}
+
+
+%%%=
+%%	\seq_use:cn
+%%			{ g_fc_line \g_fc_wnamespace_tl #2 _seq } 
+%%			{ | }
+%%
+%%	\tex_space:D (
+%%	\int_use:N
+%%			\g_gloss_wordcount_int
+%% 	\tex_space:D items for line #2)
+}
+
+
+
+
+%--------------------
+\tl_new:N \l_tmpc_tl
+\tl_new:N \l_tmpd_tl
+\tl_new:N \l_texttranslinenum_tl
+\tl_new:N \l_texttransline_tl
+\int_new:N \l_texttransline_int
+\int_new:N \l_texttransloop_int
+\NewDocumentCommand { \mfsloadaseql } { o m m +m } { 
+% 1=namespace
+% 2=seq name
+% 3=sep
+% 4=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			}
+			
+	\seq_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+	\seq_gset_split:cno 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ #3 } 
+			{ #4 }
+
+%%=
+%	\seq_show:c 
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+
+
+
+
+%-----
+	\int_gset:Nn
+			\g_gloss_licount_int
+			{
+					\seq_count:c 
+							{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+				
+			}
+
+
+%%%%=
+%%%	\seq_use:cn
+%%%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+%%%			{ | }
+
+%%%%=
+%%%	\tex_space:D (
+%%%	\int_use:N
+%%%			\g_gloss_licount_int
+%%% 	\tex_space:D items)
+ 	
+ 	% words:
+	\int_set:Nn
+			\l_tmpa_int
+			{ 1 }
+ 	\int_do_until:nNnn 
+ 		{ \l_tmpa_int } > { \g_gloss_licount_int } 
+ 	 {
+% 	 xxx
+ 	 % split out any translation
+	\tl_set:Nx 
+			\l_texttranslinenum_tl 	 
+			{ \int_use:N \l_tmpa_int }
+			
+	\cs_if_free:cT
+			{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq }
+			{ \seq_new:c
+					{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq } 
+			}
+
+	\tl_set:Nx 
+			\l_texttransline_tl 	 
+			{ 
+							 		\seq_item:cn
+ 	 							{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+ 	 							{ \int_use:N \l_tmpa_int }
+
+				}
+
+			
+%	\exp_args:NNNx		
+	\seq_gset_split:cno 
+			{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq } 
+			{ glt } 
+			{ 
+				\l_texttransline_tl
+%			 		\seq_item:cn
+% 	 							{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+% 	 							{ \int_use:N \l_tmpa_int }
+			 }
+ 	 
+ 	 %=
+%	\seq_show:c 
+%			{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq }  	 
+ 	 
+ 	 % store the text
+ 	 	\tl_set:Nx 
+ 	 				\l_tmpb_tl
+ 	 				{ 
+% 	 						\seq_item:cn
+% 	 								{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+% 	 								{ \int_use:N \l_tmpa_int }
+ 	 						\seq_item:cn
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq } 
+ 	 								{ 1 }
+
+ 	 				 }
+% 	 	\tl_show:N
+% 	 				\l_tmpb_tl
+ 	 		\mfsloadwords 	{ \int_use:N \l_tmpa_int 	}{ \tl_use:N \l_tmpb_tl }
+			\int_incr:N
+					\l_tmpa_int
+ 	 }
+
+
+ 	% ===============================
+ 	% box everything: (line,word) coord
+	\int_set:Nn
+			\l_tmpa_int
+			{ 1 }
+ 	\int_do_until:nNnn % for each line
+ 		{ \l_tmpa_int } > { \g_gloss_licount_int } 
+ 	 {
+					
+					\tl_set:Nx 
+							\g_fc_mylinenum_tl					
+							{ \int_use:N \l_tmpa_int }
+%			\seq_show:c
+%											{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+							
+							\exp_args:NNx
+					\int_set:Nn 
+							\g_gloss_wordsonthisline_int
+							{
+									\seq_count:c
+											{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+							}
+%					\int_show:N
+%							\g_gloss_wordsonthisline_int
+							
+ 	 				\int_set:Nn
+					\l_tmpb_int
+					{ 1 }
+					
+%				\int_show:c			{ g_fc_line \g_fc_wnamespace_tl \int_use:N \l_tmpa_int wordcount_int }
+%				\int_show:N \g_gloss_wordsonthisline_int 
+
+ 					\int_do_until:nNnn % for each word
+% 					{ \l_tmpb_int } > { \g_gloss_wordsonthisline_int } 
+ 					{ \l_tmpb_int } > { \int_use:c			{ g_fc_line \g_fc_wnamespace_tl \int_use:N \l_tmpa_int wordcount_int } } 
+ 	 				{
+%---start
+\tl_gset:Nx \g_gloss_currentline_tl { \int_use:N \l_tmpa_int }
+\tl_gset:Nx \g_gloss_currentword_tl { \int_use:N \l_tmpb_int }
+
+	\cs_if_free:cT
+			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+			{ \box_new:c
+					{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box } 
+			}
+			
+%xxx-start
+%	\hbox_gset:cn 
+%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%			{
+%				\seq_item:cn
+%						{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+%						{ \int_use:N \l_tmpb_int }
+%			}
+
+	\tl_set:Nx
+				\l_tmpc_tl
+			{
+				\seq_item:cn
+						{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+						{ \int_use:N \l_tmpb_int }
+			}
+
+
+%vvv
+		\regex_replace_all:nnN
+				{ (\.)(.) }
+				{ \1 \c{mfsposformat} \2 }
+				\l_tmpc_tl
+
+	\hbox_gset:cn 
+			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+			{
+				\tl_use:N
+							\l_tmpc_tl
+			}
+
+
+%------------------------ end compound gloss
+
+%%%%=			
+%%%			% show:
+%%%			\tex_par:D
+%%%	\box_use:c
+%%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box } ~ \int_use:N \l_tmpa_int --  \int_use:N \l_tmpb_int :
+%%%	\the\box_wd:c
+%%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%%%			.
+%---end
+ 	 					\int_incr:N 
+ 	 							\l_tmpb_int
+					} 	
+		\int_incr:N 
+				\l_tmpa_int
+		} 	
+ 	
+ 	
+%%% re-calc now that we are outside the loop
+%%							\exp_args:NNx
+%%					\int_set:Nn 
+%%							\g_gloss_wordsonthisline_int
+%%							{
+%%									\seq_count:c
+%%											{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+%%							}
+%% 	
+%%  \int_show:N \g_gloss_wordsonthisline_int 	
+
+
+ 	% ===============================
+ 	
+  % find widest box by word number (assumes lines are balanced)
+ 	 				\int_set:Nn
+					\l_tmpb_int
+					{ 1 }
+ 					\int_do_until:nNnn % for each word
+ 					{ \l_tmpb_int } > { \g_gloss_wordsonthisline_int } 	%%%
+% 					{ \l_tmpb_int } > { \int_use:c			{ g_fc_line \g_fc_wnamespace_tl \int_use:N \l_tmpa_int wordcount_int } } 	%%%
+ 					
+ 					{
+					
+%%					\tl_set:Nx 
+%%							\g_fc_mylinenum_tl					
+%%							{ \int_use:N \l_tmpa_int }
+%%%			\seq_show:c
+%%%											{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+%%							
+%%							\exp_args:NNx
+%%					\int_set:Nn 
+%%							\g_gloss_wordsonthisline_int
+%%							{
+%%									\seq_count:c
+%%											{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+%%							}
+%%%					\int_show:N
+%%%							\g_gloss_wordsonthisline_int
+							
+	\int_set:Nn
+			\l_tmpa_int
+			{ 1 }
+ 	\int_do_until:nNnn % for each line
+ 		{ \l_tmpa_int } > { \g_gloss_licount_int } 
+ 				{
+%---start
+\tl_gset:Nx \g_gloss_currentline_tl { \int_use:N \l_tmpa_int }
+\tl_gset:Nx \g_gloss_currentword_tl { \int_use:N \l_tmpb_int }
+
+	\cs_if_free:cT
+			{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+			{ \dim_new:c
+					{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+				}
+
+
+%IF
+%\exp_args:xNx
+\dim_compare:nNnT
+			{
+					\box_wd:c
+							{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+			}
+			>
+			{ 
+					\dim_use:c
+							{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+			}
+			{
+%				SET WORDXWIDTH-EQ
+					\dim_set:cn 
+								{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+								{
+								\box_wd:c
+											{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+
+								}				
+			}
+%%	\cs_if_free:cT
+%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%%			{ \box_new:c
+%%					{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box } 
+%%			}
+%%	\hbox_gset:cn 
+%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%%			{
+%%				\seq_item:cn
+%%						{ g_fc_line \g_fc_wnamespace_tl \g_fc_mylinenum_tl	 _seq } 
+%%						{ \int_use:N \l_tmpb_int }
+%%
+%%			}
+			
+%%			% show:
+%%			\tex_par:D
+%%	\box_use:c
+%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box } ~ \int_use:N \l_tmpa_int --  \int_use:N \l_tmpb_int :
+%%	\the\box_wd:c
+%%			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%%			.
+%%%---end
+						\int_incr:N 
+								\l_tmpa_int
+					} 	
+				\int_incr:N 
+						\l_tmpb_int
+
+
+%%%%=
+%%%Widest 
+%%%\g_gloss_currentword_tl
+%%%=
+%%%					\dim_use:c
+%%%							{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+
+		} 	
+ 	
+  
+ 	% ===============================
+  % set each nth word to widest width
+%				\tex_par:D %=
+%\leavevmode%\tex_space:D \\%=
+%				\tex_par:D %=
+					\tex_space:D \\[-\baselineskip] %=
+	\int_set:Nn
+			\l_tmpa_int
+			{ 1 }
+ 	\int_do_until:nNnn % for each line
+ 		{ \l_tmpa_int } > { \g_gloss_licount_int } 
+ 					{
+	\mfspreformat %=									
+	
+	%+++
+	%+++
+ 	 				\int_set:Nn
+					\l_tmpb_int
+					{ 1 }
+ 					\int_do_until:nNnn % for each word
+ 					{ \l_tmpb_int } > { \g_gloss_wordsonthisline_int } 	%%%
+%					{ \l_tmpb_int } > { \int_use:c			{ g_fc_line \g_fc_wnamespace_tl \int_use:N \l_tmpa_int wordcount_int } }
+ 				{
+%---start
+\tl_gset:Nx \g_gloss_currentline_tl { \int_use:N \l_tmpa_int }
+\tl_gset:Nx \g_gloss_currentword_tl { \int_use:N \l_tmpb_int }
+
+\box_gset_wd:cn
+			{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+			{ 
+					\dim_use:c
+							{ g_gloss_wordwidth\g_gloss_currentword_tl _dim }
+			}
+				\int_incr:N 
+						\l_tmpb_int
+
+%					\box_show:c %=
+%								{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+
+%%xxx						
+%					\box_use:c %=
+%								{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+%						\tex_space:D %=
+%						\tex_space:D %=
+					} 	
+						\int_incr:N 
+								\l_tmpa_int
+%%%%%%				\tex_par:D \space%=
+%%%%%%%\seq_item:cn
+%%%%%%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\l_texttranslinenum_tl _seq }
+%%%%%	\int_set:Nn 
+%%%%%			\l_texttransline_int
+%%%%%			{
+%%%%%\seq_count:c
+%%%%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\g_gloss_currentline_tl _seq }
+%%%%%			}
+%%%%%%	\int_show:N 
+%%%%%%			\l_texttransline_int
+%%%%%%%\seq_show:c
+%%%%%%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\g_gloss_currentline_tl _seq }
+%%%%%
+%%%%%
+%%%%%			
+%%%%%			\int_compare:nNnT
+%%%%%							{ \l_texttransline_int } > { 1 }
+%%%%%							{
+%%%%%								%loop through the translations
+%%%%% 	 				\int_set:Nn
+%%%%%					\l_texttransloop_int
+%%%%%					{ 2 }
+%%%%% 					\int_do_until:nNnn % for each translation
+%%%%% 					{ \l_texttransloop_int } > { \l_texttransline_int } 	%%%
+%%%%%					{
+%%%%%						\\ %= translation starts on new line
+%%%%%							\mfspreformat %=									
+%%%%%							\seq_item:cn
+%%%%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\g_gloss_currentline_tl _seq }
+%%%%% 	 								{ \l_texttransloop_int }
+%%%%%						
+%%%%%						\int_incr:N
+%%%%%								\l_texttransloop_int
+%%%%%								
+%%%%%					}			
+								
+%								}
+			
+% \\%= gloss starts on new line
+		} 	
+  
+\textglossout
+\transout{#2}
+   	
+}
+
+
+%--------------------
+%\int_new:N \l__lineloop_int
+\int_new:N \l__wordloop_int
+\tl_new:N \g_gloss_nextline_tl
+\box_new:N \l__upper_box
+\box_new:N \l__lower_box
+\box_new:N \l__vpair_box
+\box_new:N \l__hunit_box
+\NewDocumentCommand { \textglossout } { } { 
+
+%	\int_set:Nn
+%			\l_tmpa_int
+%			{ 1 }
+% 	\int_do_until:nNnn % for each line
+% 		{ \l_tmpa_int } > { \g_gloss_licount_int } 
+% 					{
+
+ 	 				\int_set:Nn
+					\l__wordloop_int
+					{ 1 }
+ 					\int_do_until:nNnn % for each word
+% 					{ \l__wordloop_int } > { \g_gloss_wordsonthisline_int } 	%%%
+					{ \l__wordloop_int } > { \int_use:c			{ g_fc_line \g_fc_wnamespace_tl 1wordcount_int } }
+ 				{
+%---start
+\tl_gset:Nx \g_gloss_currentline_tl { 1 }
+\tl_gset:Nx \g_gloss_nextline_tl { 2 }
+\tl_gset:Nx \g_gloss_currentword_tl { \int_use:N \l__wordloop_int }
+
+
+\hbox_set:Nn
+		\l__upper_box
+		{
+					\box_use:c %=
+								{ g_gloss_line\g_gloss_currentline_tl word\g_gloss_currentword_tl _box }
+					} 	
+
+\hbox_set:Nn
+		\l__lower_box
+		{
+					\box_use:c %=
+								{ g_gloss_line\g_gloss_nextline_tl word\g_gloss_currentword_tl _box }
+					} 	
+
+\vbox_set:Nn
+		\l__vpair_box
+		{
+					\box_use:N %=
+								\l__upper_box
+					\box_use:N %=
+								\l__lower_box
+					} 	
+
+\hbox_set:Nn
+		\l__hunit_box
+		{
+					\box_use:N %=
+								\l__vpair_box
+					} 	
+
+
+
+
+						\int_incr:N 
+								\l__wordloop_int
+
+\tex_space:D
+%\tex_space:D
+%\box_use:N
+%		\l__upper_box
+%\box_use:N
+%		\l__lower_box
+%\box_use:N
+%		\l__vpair_box
+\box_use:N
+		\l__hunit_box		
+\tex_space:D		
+			}
+
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \transout } { o m } { 
+% 1 = namespace
+%2 = seq name
+%\tl_show:N \g_fc_namespace_tl
+%\tl_show:N \g_gloss_currentline_tl
+
+%		\IfNoValueTF { #1 } 
+%						{ \tl_clear:N \g_fc_namespace_tl } 
+%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+
+	\int_set:Nn 
+			\l_texttransline_int
+			{
+\seq_count:c
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #22 _seq }
+			}
+%	\int_show:N 
+%			\l_texttransline_int
+%%\seq_show:c
+%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\g_gloss_currentline_tl _seq }
+%%			
+%\seq_show:c
+% 	 								{ g_fc_texttrans \g_fc_namespace_tl #22 _seq }
+						
+			\int_compare:nNnT
+							{ \l_texttransline_int } > { 1 }
+							{
+								%loop through the translations
+ 	 				\int_set:Nn
+					\l_texttransloop_int
+					{ 2 }
+ 					\int_do_until:nNnn % for each translation
+ 					{ \l_texttransloop_int } > { \l_texttransline_int } 	%%%
+					{
+						\\ %= translation starts on new line
+							\mfspreformat %=									
+							\seq_item:cn
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #22 _seq }
+ 	 								{ \l_texttransloop_int }
+						
+						\int_incr:N
+								\l_texttransloop_int
+								
+					}			
+								
+								}
+   %---
+	\cs_if_free:cF
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #23 _seq }
+		{ 
+		
+	\int_set:Nn 
+			\l_texttransline_int
+			{
+\seq_count:c
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #23 _seq }
+			}
+%	\int_show:N 
+%			\l_texttransline_int
+%%\seq_show:c
+%% 	 								{ g_fc_texttrans \g_fc_namespace_tl #2\g_gloss_currentline_tl _seq }
+%%			
+%\seq_show:c
+% 	 								{ g_fc_texttrans \g_fc_namespace_tl #22 _seq }
+						
+			\int_compare:nNnT
+							{ \l_texttransline_int } > { 1 }
+							{
+								%loop through the translations
+ 	 				\int_set:Nn
+					\l_texttransloop_int
+					{ 2 }
+ 					\int_do_until:nNnn % for each translation
+ 					{ \l_texttransloop_int } > { \l_texttransline_int } 	%%%
+					{
+						\\ %= translation starts on new line
+							\mfspreformat %=									
+							\seq_item:cn
+ 	 								{ g_fc_texttrans \g_fc_namespace_tl #23 _seq }
+ 	 								{ \l_texttransloop_int }
+						
+						\int_incr:N
+								\l_texttransloop_int
+								
+					}			
+								
+								}
+		
+		 } % end 3rd line
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsloadaseq } { o m +m } { 
+% 1=namespace
+% 2=seq name
+% 3=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			}
+	\seq_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+	\seq_gset_split:cno 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ , } 
+			{ #3 }
+
+%	\seq_show:c 
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+
+
+}
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfsloadaprop } { o m +m } { % 1=NS, 2=prop name, 3=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop }
+			{ \prop_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			}
+	\prop_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+	\prop_gset_from_keyval:cn 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			{ #3 }
+
+}
+
+
+
+
+
+
+\ExplSyntaxOff
+
+\begin{document}
+
+%
+%\mfsloadaseql[gloss]{ex1}{*/}{%
+%gef hundinum matinn
+%*/    gje hunden maten
+%*/    give {the dog} {the food}
+%*/    gib {dem Hunde} {das Essen}
+%}
+%
+%\squiggle
+%
+	\mfssetpreformat{}
+
+%\begin{exe}
+%    \ex
+%\mfsloadaseql[gloss]{ex2}{*/}{%
+%Auto uderzył dziecko. 
+%*/        car.nom/acc hit.3sg child.acc/nom
+%glt        `The car hit the child.' 
+%*/        car.acc hit.3sg child.nom 
+%glt        `The child hit the car.' 
+%}
+%\end{exe}
+
+
+%\begin{exe}
+%\ex
+%\glinlines*{%
+%  :space;x
+%glt   Somebody has arrived late.
+%*/    :llaphash;Ich bin schon da
+%*/    I am already there
+%glt   `I am here already.'}
+%\end{exe}
+
+
+\begin{exe}
+    \ex
+\glinlines{%
+Auto uderzył dziecko. 
+*/        car.nom hit.3sg child.acc
+glt        `The car hit the child.' % use * version of command
+*/        car.acc hit.3sg child.nom 
+glt        `The car hit the child.' / `The child hit the car.' 
+}
+\end{exe}
+
+\begin{exe}
+    \ex
+\glinlines*{%
+Auto uderzył dziecko. 
+*/        car.nom hit.3sg child.acc
+glt        `The car hit the child.' 
+*/        car.acc hit.3sg child.nom 
+glt        `The child hit the car.' 
+}
+\end{exe}
+
+
+
+
+
+
+\begin{exe}
+    \ex
+\glinlines{%
+gef hundinum matinn
+*/    gje hunden maten
+*/    give {the dog} {the food}
+*/    gib {dem Hunde} {das Essen}
+glt    One of the daily chores.
+}
+\end{exe}
+
+\squiggle
+
+
+
+
+
+\glsetfirstlineformat{\fug\large\color{blue}}
+\begin{exe}
+    \ex
+\glinlines{%
+𐎜𐎂𐎗𐎚 𐎖
+*/  ugrt:writing q
+*/  ʾUgarītu:speech q
+*/  Ugarit q
+glt  An ancient city in the east Mediterranean.
+glt  Also known as Ras Shamra (``head fennel'' = Cape Fennel). % Arabic: رأس شمرة, literally "Cape Fennel")
+}
+\end{exe}
+\glsetfirstlineformat{}
+
+
+\squiggle
+
+\begin{exe}
+        \ex
+\glinlines{%
+ thu-mi-t-əm =kʼwa Mink.+  chichiya7-u-s =kʼwa Mink te= c'estaya.
+*/        go.ril.ctr.pass =.quot Mink grandmother.pst.3poss =.quot Mink .det= knothole
+glt        `Mink went towards it. The knothole was Mink's grandmother.'%
+         }  
+\end{exe}
+%https://tex.stackexchange.com/questions/306764/breaking-line-in-gb4e
+
+\glsetfirstlineformat{\itshape\color{blue}}
+
+%\hangindent=1em \hangafter=-1 \noindent
+%%\newcommand{myindentedpar}[1][21.3pt]{\begin{list}{}{\leftmargin=#1 \itemindent=-\leftmargin}\item[]}
+%% {\end{list}}
+%%\newlength\listindent
+%%\setlength\listindent{20pt}
+
+\begin{exe}%[label={},itemindent=-2em,leftmargin=2em]%[leftmargin=3em,itemindent=2em]
+%%\parshape 2 0cm 0.75\linewidth \listindent \dimexpr\linewidth-\listindent\relax
+%\leftmargin=42pt\itemindent=-21pt%\leftmargin
+        \ex 
+\quad\glinlines{%
+{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} :emphe:subi er  ngak 
+*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+glt `My mother asked me what the teacher gave me a book and Toki sold me'
+         }  
+\end{exe}
+%outdent:
+%https://tex.stackexchange.com/questions/115591/how-can-i-indent-the-second-line-of-a-linguistic-gloss-with-gb4e-sty/115607#115607
+
+
+%%\begin{exe}\setlength{\listparindent}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%     
+%%
+%%
+%%
+%%
+%%%\setlength{\listparindent}{3.5em}
+%%\begin{exe}\setlength{\itemindent}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%\begin{exe}\setlength{\itemindent}{-3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%     
+%%\begin{exe}\setlength{\leftmargin}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{leftmargin3-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%\setlength{\leftmargin}{3.5em}
+%%\begin{exe}
+%%	\setlength{\itemindent}{0pt}
+%%        \ex 
+%%\glinlines{%
+%%{leftmargin3-itemindentneg-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%
+%%
+%%
+%%
+%%
+%%\begin{exe}\setlength{\parindent}{3em}
+%%        \ex 
+%%\glinlines{%
+%%{ parindent3-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%
+%%
+%%
+%%
+%%\begin{exe}\setlength{\leftmargin}{3.5em}
+%%\setlength{\itemindent}{-0.5\leftmargin}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+
+
+
+
+
+
+
+\begin{exe}
+\ex
+\glinlines{%
+bites dog cat
+*/  verb dd  cc
+glt   `The dog bites the cat.'
+glt   :llapstar;`The cat bites the dog.'
+}
+\end{exe}
+%https://tex.stackexchange.com/questions/306564/left-edge-vertical-alignment-in-gb4e
+
+
+\mfssetposformat{\scshape\bfseries\sffamily}
+\begin{exe}
+    \ex 
+    \glinlines{%
+    kma t'-əlčqu-(ɣ)in 
+*/ .1sg  .1sg.sub-see-.2sg.obj
+glt `I saw you.' (S1:71)
+		}
+%    \ex \gll q-\textschwa{l}\v{c}qu-{\textbeta}um kma\\
+%    {\sc 2.irr-}see-{\sc 1sg.obj} {\sc 1sg}\\
+%    \glt `Look (at) me.' (S1:75)
+%
+%    \ex \gll kma t-k'o{\textbeltl}-ki\v{c}en \\
+%    {\sc 1sg} {\sc 1sg.subj-}come-{\sc 1sg.subj} \\
+%    \glt `I came/arrived.' (S3:13)
+
+\end{exe}
+
+
+{
+\makeatletter
+\patchcmd\@exe
+  {(\thexnumi)}
+  {\thexnumi.}
+  {}{}
+\makeatother
+\begin{exe}
+    \ex
+    \glinlines{%
+        Dies ist ein Beispiel
+*/    This is an example
+glt    ( ) $\mapsto$. : \textbackslash usepackage\{gb4e\}
+\textbackslash usepackage\{etoolbox\}
+\textbackslash makeatletter
+\textbackslash patchcmd\textbackslash \@ exe
+  \{(\textbackslash thexnumi)\}
+  \{\textbackslash thexnumi.\}
+  \{\}\{\}
+\textbackslash makeatother
+}
+\end{exe}
+}
+
+
+%\setcounter{exx}{0}
+
+
+\begin{exe}
+\ex
+    \glinlines{%
+Saja mem-bawa surat itu kepada Ali.
+*/     I .cause-bring letter the to Ali.
+glt    I brought the letter to Ali.
+}
+\end{exe}
+
+
+
+
+\begin{exe}
+\ex
+    \glinlines{%
+        nyumba i-na-on-ek-a :uplb;na:uprb wa-tu
+*/     house(9) 9-.prs-see-.neut-.fv (.com) 2-person
+glt    intended: `(A/the) house is seen by people.'
+}
+\ex
+  \glinlines{%
+        a-li-sem-a kwamba :uplqq;na-m-ju-a:uprqq;
+*/     1-.pst-speak-.fv .comp .1sg.prs-1-know-.fv
+glt `He said, ``I know him.'''
+}
+\end{exe}
+
+
+
+%\usepackage{tabularx}
+%\usepackage{calc}
+%\newcommand{\longexampleandlanguage}[2]{
+%\begin{tabularx}{\linewidth}[t]{@{}X@{}p{\widthof{(#2)}}@{}}
+%\begin{minipage}[t]{\linewidth-1em}
+%#1
+%\end{minipage} & (#2)\\
+%\end{tabularx}}
+%
+
+%https://tex.stackexchange.com/questions/600695/limiting-space-used-by-gb4e-and-adding-language-information-to-the-right
+%
+%
+
+%edited Nov 9, 2021 at 20:17
+%answered Jun 11, 2021 at 13:34
+%user avatar
+%Stefan Müller
+%6,52733 gold badges2424 silver badges60
+
+\newcommand{\longexampleandlanguage}[2]{
+\begin{minipage}[t]{\linewidth-3em-\widthof{(#2)}}
+#1
+\end{minipage} 
+\hfill
+\begin{minipage}[t]{\widthof{(#2)}}
+ (#2)
+\end{minipage}
+}
+
+\begin{exe}
+\ex
+    \glinlines{%
+Das ist ein deutsches Beispiel.
+*/   this is a   German    example
+% \hfill(German)
+     }
+\ex
+  \glinlines{%
+Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.
+*/  this is  one   of-these very long   sentences that it in the a b German    language gives
+}
+\end{exe}
+
+
+\begin{exe}
+\ex
+\glinlinesnote{%
+Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.
+*/ this is  one   of-these very long   sentences that it in the a b German    language gives
+}{German}
+%\ex
+%\longexampleandlanguage{
+%    \gll Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.\\
+%         this is  one   of.these very long   sentences that it in the a b German    language gives\\
+%}{German}
+\end{exe}
+
+
+
+
+
+
+\begin{exe}
+\ex
+\glinlines{%
+        On the honeydew melon 
+glt     The honeydew melon is one of the two main cultivar types in Cucumis melo Inodorus Group. It is characterized by the smooth rind and lack of musky odor. 
+%glt Το πεπόνι χάνεϊντιου, γνωστό και ως μελοπέπονο, είναι φρούτο της ποικιλίας muskmelon ή Cucumis melo της οικογένειας των κολοκυνθοειδών. Η ομάδα αυτή των Inodorus περιλαμβάνει το συγκεκριμένο πεπόνι αλλά και άλλα ανάμεικτα είδη πεπονιού και κολοκύθας. 
+glt :par;:smallskip;El melón verde, melón blanco, casaba, melón rocío de miel o melón tuna es un fruto de la familia del melónCucumis melo (Cucumis melo) que se cultiva en general para el consumo gastronómico. La fruta es similar al melón anaranjado o cantalupo, pero tiene un sabor más dulce, contiene más agua y posee un color verde pálido o claro en su interior.
+glt :par;:smallskip;Le melon honeydew, ou melon miel, est un melon du groupe de cultivars de l'espèce Cucumis melo (famille des Cucurbitaceae). Le groupe Inodorus inclut le melon honeydew, le melon musqué, le melon d'hiver et d'autres hybrides du melon.
+glt :par;:smallskip;Il melone verde è un gruppo di colture appartenente al gruppo Inodorus della specie dei Cucumis melo.
+
+Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno, casaba e crenshaw. 
+%glt   ハネデューメロン（英: honeydew melon）は、白色系の果皮で橙色の果肉（赤肉）、淡い緑色の果肉（青肉）、白い果肉（白肉）の3種類があるノーネットメロン。
+%
+%日本では、「ハネジューメロン」「ハネージュメロン」「ハニジューメロン」「ハニーデューメロン」「ハニージューメロン」「ハニージュメロン」等とも呼ばれ、一般的な海外のメロンでもある。 
+%glt  Hunajameloni (Cucumis melo Hunajameloni-ryhmä) on yksi melonin lajikeryhmä.[1] Hunajameloni on yleensä noin 15–22 cm pitkä ja hieman soikea. Sen paino vaihtelee 1,8–3,6 kg:n välillä. Hedelmän liha on vaaleanvihreätä ja sileän kuoren väri vaihtelee vihreästä keltaiseen.[2] Hunajamelonin liha on mehukasta ja makeaa ja hedelmää nautitaan usein jälkiruokana. Hedelmiä myydään ympäri maailmaa. 
+%glt :par;:smallskip;Melon madu minangka salah sawijining rong jinis kultivar utama ing Grup Codumis melo Inodorus. [1] Ditondoi kanthi kulit alus lan ora duwe ambu ora enak. Jinis utama liyane ing Grup Inodorus yaiku melon casaba kulit. 
+}
+\end{exe}
+
+
+
+\mfskeepdotposoff
+\begin{exe}
+\ex
+\glinlines{%
+ Naoya-wa Mari-ga Nani::bffbox;-o Non-da ka Yumi-ni it-ta no::textbf;? 
+ */     Naoya-.Top Mari-.Nom what-.Acc drink-.Past Q Yumi-.Dat it-.Past Q?  
+ glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
+}
+\end{exe}
+
+
+\renewcommand\bffcolor{yellow!50}
+\mfsnumberedwordson
+\begin{exe}
+\ex
+\glinlines{%
+ Naoya-wa Mari-ga Nani::bffcolorbox;-o Non-da ka Yumi-ni it-ta no::bffcolorbox;? 
+ */     Naoya-.Top Mari-.Nom what-.Acc drink-.Past Q Yumi-.Dat it-.Past Q?  
+ glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
+}
+\end{exe}
+\mfsnumberedwordsoff
+\mfskeepdotposon
+
+
+%\begin{exe}
+%
+%\ex[]{\gll Naoya-wa Mari-ga \UL\framebox{\textbf{Nani}}-o Non-da ka Yumi-ni it-ta \textbf{no}\LU? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.' } 
+%\gluline
+%
+%
+%
+%\ex[]{\gll Naoya-wa Mari-ga \UL\textbf{Nani}-o Non-da ka Yumi-ni it-ta \textbf{no}\LU? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.'  
+%}
+%\gluline
+%
+%
+%\end{exe}
+%\begin{minipage}{.5\linewidth}
+%\begin{exe}
+%\ex[]{\gll Naoya-wa Mari-ga \UL\framebox{\textbf{Nani}}-o Non-da ka\LU{} \tkzmk{3}Yumi-ni it-ta \textbf{no}\tkzmk{4}? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.' } 
+%\gluline
+%\tkzuline{3}{4}
+%\end{exe}
+%\end{minipage}
+
+
+
+
+\mfsformattedvboxon
+\begin{exe}
+\ex
+\glinlines{%
+   οὐ θέλω δὲ ὑμᾶς ἀγνοεῖν, ἀδελφοί, ὅτι πολλάκις προεθέμην ἐλθεῖν
+*/  ou thelō de humas agnoein adelphoi hoti polakis proethemēn elthein
+*/  not want.1Sg but you.Acc.Pl be-ignorant.Pres.Inf brothers.Voc that often planned.1Sg come.Aor.Inf
+glt  But I don't want you to be unaware, brothers, that many times I planned to come. 
+glt   :space;:hfill;(Rom 1.13):space;
+ }
+\end{exe}
+\mfsformattedvboxoff
+
+
+\begin{exe}
+\ex
+\glinlines{%
+        w-for-w line 1 
+glt   Line 1, Trans A
+glt   Line 1, Trans B
+glt   Line 1, Trans C
+*/     w-for-w line 2   
+glt   Line 2, Trans A
+glt   Line 2, Trans B
+glt   Line 2, Trans C
+*/     w-for-w line 3 
+glt   Line 3, Trans A
+glt   Line 3, Trans B
+glt   Line 3, Trans C
+*/     w-for-w line 4 
+glt   Line 4, Trans A
+glt   Line 4, Trans B
+glt   Line 4, Trans C
+}
+\end{exe}
+
+
+\begin{exe}
+\ex
+\glinlines*{%
+        w-for-w line 1 
+glt   Line 1, Trans A
+glt   Line 1, Trans B
+glt   Line 1, Trans C
+*/     w-for-w line 2   
+glt   Line 2, Trans A
+glt   Line 2, Trans B
+glt   Line 2, Trans C
+*/     w-for-w line 3 
+glt   Line 3, Trans A
+glt   Line 3, Trans B
+glt   Line 3, Trans C
+*/     w-for-w line 4 
+glt   Line 4, Trans A
+glt   Line 4, Trans B
+glt   Line 4, Trans C
+}
+\end{exe}
+
+
+%\mfsformattedvboxon
+\begin{exe}
+\ex
+\glinlines*{%
+      {}{}{}{}
+glt   Somebody has arrived late.
+*/    :llaphash;Ich bin schon da
+*/    I am already there
+glt   `I am here already.'}
+\end{exe}
+%https://tex.stackexchange.com/questions/308008/gb4e-phantom-spacing
+
+
+
+
+
+
+\end{document}
+
+
+
+https://tex.stackexchange.com/questions/647186/linguistic-example-with-alternative-gloss-and-translation/647414#647414
+
+
