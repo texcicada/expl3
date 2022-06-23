@@ -3,13 +3,96 @@
 \usepackage{fontspec}
 \setmainfont{Noto Serif}
 \setsansfont{Noto Sans}
+\setmonofont{Noto Sans Mono}
 \usepackage{xparse}
 \usepackage{tikz} % before gb4e
 \usepackage{gb4e}
+\noautomath
 %\usepackage{enumitem}
 \usepackage{etoolbox} % patch
 %\usepackage{tabularx}
 \usepackage{calc} % widthof
+\usepackage{xurl}
+\newcommand\surl[1]{{\footnotesize\noindent Source Reference}\\\url{#1}}
+
+%=======================
+%%%%\usepackage[bidi=basic]{babel}
+%%%%\babelprovide[import,main]{arabic}
+%%%%\babelfont{rm}[Scale=2]{Amiri}
+%%%\usepackage[bidi=basic,arabic,english]{babel}
+%%%%\babelprovide[import, onchar = fonts ids]{arabic}
+%%%\babelprovide[import,main]{arabic}
+%%%\babelfont[arabic]{rm}[Scale=2]{Amiri}
+%%%\usepackage{luacolor,lua-ul}
+%%%%%%inspired via unisugar:
+%%%%%\catcode`¶=11
+%%%%%\edef\¶{¶}
+%%%%%\catcode`¶=0 
+%%%%%
+%%%%%
+%%%%%\newcommand{¶اللون}[1]{\color{#1}}% allawn colour
+%%%%%\newcommand{¶أسود}{black}% 'aswad black
+%%%%%\newcommand{¶أحمر}{red}% 'ahmar red
+%%%%%\newcommand{¶أخضر}{green!95!blue!40}% (lawn) 'akhdar green
+%%%%%\newcommand{¶أزرق}{blue}% 'azraq blue
+
+%================
+
+%\usepackage{expex}  
+\usepackage{polyglossia}
+%\defaultfontfeatures{Ligatures=TeX}
+\setmainlanguage{english}
+\setotherlanguage{brazil}
+\setotherlanguage[variant=ancient]{greek}
+\setotherlanguage{arabic}
+
+\newfontfamily\arabicfont[Scale=2,Script=Arabic,Renderer=HarfBuzz]{Amiri}%{Scheherazade}
+\newfontfamily\greekfont[Script=Greek,Renderer=HarfBuzz]{Noto Serif}%{Linux Libertine O}
+\newfontfamily\brazilfont{Linux Libertine O}
+
+
+
+
+
+
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing,calc}
+\newlength{\braceamp}
+\newlength{\uptextlen}
+\setlength{\braceamp}{5pt}
+\setlength{\uptextlen}{8pt}
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture,auto,yshift=-3pt] \coordinate (#1);}
+\newcommand{\tikzbrace}[4][0]{\tikz[overlay,remember picture]\draw [thick,decorate,decoration={brace,amplitude=\braceamp,mirror}]  ($(#2.west)+ (0,-#1pt)$) -- ($(#3.east)+(0,-#1pt)$)  node[midway,yshift=-2.5\braceamp] {#4};}
+\newcommand{\overunderbrace}[5][0]{\tikz[overlay,remember picture]\draw [thick,decorate,decoration={brace,amplitude=\braceamp,mirror}]  ($(#2.west)+ (0,-#1pt)$) -- ($(#3.east)+(0,-#1pt)$)  node[midway,yshift=-2.5\braceamp] {#5} node [midway, yshift=\uptextlen] {#4};}
+%https://tex.stackexchange.com/questions/355934/horizontal-curly-braces-in-expex-glossing-example
+%================
+
+
+
+
+
+\ExplSyntaxOn
+%-----
+\NewDocumentCommand \marktext { +m } { \l_texthighlight:n { #1 } }
+\cs_new_protected:Npn \l_texthighlight:n #1
+ {
+     \tl_set:Nn \l_tmpa_tl { #1 }
+     \regex_replace_all:nnN 
+          { ([ؐ-ًؚ-ٟ]) }
+          { \c{textcolor}\cB\{ red \cE\}\cB\{\1\cE\} }    
+          \l_tmpa_tl
+  \tl_use:N \l_tmpa_tl
+ }
+ 
+ 
+
+\ExplSyntaxOff
+
+%===============
+
+
+
 
 %https://tex.stackexchange.com/questions/425424/boxed-text-and-underline-within-the-gb4e-environment/425467#425467
 % answered Apr 8, 2018 at 13:51
@@ -41,12 +124,23 @@
 \newcommand\bffbox[1]{\fbox{\textbf{#1}}}
 \newcommand\bffcolorbox[1]{\fcolorbox{black}{\bffcolor}{\textbf{#1}}}
 \newcommand\bffcolor{blue!15}
-\newcommand\llaphash{\llap{\#}}
-\newcommand\llapstar{\llap{*}}
-
-
-
-
+\newcommand\llaphash{{\upshape\llap{\#}}}
+\newcommand\llapstar{{\upshape\normalcolor\llap{*}}}
+\newcommand\hindent[1]{\hangindent=#1}
+\newcommand\ttikz[1]{\tikz[remember picture,baseline={([yshift=-.25em]current bounding box.center)}] \node[fill=green!60,opacity=0.72,inner sep=0pt,text=red!80!blue] (#1) {#1\vphantom{Ag}};}
+%,baseline={text.base}
+%baseline={(0,0)}
+%baseline={([yshift=-.25em]current bounding box.center)}
+%\newcommand\textdirltl{\textdir LTL}
+%\newcommand\slgk{\selectlanguage[variant=ancient]{greek}}
+\newcommand\para[1]{\bigskip\bigskip\paragraph{#1}}
+\newcommand\subpara[1]{\smallskip\subparagraph{#1}}
+\newcommand\glcmd[1]{\textcolor{violet}{\texttt{\textbackslash#1}}}
+\newcommand\glcmdb[1]{\glcmd{#1}\{\}}
+\newcommand\glsub[1]{\textsubscript{#1}}
+\newcommand\glsuper[1]{\textsuperscript{#1}}
+\newcommand\suba{\glsub{a}}
+\newcommand\subalpha{\glsub{\symbol{945}}}
 
 %squiggle
 \newcommand\squiggle{%
@@ -85,6 +179,26 @@
 \tl_new:N \g_gloss_currentline_tl
 \tl_new:N \g_gloss_currentword_tl
 \tl_new:N \g_gloss_parentline_tl
+
+
+
+%\keys_define:nn { mymodule }
+%{
+%key-one .code:n = code including parameter #1,
+%key-two .tl_set:N = \l_mymodule_store_tl
+%}
+
+\tl_new:N \g_gloss_preamble_tl
+
+\keys_define:nn { gloss }
+{
+preamble .tl_gset:N = \g_gloss_preamble_tl,
+%unknown .initial:n = {},
+%-NoValue- .initial:n = {}
+}
+%\keys_set_known:nn { gloss } { preamble }
+
+
 
 %------------------
 %****************************************************
@@ -193,8 +307,19 @@
 
 			}
 
+%
+	%		::command!arg;	 > \command	{arg}
+		\regex_replace_all:nnN
+				{ (\:\:)(\w+)(\!)(\w+)(;) }
+				{ \c{\2} \cB\{ \4 \cE\}  }
+				\l_tmpc_tl
 
 
+	%		word::command;	 > \command	{word}
+		\regex_replace_all:nnN
+				{ (\S+)(\:\:)(\w+)(;) }
+				{ \c{\3} \cB\{ \1 \cE\}  }
+				\l_tmpc_tl
 
 				
 	%		:command;	 > \command	
@@ -327,6 +452,13 @@
 				\l_tmpc_tl
 			}
 			
+
+	%		::command!arg;	 > \command	{arg}
+		\regex_replace_all:nnN
+				{ (\:\:)(\w+)(\!)(\w+)(;) }
+				{ \c{\2} \cB\{ \4 \cE\}  }
+				\l_tmpc_tl
+
 
 	%		word::command;	 > \command	{word}
 		\regex_replace_all:nnN
@@ -712,7 +844,12 @@
 					\int_case:nnTF { \g__gloss_basenameloop_int }
 					{
 					{ 1 } { \glfirstlineformat }
-					} { % true
+					{ 2 } { \glsecondlineformat }
+					{ 3 } { \glthirdlineformat }
+					{ 4 } { \glfourthlineformat }
+					{ 5 } { \glfifthlineformat }
+					{ 6 } { \glsixthlineformat }					
+							} { % true
 					    %
 					}
 					{ } % false
@@ -1072,28 +1209,41 @@
 
 
 %--------------------
-\NewDocumentCommand { \glinlines } { s +m } { 
+\NewDocumentCommand { \glinlines } { s o +m } { 
 	% 1==gloss/trans print choice
 	% 2==data
     \IfBooleanTF {#1} 
     { \bool_set_true:N  \g__gloss_glosstrans_bool } 
     { \bool_set_false:N  \g__gloss_glosstrans_bool }
     
-		\glinlinesbase[gloss]{ex2a}{*/}{#2}
+     
+    \IfNoValueF{#2}
+    { 
+    	\keys_set:nn { gloss } { #2 } 
+    	\tl_use:N \g_gloss_preamble_tl \\ 
+    	}
+   
+		\glinlinesbase[gloss]{ex2a}{*/}{#3}
 }
 
 
 %--------------------
-\NewDocumentCommand { \glinlinesnote } { +m m } { 
+\NewDocumentCommand { \glinlinesnote } { o +m m } { 
 	% 1==data
 	% 2==note
 	
-\begin{minipage}[t]{\linewidth-3em-\widthof{(#2)}}
-			\glinlines{#1}
+\begin{minipage}[t]{\linewidth-3em-\widthof{(#3)}}
+    \IfNoValueF{#1}
+    { 
+    	\keys_set:nn { gloss } { #1 } 
+    	\tl_use:N \g_gloss_preamble_tl \\ 
+    	}
+
+			\glinlines{#2}
 \end{minipage} 
 \hfill
-\begin{minipage}[t]{\widthof{(#2)}}
- (#2)
+\begin{minipage}[t]{\widthof{(#3)}}
+ (#3)
 \end{minipage}
 
 }
@@ -1111,6 +1261,67 @@
 \NewDocumentCommand { \glsetfirstlineformat } { m } { 
 			\renewcommand{\glfirstlineformat}{#1}
 }
+
+
+%--------------------
+\NewDocumentCommand { \glsecondlineformat } { } { 
+			
+}
+%--------------------
+\NewDocumentCommand { \glsetsecondlineformat } { m } { 
+			\renewcommand{\glsecondlineformat}{#1}
+}
+
+
+%--------------------
+\NewDocumentCommand { \glthirdlineformat } { } { 
+}
+%--------------------
+\NewDocumentCommand { \glsetthirdlineformat } { m } { 
+			\renewcommand{\glthirdlineformat}{#1}
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \glfourthlineformat } { } { 
+}
+%--------------------
+\NewDocumentCommand { \glsetfourthlineformat } { m } { 
+			\renewcommand{\glfourthlineformat}{#1}
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \glfifthlineformat } { } { 
+}
+%--------------------
+\NewDocumentCommand { \glsetfifthlineformat } { m } { 
+			\renewcommand{\glfifthlineformat}{#1}
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \glsixthlineformat } { } { 
+}
+%--------------------
+\NewDocumentCommand { \glsetsixthlineformat } { m } { 
+			\renewcommand{\glsixthlineformat}{#1}
+}
+
+
+%--------------------
+\NewDocumentCommand { \glresetlineformats } {  } { 
+\glsetfirstlineformat{}
+\glsetsecondlineformat{}
+\glsetthirdlineformat{}
+\glsetfourthlineformat{}
+\glsetfifthlineformat{}
+\glsetsixthlineformat{}
+}
+
 
 %--------------------
 \NewDocumentCommand { \mfspreformat } { } { 
@@ -1992,6 +2203,8 @@ gef hundinum matinn
 glt    One of the daily chores.
 }
 \end{exe}
+%https://tex.stackexchange.com/questions/156066/align-glosses-in-more-than-one-language-with-gb4e
+
 
 \squiggle
 
@@ -2022,6 +2235,7 @@ glt  Also known as Ras Shamra (``head fennel'' = Cape Fennel). % Arabic: رأس 
  thu-mi-t-əm =kʼwa Mink.+  chichiya7-u-s =kʼwa Mink te= c'estaya.
 */        go.ril.ctr.pass =.quot Mink grandmother.pst.3poss =.quot Mink .det= knothole
 glt        `Mink went towards it. The knothole was Mink's grandmother.'%
+%glt \ttfamily Mink+
          }  
 \end{exe}
 %https://tex.stackexchange.com/questions/306764/breaking-line-in-gb4e
@@ -2276,6 +2490,7 @@ Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Spra
 \glinlinesnote{%
 Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.
 */ this is  one   of-these very long   sentences that it in the a b German    language gives
+glt This item has a language note.
 }{German}
 %\ex
 %\longexampleandlanguage{
@@ -2283,7 +2498,7 @@ Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Spra
 %         this is  one   of.these very long   sentences that it in the a b German    language gives\\
 %}{German}
 \end{exe}
-
+%https://tex.stackexchange.com/questions/600695/limiting-space-used-by-gb4e-and-adding-language-information-to-the-right
 
 
 
@@ -2293,9 +2508,9 @@ Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Spra
 \ex
 \glinlines{%
         On the honeydew melon 
-glt     The honeydew melon is one of the two main cultivar types in Cucumis melo Inodorus Group. It is characterized by the smooth rind and lack of musky odor. 
+glt     The honeydew:space;melon::ttikz; is one of the two main cultivar types in Cucumis melo Inodorus Group. It is characterized by the smooth rind and lack of musky odor. 
 %glt Το πεπόνι χάνεϊντιου, γνωστό και ως μελοπέπονο, είναι φρούτο της ποικιλίας muskmelon ή Cucumis melo της οικογένειας των κολοκυνθοειδών. Η ομάδα αυτή των Inodorus περιλαμβάνει το συγκεκριμένο πεπόνι αλλά και άλλα ανάμεικτα είδη πεπονιού και κολοκύθας. 
-glt :par;:smallskip;El melón verde, melón blanco, casaba, melón rocío de miel o melón tuna es un fruto de la familia del melónCucumis melo (Cucumis melo) que se cultiva en general para el consumo gastronómico. La fruta es similar al melón anaranjado o cantalupo, pero tiene un sabor más dulce, contiene más agua y posee un color verde pálido o claro en su interior.
+glt :par;:smallskip;El melón:space;verde::ttikz;, melón blanco, casaba, melón rocío de miel o melón tuna es un fruto de la familia del melónCucumis melo (Cucumis melo) que se cultiva en general para el consumo gastronómico. La fruta es similar al melón anaranjado o cantalupo, pero tiene un sabor más dulce, contiene más agua y posee un color verde pálido o claro en su interior.
 glt :par;:smallskip;Le melon honeydew, ou melon miel, est un melon du groupe de cultivars de l'espèce Cucumis melo (famille des Cucurbitaceae). Le groupe Inodorus inclut le melon honeydew, le melon musqué, le melon d'hiver et d'autres hybrides du melon.
 glt :par;:smallskip;Il melone verde è un gruppo di colture appartenente al gruppo Inodorus della specie dei Cucumis melo.
 
@@ -2305,6 +2520,15 @@ Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno
 %日本では、「ハネジューメロン」「ハネージュメロン」「ハニジューメロン」「ハニーデューメロン」「ハニージューメロン」「ハニージュメロン」等とも呼ばれ、一般的な海外のメロンでもある。 
 %glt  Hunajameloni (Cucumis melo Hunajameloni-ryhmä) on yksi melonin lajikeryhmä.[1] Hunajameloni on yleensä noin 15–22 cm pitkä ja hieman soikea. Sen paino vaihtelee 1,8–3,6 kg:n välillä. Hedelmän liha on vaaleanvihreätä ja sileän kuoren väri vaihtelee vihreästä keltaiseen.[2] Hunajamelonin liha on mehukasta ja makeaa ja hedelmää nautitaan usein jälkiruokana. Hedelmiä myydään ympäri maailmaa. 
 %glt :par;:smallskip;Melon madu minangka salah sawijining rong jinis kultivar utama ing Grup Codumis melo Inodorus. [1] Ditondoi kanthi kulit alus lan ora duwe ambu ora enak. Jinis utama liyane ing Grup Inodorus yaiku melon casaba kulit. 
+}
+\end{exe}
+
+
+\begin{exe}
+\ex
+\glinlines{%
+     The honeydew::ttikz; melon
+*/   .art .prod.met.attr .fruit
 }
 \end{exe}
 
@@ -2319,6 +2543,7 @@ Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno
  glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
 }
 \end{exe}
+%https://tex.stackexchange.com/questions/425424/boxed-text-and-underline-within-the-gb4e-environment
 
 
 \renewcommand\bffcolor{yellow!50}
@@ -2424,23 +2649,204 @@ glt   Line 4, Trans C
 }
 \end{exe}
 
-
+\para{option key preamble=}
 %\mfsformattedvboxon
 \begin{exe}
-\ex
-\glinlines*{%
-      {}{}{}{}
-glt   Somebody has arrived late.
-*/    :llaphash;Ich bin schon da
+\ex%
+\glinlines[preamble={Somebody has arrived late.}]{%
+       :llaphash;Ich bin schon da
 */    I am already there
 glt   `I am here already.'}
 \end{exe}
-%https://tex.stackexchange.com/questions/308008/gb4e-phantom-spacing
+
+\surl{https://tex.stackexchange.com/questions/308008/gb4e-phantom-spacing}
 
 
 
 
 
+\begin{exe}
+\ex
+\glinlines{%
+       [This] is an example which displays properly.
+       }
+%\ex[*]
+%\glinlines{%
+%       [This] is an example which displays properly.
+%       }
+\end{exe}
+
+
+
+
+\begin{exe}
+\ex
+\glinlines{%
+       [This] a is an example which displays properly.
+       }
+\ex[*]{}
+\glinlines{%
+       [This] b is an example which displays properly.
+       }
+\ex
+\glinlines{%
+       :llapstar;[This] c is an example which displays properly.
+       }
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/590883/how-to-use-gb4e-to-produce-glossed-example-with-bracket}
+
+
+
+Text, see footnote\footnote{\glinlines{%
+This is a footnoted example.
+*/ dA V iA Adj N
+       }}
+
+
+\begin{exe}
+\ex
+\glinlines{%
+Text:footnotemark;, text, text.
+*/ Text:footnotemark;, text, text.
+*/ Text:footnotemark;, text, text.
+glt Text is here:footnotemark;, text, text.
+}
+\end{exe}
+\footnotetext[2]{A footnote.}
+\footnotetext[3]{A footnote.}
+\footnotetext[4]{A footnote.}
+\footnotetext{A footnote: \surl{https://tex.stackexchange.com/questions/334636/using-gb4e-to-insert-footnote-in-gll-line}}
+
+
+%%\begin{exe}
+%%  \ex
+%%  \begin{xlist}
+%%    \ex[??/*]           {Which \ldots}
+%%    \ex[\phantom{??/}*] {Which \ldots}
+%%    \ex[*]              {Which \ldots}
+%%  \end{xlist}
+%%\end{exe}
+%%%https://tex.stackexchange.com/questions/282740/gb4e-tabbing-problem
+
+
+
+\NewDocumentCommand\definekey{mm}
+ {
+  \keys_define:nn { #1 }
+   {
+    #2 .tl_set:c = { l_#1_#2_tl },
+   }
+ }
+%%\begin{equation}
+%%xxx \label{key3} yyy
+%%\end{equation}
+%%xxx \ref{key3} xxx
+
+
+
+%%\begin{exe}
+%%\ex
+%%\glinlines{%
+%%:marktext;{بَبَب}
+%%%ب¶اللون{¶أحمر}َ¶اللون{¶أخضر}ب¶اللون{¶أزرق}ب
+%%       }
+%%\end{exe}
+%%
+
+
+
+
+
+
+\newpage
+%\begin{figure}
+\begin{exe}
+\ex%~[lingstyle=EarlyBabbish,exno=1]  
+\glinlines{%
+luizcid dun-  ua-  glud-  gan giumima 
+*/ ART PFX PFX V SFX N 
+*/ ATEL-  NPST-  be.old-  ACT-  VST.PTCP woman 
+*/ A::tikzmark;{there was a} C::tikzmark;{being old} D::tikzmark;  {}  {woman who} woman::phantom;B::tikzmark;
+}
+\end{exe}
+%\caption{Example of figure}
+%\end{figure}
+      \tikzbrace{C}{D}{Something else}
+      \tikzbrace[25]{A}{B}{Ergative subject of muiddrin}
+      \overunderbrace[60]{A}{B}{Over text}{Under text}
+
+
+\vspace{8em}
+\surl{https://tex.stackexchange.com/questions/355934/horizontal-curly-braces-in-expex-glossing-example}
+
+xxx
+
+\para{Right-to-Left} See the example (uses polyglossia).
+
+\subpara{Even height and depth} with a zero width \textbackslash vrule.
+           
+\para{Right-to-Left}
+\begin{Arabic}
+\glsetfirstlineformat{\selectlanguage{arabic}\Large\color{blue}{\vrule height 28pt depth 16pt width 0.2pt}}
+\glsetsecondlineformat{\selectlanguage{greek}}
+\glsetthirdlineformat{\selectlanguage{brazil}}
+\glsetfourthlineformat{\selectlanguage{english}}
+\glsetfifthlineformat{\selectlanguage{english}\ttfamily}
+\glsetsixthlineformat{\selectlanguage{english}\itshape}
+\mfsformattedvboxon
+%\mfsnumberedwordson
+\begin{exe}
+\ex  \quad\quad\quad
+\glinlines{%
+
+ هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما {سيلهي القارئ} {عن الترك}
+
+*/ {εν τω} έτει τω-δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη {το πνεύμα αυτού} και {ο ύπνος αυτού} {εγένετο απ 'αυτού}
+*/ No ano-segundo {do reinado} {de Nabucodonosor} sonhou Nabucodonsor {um sonho,} e desconcertou-se {o espirito dele,} e o {sono dele} {se lhe fugiu.}
+*/ english::selectlanguage; x x x x x x x x x x x x y
+*/  hunak haqiqat muthabatat mundh zaman tawil wahi 'ana almuhtawaa almaqru' lisafhat ma {silahi alqari} {ean alturk}
+*/ there reality installed ago time long which that content read for-page what-will {distract the-reader} {about the-turk/leaving}
+glt english::selectlanguage; `There is a long-established fact that the readable content of a page will distract the reader from leaving.'
+}
+\end{exe}
+\end{Arabic}
+\glsetthirdlineformat{}
+\mfsformattedvboxoff
+
+\surl{https://tex.stackexchange.com/questions/317589/arabic-russian-interlinear-text/317703#317703}
+
+
+
+\para{Reset line formats} with \glcmd{glresetlineformats}.
+
+\glresetlineformats
+\begin{exe}
+\ex  
+\glinlines{%
+x y z
+*/ a b c
+*/ a b c
+*/ a b c
+*/ a b c
+*/ a b c
+}
+\end{exe}
+
+\para{Subscripts and Superscripts} with \glcmdb{glsub} and \glcmdb{glsuper}.
+
+
+\begin{exe}
+\ex  
+\glinlines{%
+       x:suba; y:subalpha; z::glsub!b;
+*/    a b c
+*/    a b c
+*/    a b c
+*/    a b c
+*/    a b c
+}
+\end{exe}
 
 \end{document}
 
