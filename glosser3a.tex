@@ -141,6 +141,12 @@
 \newcommand\glsuper[1]{\textsuperscript{#1}}
 \newcommand\suba{\glsub{a}}
 \newcommand\subalpha{\glsub{\symbol{945}}}
+\newcommand\pkvcat[1]{\mfsgetapropkv{cat}{#1}}
+\newcommand\pkvstrong[1]{\mfsgetapropkv{strong}{#1}}
+\newcommand\pkvnabeng[1]{\mfsgetapropkv{nabeng}{#1}}
+\newcommand\pkvtest[1]{\fbox{#1}}
+
+
 
 %squiggle
 \newcommand\squiggle{%
@@ -189,10 +195,18 @@
 %}
 
 \tl_new:N \g_gloss_preamble_tl
+\tl_new:c { l_gloss_cline1_tl }
+\tl_new:c { l_gloss_cline2_tl }
+\tl_new:c { l_gloss_cline3_tl }
 
 \keys_define:nn { gloss }
 {
-preamble .tl_gset:N = \g_gloss_preamble_tl,
+preamble .tl_set:N = \g_gloss_preamble_tl,
+addca .tl_set:c = { l_gloss_cline1_tl },
+addcb .tl_set:c = { l_gloss_cline2_tl },
+addcc .tl_set:c = { l_gloss_cline3_tl },
+%addca .tl_set:N = l_gloss_cline1_tl ,
+%%addca .initial:n = {\tl_gclear:c { l_gloss_cline1_tl } },
 %unknown .initial:n = {},
 %-NoValue- .initial:n = {}
 }
@@ -317,7 +331,7 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 
 	%		word::command;	 > \command	{word}
 		\regex_replace_all:nnN
-				{ (\S+)(\:\:)(\w+)(;) }
+				{ (\S+)(\:\:)(\S+)(;) }  %Greek
 				{ \c{\3} \cB\{ \1 \cE\}  }
 				\l_tmpc_tl
 
@@ -435,6 +449,51 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 %------------------
 	\cs_set:Npn \gl_funcregexmeta:  { 
 % regex meta commands
+
+% line1 commands
+%    \tl_use:c { l_gloss_cline1_tl }
+		\tl_if_empty:cF { l_gloss_cline1_tl }
+		{  
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 1 }
+								  {
+%		\tl_show:c { l_gloss_cline1_tl }
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_gloss_cline1_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}% end line1
+			}% end has value
+%---
+% line2 commands
+		\tl_if_empty:cF { l_gloss_cline2_tl }
+		{  
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 2 }
+								  {
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_gloss_cline2_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}% end line2
+			}% end has value
+%---
+% line3 commands
+		\tl_if_empty:cF { l_gloss_cline3_tl }
+		{  
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 3 }
+								  {
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_gloss_cline3_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}% end line3
+			}% end has value
+%---
+
+
+
 		\bool_if:NTF
 		\g__gloss_keepdotpos_bool
 		{
@@ -1216,14 +1275,29 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
     { \bool_set_true:N  \g__gloss_glosstrans_bool } 
     { \bool_set_false:N  \g__gloss_glosstrans_bool }
     
+%    \begingroup
      
     \IfNoValueF{#2}
-    { 
+%    {
+%    	\keys_set:nn { gloss } { preamble=,addca=, } 
+%    }
+    {
+%    \keys_show:nn {gloss}{addca} 
+%    \begingroup
     	\keys_set:nn { gloss } { #2 } 
-    	\tl_use:N \g_gloss_preamble_tl \\ 
+    	\tl_if_empty:NF
+    			 \g_gloss_preamble_tl
+    	  { \tl_use:N \g_gloss_preamble_tl \\ }
+%    	  \endgroup
     	}
    
-		\glinlinesbase[gloss]{ex2a}{*/}{#3}
+%   \tl_set:Nn
+%   		\l_tmpa_tl
+%   		{ #3 }
+%   \exp_args:Nnnnx
+		\glinlinesbase[gloss]{ex2a}{*/}{ #3 }
+%    	  \endgroup
+
 }
 
 
@@ -1236,7 +1310,9 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
     \IfNoValueF{#1}
     { 
     	\keys_set:nn { gloss } { #1 } 
-    	\tl_use:N \g_gloss_preamble_tl \\ 
+    	\tl_if_empty:NF
+    		 \g_gloss_preamble_tl
+    		{ \tl_use:N \g_gloss_preamble_tl \\ }
     	}
 
 			\glinlines{#2}
@@ -1339,6 +1415,17 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 \NewDocumentCommand { \mfssetposformat } { m } { 
 			\renewcommand{\mfsposformat}{#1}
 }
+
+
+
+%==============================
+%--------------------
+\NewDocumentCommand { \mfssetfirstlinefunc} { m } { 
+			\tl_gset:cx  { l_gloss_cline1_tl } { #1 }
+%					\tl_show:c { l_gloss_cline1_tl }
+
+}
+
 
 
 
@@ -1465,6 +1552,74 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 \tl_new:N \l_texttransline_tl
 \int_new:N \l_texttransline_int
 \int_new:N \l_texttransloop_int
+
+\NewDocumentCommand { \mfsuseaseql } { o m m } { 
+% 1=namespace
+% 2=seq name
+% 3=sep
+%%% 4=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+%=
+%\tl_set:Nn
+%\l_tmpa_tl
+% {
+%	\seq_use:cn
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+%			{ #3 }
+%	}
+
+			\exp_args:Nnnx
+	\seq_set_split:Nnn 
+		\l_tmpa_seq
+			{ ~ }
+ {
+	\seq_use:cn
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ #3 }
+	}
+
+\tl_set:Nn
+\l_tmpa_tl
+ {
+	\seq_use:Nn
+		\l_tmpa_seq
+			{ ~ }
+	}
+
+\tl_use:N
+\l_tmpa_tl
+
+}
+
+
+\NewDocumentCommand { \mfsuseaseqli } { o m m } { 
+% 1=namespace
+% 2=seq name
+% 3=item
+%%% 4=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+%=
+	\seq_item:cn
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ #3 }
+
+
+}
+
+
+
+
+
+
+
 \NewDocumentCommand { \mfsloadaseql } { o m m +m } { 
 % 1=namespace
 % 2=seq name
@@ -1885,8 +2040,8 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 % \\%= gloss starts on new line
 		} 	
   
-\textglossout
-\transout{#2}
+%%\textglossout
+%%\transout{#2}
    	
 }
 
@@ -2121,6 +2276,39 @@ preamble .tl_gset:N = \g_gloss_preamble_tl,
 			{ #3 }
 
 }
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsgetapropkv } { o m m } { % 1=NS, 2=prop name, 3=key
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+	\prop_item:cn
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			{ #3 }
+%			\l_tmpa_tl
+%
+%			\tl_use:N \l_tmpa_tl
+}
+
+
+
+%--------------------
+\NewDocumentCommand { \mfsuseaprop } { o m } { % 1=NS, 2=prop name
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+	\prop_show:c
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+%			{ #3 }
+%			\l_tmpa_tl
+%
+%			\tl_use:N \l_tmpa_tl
+}
+
 
 
 
@@ -2847,6 +3035,167 @@ x y z
 */    a b c
 }
 \end{exe}
+
+
+\para{Single-item Sequence as Input Line}
+\mfsloadaseql{cat}{.}{The cat sat on the mat.}
+\begin{exe}
+\ex  
+\glinlines{%
+       \mfsuseaseql{cat}{.}
+*/    \mfsuseaseql{cat}{!}
+*/    \mfsuseaseql{cat}{?}
+*/    \mfsuseaseql{cat}{??}
+}
+\end{exe}
+
+\para{Sequence item as Input Line}
+\mfsloadaseql{dog}{*/}{%
+The cat sat on the mat.
+*/ The quick brown fox jumps over.
+*/ Many Volcanoes Erupt Mulberry Jam Sandwiches.
+}
+
+
+\begin{exe}
+\ex  
+\glinlines{%
+       \mfsuseaseqli{dog}{3}
+*/    \mfsuseaseqli{dog}{1}
+*/    \mfsuseaseqli{dog}{2}
+}
+\end{exe}
+
+\mfsloadaprop{cat}{%
+The=1
+,cat=2
+,sat=3
+,on=4
+,the=5
+,mat=6
+,mat.=7
+}
+\mfsgetapropkv{cat}{the}
+
+%\mfsuseaprop{cat}
+%The property list \g_fc_rwecat_prop contains the pairs (without outer braces):
+%>  {The}  =>  {1}
+%>  {cat}  =>  {2}
+%>  {sat}  =>  {3}
+%>  {on}  =>  {4}
+%>  {the}  =>  {5}
+%>  {mat}  =>  {6}.
+
+\begin{exe}
+\ex  
+\glinlines[addca=pkvcat]{%
+%\glinlines{%
+          The cat sat on the mat.
+*/       The::pkvcat; cat::pkvcat; sat::pkvcat; on::pkvcat; the::pkvcat; mat::pkvcat;. {pkvcat added manually}
+*/    The cat sat on the mat. {}
+%glt  \newcommand\pkvcat[1]{\mfsgetapropkv{cat}{#1}}
+}
+\end{exe}
+
+
+
+%
+%ενG1722 In τωG3588 the έτειG2094 year τωG3588 δευτέρωG1208 second τηςG3588 of the βασιλείαςG932 kingdom Ναβουχοδονόσορ of Nebuchadnezzar, ενυπνιάσθηG1797 dreamed Ναβουχοδονόσορ Nebuchadnezzar ενύπνιονG1798 a dream, καιG2532 and εξέστηG1839 was startled τοG3588 πνεύμα αυτούG4151 his spirit, καιG2532 and οG3588 ύπνος αυτούG5258 his sleep εγένετοG1096 went απ΄G575 from αυτούG1473 him.
+%
+%\surl{http://biblia-online.pl/Biblia/Septuaginta/Ksiega-Daniela/2/1}
+%\mfsloadaseql{dog}{*/}{%
+
+\mfsloadaseql{nab}{*/}{%
+εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+}
+
+\mfsloadaprop{strong}{%
+εν=G1722
+,τω=G3588
+,έτει=G2094
+%,τω=G3588 
+,δευτέρω=G1208
+,της=G3588
+,βασιλείας=G932
+,Ναβουχοδονόσορ=*
+,ενυπνιάσθη=G1797
+%,Ναβουχοδονόσορ=*
+,ενύπνιον=G1798
+,και=G2532
+,εξέστη=G1839
+,το=G3588 
+,πνεύμα=G4151 
+,αυτού=G1473
+%,και=G2532
+,ο=G3588 
+,ύπνος=G5258
+%,αυτού=G1473
+,εγένετο=G1096
+,απ΄=G575
+%,αυτού=G1473
+,test=Y9999
+}
+
+\mfsloadaprop{nabeng}{%
+εν=in 
+,τω=the 
+,έτει=year 
+%,τω=G3588 
+,δευτέρω=second 
+,της=of-the 
+,βασιλείας=reign
+,Ναβουχοδονόσορ=Nebuchadnezzar 
+,ενυπνιάσθη=dreamed 
+%,Ναβουχοδονόσορ
+% Nebuchadnezzar 
+,ενύπνιον=a-dream
+,και=and 
+,εξέστη=was-startled 
+,το=the
+,πνεύμα=spirit
+,αυτού=his
+%,και=G2532
+% and 
+,ο=the
+,ύπνος=sleep
+%,αυτού=G5258
+% his sleep 
+,εγένετο=went 
+,απ΄=from 
+%,αυτού=G1473
+% him.
+,test=X9999
+}
+
+
+\glsetfirstlineformat{\footnotesize\ttfamily}
+\glsetsecondlineformat{\selectlanguage{greek}\color{blue}{\vrule height 12pt depth 6pt width 0pt}}
+\glsetthirdlineformat{\small}
+\mfsformattedvboxon
+
+\begin{exe}
+\ex  
+\glinlines[addca=pkvstrong,addcc=pkvnabeng]{%
+%     test ύπνος το πνεύμα
+% */ bΝαβουχοδονόσορ ύπνος x x
+% */ cΝαβουχοδονόσορ x x x
+%       \mfsuseaseql{nab}{.}
+%*/    \mfsuseaseql{nab}{.}
+%*/    \mfsuseaseql{nab}{.}
+    εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+    */     εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+    */    εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+}
+\end{exe}
+
+
+
+%\mfsgetapropkv{strong}{ύπνος}
+%
+%\pkvstrong{ύπνος}
+
+
+
 
 \end{document}
 
