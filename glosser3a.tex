@@ -1,5 +1,6 @@
 \documentclass{article}
-\usepackage{xcolor}
+%\usepackage{xcolor}
+\usepackage{xcolor,luacolor,lua-ul}
 \usepackage{fontspec}
 \setmainfont{Noto Serif}
 \setsansfont{Noto Sans}
@@ -145,6 +146,22 @@
 \newcommand\pkvstrong[1]{\mfsgetapropkv{strong}{#1}}
 \newcommand\pkvnabeng[1]{\mfsgetapropkv{nabeng}{#1}}
 \newcommand\pkvtest[1]{\fbox{#1}}
+\newcommand\doemph[1]{{\Huge\color{red}#1}}
+
+\newunderlinetype\beginUnderWavy[\number\dimexpr1ex]{\cleaders\hbox{%
+\setlength\unitlength{.3ex}%
+\begin{picture}(4,0)(0,1)
+\thicklines
+\color{red}%
+\qbezier(0,0)(1,1)(2,0)
+\qbezier(2,0)(3,-1)(4,0)
+\end{picture}%
+}}
+\newcommand\underWavy[1]{{\beginUnderWavy#1}}
+
+
+
+
 
 
 
@@ -198,6 +215,16 @@
 \tl_new:c { l_gloss_cline1_tl }
 \tl_new:c { l_gloss_cline2_tl }
 \tl_new:c { l_gloss_cline3_tl }
+\tl_new:c { l_gloss_cline1w_tl }
+\tl_new:c { l_gloss_cline2w_tl }
+\tl_new:c { l_gloss_cline3w_tl }
+\tl_new:c { l_gloss_clinexwxa_tl }
+\tl_new:c { l_gloss_clinexwxb_tl }
+\tl_new:c { l_gloss_clinexwxc_tl }
+\tl_new:c { l_gloss_clinexwxd_tl }
+\tl_new:c { l_gloss_clinexwxe_tl }
+\tl_new:c { l_gloss_clinexwxf_tl }
+
 
 \keys_define:nn { gloss }
 {
@@ -205,6 +232,15 @@ preamble .tl_set:N = \g_gloss_preamble_tl,
 addca .tl_set:c = { l_gloss_cline1_tl },
 addcb .tl_set:c = { l_gloss_cline2_tl },
 addcc .tl_set:c = { l_gloss_cline3_tl },
+addcaw .tl_set:c = { l_gloss_cline1w_tl },
+addcbw .tl_set:c = { l_gloss_cline2w_tl },
+addccw .tl_set:c = { l_gloss_cline3w_tl },
+addcxa .tl_set:c = { l_gloss_clinexwxa_tl },
+addcxb .tl_set:c = { l_gloss_clinexwxb_tl },
+addcxc .tl_set:c = { l_gloss_clinexwxc_tl },
+addcxd .tl_set:c = { l_gloss_clinexwxd_tl },
+addcxe .tl_set:c = { l_gloss_clinexwxe_tl },
+addcxf .tl_set:c = { l_gloss_clinexwxf_tl },
 %addca .tl_set:N = l_gloss_cline1_tl ,
 %%addca .initial:n = {\tl_gclear:c { l_gloss_cline1_tl } },
 %unknown .initial:n = {},
@@ -445,7 +481,7 @@ addcc .tl_set:c = { l_gloss_cline3_tl },
 
 
 
-
+\tl_new:N \l_tmpe_tl
 %------------------
 	\cs_set:Npn \gl_funcregexmeta:  { 
 % regex meta commands
@@ -465,6 +501,28 @@ addcc .tl_set:c = { l_gloss_cline3_tl },
 												}% end line1
 			}% end has value
 %---
+		\tl_if_empty:cF { l_gloss_cline1w_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator
+			{ \tl_use:c { l_gloss_cline1w_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 1 }
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } }
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 2 } }
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end line1w
+			}% end has value
+%---
 % line2 commands
 		\tl_if_empty:cF { l_gloss_cline2_tl }
 		{  
@@ -476,6 +534,28 @@ addcc .tl_set:c = { l_gloss_cline3_tl },
 				{ \c{\u{l_gloss_cline2_tl}} \cB\{ \0 \cE\} }
 				\l_tmpc_tl
 												}% end line2
+			}% end has value
+%---
+		\tl_if_empty:cF { l_gloss_cline2w_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator
+			{ \tl_use:c { l_gloss_cline2w_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 2 }
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } }
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 2 } }
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end line2w
 			}% end has value
 %---
 % line3 commands
@@ -491,9 +571,85 @@ addcc .tl_set:c = { l_gloss_cline3_tl },
 												}% end line3
 			}% end has value
 %---
+		\tl_if_empty:cF { l_gloss_cline3w_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator
+			{ \tl_use:c { l_gloss_cline3w_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { 3 }
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } }
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 2 } }
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end line3w
+			}% end has value
+%---
+%--- line X word X: a-f
+%--- a:
+		\tl_if_empty:cF { l_gloss_clinexwxa_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxa_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXa
+			}% end has value
+%--------------------
+%--- b:
+		\tl_if_empty:cF { l_gloss_clinexwxb_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxb_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXb
+			}% end has value
+%--------------------
 
 
 
+
+
+
+
+
+
+%========================
 		\bool_if:NTF
 		\g__gloss_keepdotpos_bool
 		{
@@ -3090,7 +3246,7 @@ The=1
 \ex  
 \glinlines[addca=pkvcat]{%
 %\glinlines{%
-          The cat sat on the mat.
+          The cat sat on the mat. {}
 */       The::pkvcat; cat::pkvcat; sat::pkvcat; on::pkvcat; the::pkvcat; mat::pkvcat;. {pkvcat added manually}
 */    The cat sat on the mat. {}
 %glt  \newcommand\pkvcat[1]{\mfsgetapropkv{cat}{#1}}
@@ -3187,8 +3343,8 @@ The=1
     */    εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
 }
 \end{exe}
-
-
+\mfsformattedvboxoff
+\glresetlineformats
 
 %\mfsgetapropkv{strong}{ύπνος}
 %
@@ -3196,6 +3352,35 @@ The=1
 
 
 
+
+\begin{exe}
+\ex  
+\glinlines[addcaw=2;doemph,
+addcb=pkvcat,
+addccw=6;doemph,
+addcxa=3;1;doemph,
+]{%
+%\glinlines{%
+          The cat sat on the mat. 
+*/       The cat sat on the mat. 
+*/    The cat sat on the mat. 
+}
+\end{exe}
+
+
+``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
+
+
+\begin{exe}
+\ex  
+\glinlines[
+addcxa=1;1;textit,
+addcaw=1;textbf,
+addcxb=1;1;underWavy,
+]{%
+          The ⌞cat⌟ sat on the mat. 
+}
+\end{exe}
 
 \end{document}
 
