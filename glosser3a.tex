@@ -159,6 +159,12 @@
 }}
 \newcommand\underWavy[1]{{\beginUnderWavy#1}}
 
+\definecolor{dg}{rgb}{0,.392,0} %DarkGreen
+\definecolor{dm}{rgb}{.545,0,.545}  %DarkMagenta
+\newcommand\mnote[1]{\leavevmode\reversemarginpar\marginpar{\raggedright\ttfamily\color{dg}
+#1}}
+\newcommand\nnote[1]{\leavevmode\normalmarginpar\marginpar{\raggedright\sffamily\color{dm}
+#1}}
 
 
 
@@ -224,7 +230,7 @@
 \tl_new:c { l_gloss_clinexwxd_tl }
 \tl_new:c { l_gloss_clinexwxe_tl }
 \tl_new:c { l_gloss_clinexwxf_tl }
-
+\bool_new:N \g__gloss_numberthelinesa_bool
 
 \keys_define:nn { gloss }
 {
@@ -241,6 +247,7 @@ addcxc .tl_set:c = { l_gloss_clinexwxc_tl },
 addcxd .tl_set:c = { l_gloss_clinexwxd_tl },
 addcxe .tl_set:c = { l_gloss_clinexwxe_tl },
 addcxf .tl_set:c = { l_gloss_clinexwxf_tl },
+linenumsa .bool_set:N = \g__gloss_numberthelinesa_bool,
 %addca .tl_set:N = l_gloss_cline1_tl ,
 %%addca .initial:n = {\tl_gclear:c { l_gloss_cline1_tl } },
 %unknown .initial:n = {},
@@ -625,6 +632,98 @@ addcxf .tl_set:c = { l_gloss_clinexwxf_tl },
 		\l_tmpa_seq
 			{ ; } % separator: line;word;command
 			{ \tl_use:c { l_gloss_clinexwxb_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXb
+			}% end has value
+%--------------------
+%--- c:
+		\tl_if_empty:cF { l_gloss_clinexwxc_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxc_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXb
+			}% end has value
+%--------------------
+%--- d:
+		\tl_if_empty:cF { l_gloss_clinexwxd_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxd_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXb
+			}% end has value
+%--------------------
+%--- e:
+		\tl_if_empty:cF { l_gloss_clinexwxe_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxe_tl } }
+			
+		\int_compare:nNnT
+								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
+								  {
+		\int_compare:nNnT
+								  { \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 2 } } % word
+								  {
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 3 } } % command name
+		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}}% end lineXwXb
+			}% end has value
+%--------------------
+%--- f:
+		\tl_if_empty:cF { l_gloss_clinexwxf_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator: line;word;command
+			{ \tl_use:c { l_gloss_clinexwxf_tl } }
 			
 		\int_compare:nNnT
 								  { \g__gloss_basenameloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } } % line
@@ -1068,6 +1167,41 @@ addcxf .tl_set:c = { l_gloss_clinexwxf_tl },
 					    %
 					}
 					{ } % false
+
+
+					\int_case:nnTF { \g__gloss_wordloop_int }
+					{
+					{ 1 } { 
+					\bool_if:NT
+						\g__gloss_numberthelinesa_bool
+						{
+											\tex_space:D
+											\llap { (
+					\int_case:nnTF { \g__gloss_basenameloop_int }
+					{
+					{ 1 } { a }
+					{ 2 } { b }
+					{ 3 } { c }
+					{ 4 } { d }
+					{ 5 } { e }
+					{ 6 } { f }
+					}
+					{}{}
+%											\alph { \int_use:N \g__gloss_basenameloop_int }
+											) } 
+											\tex_space:D
+											}
+        } % end bool
+%					{ 2 } { \glsecondlineformat }
+%					{ 3 } { \glthirdlineformat }
+%					{ 4 } { \glfourthlineformat }
+%					{ 5 } { \glfifthlineformat }
+%					{ 6 } { \glsixthlineformat }					
+							} { % true
+					    %
+					}
+					{ } % false
+
 
 
 					\tl_use:N
@@ -3184,8 +3318,8 @@ x y z
 \ex  
 \glinlines{%
        x:suba; y:subalpha; z::glsub!b;
-*/    a b c
-*/    a b c
+*/    a::glsuper!x; b::glsuper!y; c::glsuper!z;
+*/    a::glsub!1; b::glsub!2; c::glsub!3;
 */    a b c
 */    a b c
 */    a b c
@@ -3205,7 +3339,9 @@ x y z
 }
 \end{exe}
 
+%----------------------
 \para{Sequence item as Input Line}
+
 \mfsloadaseql{dog}{*/}{%
 The cat sat on the mat.
 */ The quick brown fox jumps over.
@@ -3241,6 +3377,9 @@ The=1
 %>  {on}  =>  {4}
 %>  {the}  =>  {5}
 %>  {mat}  =>  {6}.
+
+%----------------------
+\para{Attaching a command to every word on a line}
 
 \begin{exe}
 \ex  
@@ -3323,6 +3462,8 @@ The=1
 ,test=X9999
 }
 
+%----------------------
+\para{Doing lookups}
 
 \glsetfirstlineformat{\footnotesize\ttfamily}
 \glsetsecondlineformat{\selectlanguage{greek}\color{blue}{\vrule height 12pt depth 6pt width 0pt}}
@@ -3330,7 +3471,7 @@ The=1
 \mfsformattedvboxon
 
 \begin{exe}
-\ex  
+\ex  \mnote{addca=\\ addcc=}
 \glinlines[addca=pkvstrong,addcc=pkvnabeng]{%
 %     test ύπνος το πνεύμα
 % */ bΝαβουχοδονόσορ ύπνος x x
@@ -3351,14 +3492,16 @@ The=1
 %\pkvstrong{ύπνος}
 
 
-
+%----------------------
+\para{Attaching commands to specific words}
 
 \begin{exe}
-\ex  
+\ex \mnote{addc\fbox{b}=\\ addc\fbox{a}w=\\ addc\fbox{c}w=\\ addcxa=} 
 \glinlines[addcaw=2;doemph,
 addcb=pkvcat,
 addccw=6;doemph,
 addcxa=3;1;doemph,
+linenumsa=true,
 ]{%
 %\glinlines{%
           The cat sat on the mat. 
@@ -3368,19 +3511,40 @@ addcxa=3;1;doemph,
 \end{exe}
 
 
+%----------------------
+\para{An inline lookup}
+
 ``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
 
 
+
+
+%----------------------
+\para{Attaching multiple commands to one word}
+
 \begin{exe}
-\ex  
+\ex  \mnote{addcxa=\\ addc\fbox{a}w=\\ addcxb=}
+%      \nnote{Multiple commands}
 \glinlines[
 addcxa=1;1;textit,
 addcaw=1;textbf,
 addcxb=1;1;underWavy,
+linenumsa=true,
 ]{%
           The ⌞cat⌟ sat on the mat. 
 }
 \end{exe}
+
+
+
+%%\begin{exe}
+%%\ex 
+%%\glinlines{%
+%%\mfsuseaseql{dog}{*/}
+%%}
+%%\end{exe}
+
+
 
 \end{document}
 
