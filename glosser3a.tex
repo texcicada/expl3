@@ -142,6 +142,7 @@
 \newcommand\subpara[1]{\smallskip\subparagraph{#1}}
 \newcommand\glcmd[1]{\textcolor{violet}{\texttt{\textbackslash#1}}}
 \newcommand\glcmdb[1]{\glcmd{#1}\{\}}
+\newcommand\glmeta[1]{\textcolor{brown}{\texttt{#1}}}
 \newcommand\glsub[1]{\textsubscript{#1}}
 \newcommand\glsuper[1]{\textsuperscript{#1}}
 \newcommand\suba{\glsub{a}}
@@ -173,7 +174,8 @@
 \newcommand\textred[1]{\textcolor{red}{#1}}
 \newcommand\textredit[1]{\textcolor{red}{\textit{#1}}}
 %\newcommand\xp[1]}{\xpinyin*{#1}}
-
+\newcommand\eg{e.g.,\space}
+\newcommand\ie{i.e.,\space}
 
 %squiggle
 \newcommand\squiggle{%
@@ -2711,6 +2713,63 @@ addwsa .tl_set:c = { l_gloss_wordstacka_tl },
 %glt   `I am here already.'}
 %\end{exe}
 
+\para{The \texttt{\textbackslash glinlines} macro}
+The \glcmdb{glinlines} macro provides for an unlimited number of word-for-word interlinear text/gloss lines, and an unlimited number of free-form text lines for translations, notes, etc.
+
+The macro can be used inside the linguistic example environment (\verb|exe|) of the \verb|gb4e| package, standing in place of the \glcmd{gl...} commands in some cases.
+
+\begin{verbatim}
+\begin{exe}
+\ex
+\gll Wenn jemand in die Wüste zieht ... \\
+If someone in the desert draws and lives ... \\
+\trans `if one retreats to the desert and ... '
+\end{exe}
+\end{verbatim}
+
+produces:
+
+\begin{exe}
+\ex
+\gll Wenn jemand in die Wüste zieht und ... \\
+If someone in the desert draws and lives ... \\
+\trans `if one retreats to the desert and ... '
+\end{exe}
+
+
+The \glcmdb{glinlines} equivalent is:
+
+\begin{verbatim}
+\begin{exe}
+\ex
+\glinlines{%
+       Wenn jemand in die Wüste zieht und ... 
+*/     If someone in the desert draws and  ... 
+glt    `If one retreats to the desert and ... '
+\end{exe}
+\end{verbatim}
+
+and produces:
+
+\begin{exe}
+\ex
+\glinlines{%
+       Wenn jemand in die Wüste zieht und ... 
+*/     If someone in the desert draws and  ... 
+glt    `If one retreats to the desert and ... '
+}
+\end{exe}
+
+The number of words in the text/gloss lines currently must be equal.
+
+Lines are delineated with \verb|*/| (arbitrarily chosen, can be set to some other string).
+
+Words are split out by spaces. ``they-have'' is one word, ``they have'' is two words. Braces, which have a special meaning to \TeX, can be used to group words, in effect shielding everything they contain from being seen: ``\{they have\}'' counts as one word. Because braces are eventually stripped out before printing, their presence affects the working of the attach-commands that \glcmdb{glinlines} might use.
+
+Free-form text is introduced with \verb|glt| (likewise arbitrary).
+
+Multiple glosses are possible:
+
 
 \begin{exe}
     \ex
@@ -2722,6 +2781,10 @@ glt        `The car hit the child.' % use * version of command
 glt        `The car hit the child.' / `The child hit the car.' 
 }
 \end{exe}
+
+Each text/gloss line (the word-for-word lines, WFW), can have one or more free-form text lines (FFT) attached.
+
+The unstarred version of the macro, \glcmdb{glinlines}, will print the FFT line(s) attached to the last WFW line. The starred version, \glcmdb{glinlines*}, will print all FFT lines.
 
 \begin{exe}
     \ex
@@ -2736,7 +2799,9 @@ glt        `The child hit the car.'
 
 
 
+The WFW lines can hold anything, not just glossing, as long as the number of words matches.
 
+The FFT lines likewise can contain anything, not just translations.
 
 
 \begin{exe}
@@ -2749,14 +2814,17 @@ gef hundinum matinn
 glt    One of the daily chores.
 }
 \end{exe}
-%https://tex.stackexchange.com/questions/156066/align-glosses-in-more-than-one-language-with-gb4e
+
+\surl{https://tex.stackexchange.com/questions/156066/align-glosses-in-more-than-one-language-with-gb4e}
 
 
 \squiggle
 
 
 
+The \glcmdb{glsetfirstlineformat} command will apply its contents to every word on the first line, \eg	font, font size, font colour.
 
+To keep the spaces pristine, commands to be applied inside a line are marked with a colon (:) and suffixed to a word, \eg \glmeta{ugrt:writing} becomes \glmeta{ugrt}\glcmd{writing}, which prints as ``ugrt\writing''.
 
 \glsetfirstlineformat{\fug\large\color{blue}}
 \begin{exe}
@@ -2767,13 +2835,20 @@ glt    One of the daily chores.
 */  ʾUgarītu:speech q
 */  Ugarit q
 glt  An ancient city in the east Mediterranean.
-glt  Also known as Ras Shamra (``head fennel'' = Cape Fennel). % Arabic: رأس شمرة, literally "Cape Fennel")
+glt  Also known as Ras Shamra (``head fennel'' = Cape Fennel), arabic::selectlanguage;
+
+ رأس شمرة 
+
+%english::selectlanguage; . % Arabic: رأس شمرة, literally "Cape Fennel")
 }
 \end{exe}
 \glsetfirstlineformat{}
 
 
 \squiggle
+
+\para{New line} Post-pend a plus sign (+) to the word prior to where the new line should occur, \eg ``Mink.+'':
+
 
 \begin{exe}
         \ex
@@ -2784,7 +2859,14 @@ glt        `Mink went towards it. The knothole was Mink's grandmother.'%
 %glt \ttfamily Mink+
          }  
 \end{exe}
-%https://tex.stackexchange.com/questions/306764/breaking-line-in-gb4e
+
+\surl{https://tex.stackexchange.com/questions/306764/breaking-line-in-gb4e}
+
+
+Switching over to italic blue for the first line.
+
+Notice the emphasized e, subscript i, \emphe\subi, inside an italic environment.
+
 
 \glsetfirstlineformat{\itshape\color{blue}}
 
@@ -2804,8 +2886,9 @@ glt        `Mink went towards it. The knothole was Mink's grandmother.'%
 glt `My mother asked me what the teacher gave me a book and Toki sold me'
          }  
 \end{exe}
-%outdent:
-%https://tex.stackexchange.com/questions/115591/how-can-i-indent-the-second-line-of-a-linguistic-gloss-with-gb4e-sty/115607#115607
+To do: outdent:
+
+\surl{https://tex.stackexchange.com/questions/115591/how-can-i-indent-the-second-line-of-a-linguistic-gloss-with-gb4e-sty/115607#115607}
 
 
 %%\begin{exe}\setlength{\listparindent}{3.5em}
@@ -2896,7 +2979,7 @@ glt `My mother asked me what the teacher gave me a book and Toki sold me'
 
 
 
-
+\para{Prepend commands} To prepend a command to a word, mark the command's finish with a semicolon (;), \eg \glmeta{:llapstar;`The} becomes \glcmd{llapstar}\glmeta{`The} which becomes ``*`The''. (The \glcmdb{llap} command is used here to overprint the * to the left, so that the text aligns vertically.)
 
 \begin{exe}
 \ex
@@ -2907,8 +2990,10 @@ glt   `The dog bites the cat.'
 glt   :llapstar;`The cat bites the dog.'
 }
 \end{exe}
-%https://tex.stackexchange.com/questions/306564/left-edge-vertical-alignment-in-gb4e
 
+\surl{https://tex.stackexchange.com/questions/306564/left-edge-vertical-alignment-in-gb4e}
+
+\para{Dot Prefix} Words (\ie made of letters A-Z, a-z, and digits 0-9) beginning with a dot are treated as parts of speech and their formatting is governed by the \glcmdb{mfssetposformat} command, \eg ``.1sg'' becomes ``{\scshape\bfseries\sffamily .1sg}''.
 
 \mfssetposformat{\scshape\bfseries\sffamily}
 \begin{exe}
@@ -2928,6 +3013,10 @@ glt `I saw you.' (S1:71)
 
 \end{exe}
 
+\surl{https://tex.stackexchange.com/questions/184860/gb4e-leaves-extra-space-before-translation/184862#184862}
+
+
+\para{Patching the example number format}
 
 {
 \makeatletter
@@ -2956,6 +3045,10 @@ glt    ( ) $\mapsto$. : \textbackslash usepackage\{gb4e\}
 
 %\setcounter{exx}{0}
 
+\para{Global settings}
+
+The \glcmdb{mfssetposformat} formatting continues to apply from one example to the next, like a global switch.
+
 
 \begin{exe}
 \ex
@@ -2966,7 +3059,12 @@ glt    I brought the letter to Ali.
 }
 \end{exe}
 
+\surl{https://tex.stackexchange.com/questions/337817/using-gb4e-inside-of-enumerate-environment/338093#338093}
 
+
+\para{Attaching commands} Use \glmeta{:commandA;na:commandB } to achieve \glcmd{commandA}\glmeta{na}\glcmd{commandB}
+
+\eg\glmeta{:uplb;na:uprb } $\mapsto$ \uplb na\uprb (upright brackets).
 
 
 \begin{exe}
@@ -2984,6 +3082,7 @@ glt `He said, ``I know him.'''
 }
 \end{exe}
 
+\surl{https://tex.stackexchange.com/questions/308454/gb4e-overwrite-italics-in-first-line}
 
 
 %\usepackage{tabularx}
