@@ -1,0 +1,386 @@
+\documentclass{article}
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+\setmonofont{Noto Sans Mono}
+\usepackage{xparse}
+\newfontfamily\cjk{NotoSerifCJKtc-Regular}
+\newfontface\sym{DejaVu Sans}
+\newcommand\tick{{\sym ✓}}
+%-------------------------------------------------------------
+\ExplSyntaxOn
+
+% Adapted from xpinyin.sty:
+% #1 (character), rather than #2 (Unicode codepoint),
+% becomes part of the control sequence name.
+% #3 is the pinyin. All three are in the database.
+\cs_new_protected:Npn \xpinyin_customary:nnn #1#2
+  { \cs_gset_nopar:cpn { c__xpinyin_#1_tl } }
+\cs_new_protected:Npn \xpinyin_multiple:nnn #1#2
+  { \cs_gset_nopar:cpn { c__xpinyin_multiple_#1_clist } }
+\group_begin:
+  \cs_set_eq:NN \XPYU  \xpinyin_customary:nnn
+  \cs_set_eq:NN \XPYUM \xpinyin_multiple:nnn
+  \file_input:n { xpinyin-database.def }
+\group_end:
+
+%-----------------------------
+%-----------------------------
+
+
+
+
+		\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn 
+			{ Nxx }
+
+		\cs_generate_variant:Nn 
+			\str_replace_all:Nnn 
+			{ Nxx }
+
+		\cs_generate_variant:Nn 
+					\seq_set_split:Nnn 
+				{ cnx }
+
+%-----------------------------
+\keys_define:nn { mpy }
+{
+mpya .tl_set:c = { l_mpy_char1_tl },
+mpyb .tl_set:c = { l_mpy_char2_tl },
+mpyc .tl_set:c = { l_mpy_char3_tl },
+}
+\seq_new:c { l_mpy_char1_seq }
+\seq_new:c { l_mpy_char2_seq }
+\seq_new:c { l_mpy_char3_seq }
+
+\int_new:c { l_mpy_char1item_int }
+\int_new:c { l_mpy_char2item_int }
+\int_new:c { l_mpy_char3item_int }
+
+\int_new:c { l_mpy_char1py_int }
+\int_new:c { l_mpy_char2py_int }
+\int_new:c { l_mpy_char3py_int }
+
+
+%-----------------------------
+	\cs_set:Npn \gl_funcxpp:n #1 { 
+	 \tl_set:Nn \l_tmpb_tl { #1 }
+%	 \tl_show:N \l_tmpb_tl
+
+   \tl_replace_all:Nxx
+   	\l_tmpa_tl
+   	{ \l_tmpb_tl }
+   	{
+		\clist_if_exist:cTF
+				{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+				{ % there is a comma list for the character
+		\bool_if:NTF
+		\g__mpy_printfirstvar_bool
+		{ % bool true = print first reading
+						\clist_item:cn 
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ 1 }
+								* %=multi
+			}
+			{	% bool false = print all readings				
+								(
+								\clist_use:cn								
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ , }
+								)								
+     }
+								\tex_space:D
+				 }
+				{ % not a comma list = only one reading
+					\cs_if_exist:cT
+					{ c__xpinyin_ \l_tmpb_tl _tl }
+					{
+					 \use:c { c__xpinyin_ \l_tmpb_tl _tl }
+					 \tex_space:D
+					}
+				}
+				}
+
+%  	\cs_show:c { c__xpinyin_ \l_tmpb_tl _tl }
+}
+
+\tl_new:N \l_gl_item_tl
+%-----------------------------
+	\cs_set:Npn \gl_functitlecase:n #1
+      {~
+      		\tl_set:Nn \l_gl_item_tl { #1 }
+        \text_titlecase:nn {en} { \tl_use:N \l_gl_item_tl }
+%        \tex_space:D
+      }
+      
+%-----------------------------
+	\cs_set:Npn \gl_funcxppname:n #1 { 
+
+		\int_gincr:c { l_mpy_char1count_int }
+	
+	 \tl_set:Nn \l_tmpb_tl { #1 }
+
+   \tl_replace_all:Nxx
+   	\l_tmpa_tl
+   	{ \l_tmpb_tl }
+   	{
+		\clist_if_exist:cTF
+				{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+				{ % there is a comma list for the character
+				   % nth character's mth pinyin
+						\int_compare:nNnTF
+								  { \int_use:c { l_mpy_char1count_int } }
+								   = 
+								   { \int_use:c { l_mpy_char2item_int } }
+								  {
+						\clist_item:cn 
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ \int_use:c { l_mpy_char2py_int } }
+										}%%
+							{ %not 2			
+				   % nth character's mth pinyin
+						\int_compare:nNnTF
+								  { \int_use:c { l_mpy_char1count_int } }
+								   = 
+								   { \int_use:c { l_mpy_char3item_int } }
+								  {
+						\clist_item:cn 
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ \int_use:c { l_mpy_char3py_int } }
+										}%%
+					{ % not 3
+				   % nth character's mth pinyin
+						\int_compare:nNnTF
+								  { \int_use:c { l_mpy_char1count_int } }
+								   = 
+								   { \int_use:c { l_mpy_char1item_int } }
+								  {
+						\clist_item:cn 
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ \int_use:c { l_mpy_char1py_int } }
+										}%%
+										{ % not 1, therefore 1st pinyin
+						\clist_item:cn 
+								{ c__xpinyin_multiple_ \l_tmpb_tl _clist }
+								{ 1 }
+								}%false1
+								}%false2
+								}%false3
+				 }
+				{ % not a comma list = only one reading
+					\cs_if_exist:cTF
+					{ c__xpinyin_ \l_tmpb_tl _tl }
+					{
+					 \use:c { c__xpinyin_ \l_tmpb_tl _tl }
+					}
+					{ % anything else
+						#1
+					}
+				}
+				}
+}
+
+
+
+
+
+
+
+\bool_new:N \g__mpy_printfirstvar_bool
+\NewDocumentCommand \xpppinyin { s m }
+  {
+  \IfBooleanTF {#1 }
+  		{ \bool_gset_false:N \g__mpy_printfirstvar_bool }
+  		{ \bool_gset_true:N \g__mpy_printfirstvar_bool }
+  
+		\tl_set:Nn \l_tmpa_tl { #2 }
+
+		\tl_map_function:NN
+		\l_tmpa_tl 
+		\gl_funcxpp:n 
+
+		\tl_use:N \l_tmpa_tl
+
+  }
+
+
+\int_new:c { l_mpy_char1count_int }
+\NewDocumentCommand \xppname { O{mpya={},
+mpyb={},
+mpyc={},} m }
+  {
+  
+     \int_gset:cn { l_mpy_char1count_int } { 0 }
+     \int_gset:cn { l_mpy_char1item_int  } { 0 } 
+     \int_gset:cn { l_mpy_char2item_int  } { 0 } 
+     \int_gset:cn { l_mpy_char3item_int  } { 0 } 
+          
+      \IfNoValueF{#1}
+    {
+    	\keys_set:nn { mpy } { #1 } 
+    	}
+  
+  
+  %----- if the option has been set
+  		\tl_if_empty:cF { l_mpy_char1_tl }
+		{  
+				%----- store the record
+					\seq_set_split:cnx
+							 { l_mpy_char1_seq }
+							{ ; } % separator
+							{ \tl_use:c { l_mpy_char1_tl } }
+				%----- store the fields
+				\int_set:cn
+						{ l_mpy_char1item_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char1_seq }
+									{ 1 } %the i-th character
+						}
+				\int_set:cn
+						{ l_mpy_char1py_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char1_seq }
+									{ 2 } %the k-th pinyin reading
+						}
+
+		}%end1
+  %----- if the option has been set
+  		\tl_if_empty:cF { l_mpy_char2_tl }
+		{  
+				%----- store the record
+					\seq_set_split:cnx
+							 { l_mpy_char2_seq }
+							{ ; } % separator
+							{ \tl_use:c { l_mpy_char2_tl } }
+				%----- store the fields
+				\int_set:cn
+						{ l_mpy_char2item_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char2_seq }
+									{ 1 } %the i-th character
+						}
+				\int_set:cn
+						{ l_mpy_char2py_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char2_seq }
+									{ 2 } %the k-th pinyin reading
+						}
+
+		}%end2
+  %----- if the option has been set
+  		\tl_if_empty:cF { l_mpy_char3_tl }
+		{  
+				%----- store the record
+					\seq_set_split:cnx
+							 { l_mpy_char3_seq }
+							{ ; } % separator
+							{ \tl_use:c { l_mpy_char3_tl } }
+				%----- store the fields
+				\int_set:cn
+						{ l_mpy_char3item_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char3_seq }
+									{ 1 } %the i-th character
+						}
+				\int_set:cn
+						{ l_mpy_char3py_int }
+						{
+								\seq_item:cn
+									{ l_mpy_char3_seq }
+									{ 2 } %the k-th pinyin reading
+						}
+
+		}%end3
+  
+  
+
+
+
+
+
+  
+  %-----
+		\tl_set:Nn \l_tmpa_tl { #2 }
+
+		\tl_map_function:NN
+		\l_tmpa_tl
+		\gl_funcxppname:n 
+
+		\seq_set_split:NnV \l_tmpa_seq { ~ } \l_tmpa_tl
+
+    \seq_map_function:NN 
+    			\l_tmpa_seq 
+    			\gl_functitlecase:n
+  }
+
+
+
+
+\ExplSyntaxOff
+	
+\begin{document}
+
+{\cjk 诸葛 亮} $\mapsto$ \xpppinyin{诸葛 亮}
+
+{\cjk 诸葛 亮} $\mapsto$ \xpppinyin*{诸葛 亮}
+
+\xppname{诸葛 亮}, ...
+
+%  mpya - for a character setting ``a''
+%  = - set it to
+%  2 - character position in the argument
+%  ; - delimiter
+%  2 - pinyin position in the comma list
+\xppname[mpya=2;2]{诸葛 亮}, ...
+
+\bigskip
+\xpppinyin*{𪀩𪘬𩞀}
+
+\tick 3:2:3 \xppname[mpya=2;2,
+mpyb=3;3,
+mpyc=1;3,
+]{𪀩𪘬 𩞀}
+
+\tick 1:1:2 \xppname[mpya=3;2,
+mpyb=1;1,
+mpyc=2;1,
+]{𪀩𪘬 𩞀}
+
+\tick 2:3:- \xppname[mpya={},
+mpyb=1;2,
+mpyc=2;3,
+]{𪀩𪘬 𩞀}
+
+\tick -:-:- \xppname[%mpya={},
+mpyb={},
+mpyc={},
+]{𪀩𪘬 𩞀}
+
+\tick -:-:2 \xppname[mpya=3;2]{𪀩𪘬 𩞀}
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+\tick 1:1:2 \xppname[mpya=3;2,
+mpyb=1;1,
+mpyc=2;1,
+]{𪀩𪘬 𩞀}
+
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+\tick -:-:2 \xppname[mpya=3;2]{𪀩𪘬 𩞀}
+
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+
+\end{document}
+
+
+
+https://tex.stackexchange.com/questions/576339/xpinyin-display-only-pinyin/649570#649570
