@@ -1,0 +1,5881 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\usepackage{multicol}
+\usepackage{xparse}
+\usepackage{realboxes}
+\pagecolor{brown!5}
+
+\newfontfamily\nsd{Noto Serif Devanagari}[Script=Devanagari,Renderer=HarfBuzz]
+\newfontfamily\nsl{Noto Sans Lycian}[Renderer=HarfBuzz]
+\newfontfamily\ns{Noto Serif}
+
+\newfontface\fegyh{Noto Sans Egyptian Hieroglyphs}
+%...............................................................................................
+\ExplSyntaxOn
+
+
+		\cs_generate_variant:Nn 
+			\seq_set_split:Nnn 
+			{ cno }
+
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ cno }
+
+	\cs_generate_variant:Nn 
+			\tl_count_tokens:n 
+			{ V }
+
+	\cs_generate_variant:Nn 
+			\tl_greplace_all:Nnn
+			{ Nxx }
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn
+			{ Nxx }
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn
+			{ Nvv }
+
+	\cs_generate_variant:Nn 
+			\regex_replace_all:nnN
+			{ xxN }
+
+%	\cs_generate_variant:Nn 
+%			\tl_show:N
+%			{ V }
+
+
+	\seq_new:N 
+			\l_fc_rweq_seq
+	\seq_new:N 
+			\l_fc_rweqz_seq
+	\seq_new:N 
+			\l_fc_rweqy_seq
+	\tl_new:N 
+			\l_fc_rweqz_tl
+	\seq_new:N 
+			\l_fc_rweqyy_seq
+	\int_new:N 
+			\l_fc_rweqz_int
+	\int_new:N 
+			\l_fc_rweqy_int
+
+	\tl_new:N 
+			\g_fc_rwenamespace_tl
+
+	\tl_gset:Nn 
+			\g_fc_rwenamespace_tl
+			{mfs}
+
+	\tl_new:N 
+			\l_fc_rwenamespacea_tl
+	\tl_new:N 
+			\l_fc_rwenamespaceb_tl
+	\tl_new:N 
+			\l_fc_rwenamespacec_tl
+
+
+\tl_new:N \l_tmpc_tl
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcunderline:n #1 {
+	% 1=character
+
+%	\int_set:Nn \l_tmpa_int { 32 }
+%	\bool_if:nTF
+%	{
+%		\int_compare_p:n { `\#1  = 32 }
+%	}
+%\tl_set:Nn \l_tmpc_tl { \c_space_token }
+%	\if_charcode:w { #1 }{\c_space_token }  
+\tl_if_blank:eTF
+		{ #1 }
+		{
+		\tl_set:Nn \l_tmpc_tl { \c_space_token }
+		}
+%	else:
+	{
+		\tl_set:Nn \l_tmpc_tl {
+				#1 
+				\llap {
+				\g_tmpa_tl
+				}
+		}
+%	\fi:
+	}
+%	\tl_show:N \l_tmpc_tl
+	\tl_use:N \l_tmpc_tl	
+}
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseq:cn #1#2 { % 1=seq, 2=order (<:descending, >:ascending) 
+	\seq_sort:cn  { #1 } %\l_fc_rweq_seq 
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\tl_count_tokens:V 
+								\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\tl_count_tokens:V 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseqnumgen:cnn #1#2#3 { 
+	% 1=seq, 
+	% 2=order (<:descending, >:ascending) 
+	% 3=sort field
+	\seq_sort:cn  { #1 } %  
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{ #3 } 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{ #3 } 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseqnum:cn #1#2 { % 1=seq, 2=order (<:descending, >:ascending) 
+	\seq_sort:cn  { #1 } % A;B are both numbers 
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfsloadaseq } { o m +m } { % 1=seq name, 2=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			}
+	\seq_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+	\seq_gset_split:cno 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ , } 
+			{ #3 }
+
+%	\seq_show:c 
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfsloadaprop } { o m +m } { % 1=NS, 2=prop name, 3=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop }
+			{ \prop_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			}
+	\prop_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+	\prop_gset_from_keyval:cn 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			{ #3 }
+
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfssortaseq } { o m m } { %1=seqname, 2=><, asc/desc
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+\ic_funcsortseq:cn { g_fc_rwe \g_fc_namespace_tl #2 _seq } { #3 }
+
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfssortaseqnum } { o m m } { %1=seqname, 2=><, asc/desc
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+\ic_funcsortseqnum:cn { g_fc_rwe \g_fc_namespace_tl #2 _seq } { #3 }
+}
+
+
+
+
+
+
+
+
+
+
+\seq_new:N \g_fc_current_seq
+\seq_new:N \g_fc_currentb_seq
+\tl_new:N \g_fc_current_tl
+\tl_new:N \l_fc_currentb_tl
+\seq_new:N \g_fc_fontsn_seq
+\seq_new:N \g_fc_fontln_seq
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Meta
+\NewDocumentCommand \mm { s m } { % 1=run, 2=token liat
+\str_set:Nn \l_tmpa_str { #2 }
+ { \ttfamily\small\str_use:N \l_tmpa_str }
+	\IfBooleanTF { #1 } { \space $\mapsto$ \space #2 } { }
+
+}
+%-------------------- MetaC
+\NewDocumentCommand \mmc { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { { \ttfamily\color{brown} \mm{#1} } }
+\tl_use:N \l_tmpa_tl
+
+}
+
+%-------------------- MetaO
+\NewDocumentCommand \mmo { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { [ \mmi { #1 } ] }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaM
+\NewDocumentCommand \mmm { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { \{ \mmi { #1 } \} }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaI
+\NewDocumentCommand \mmi { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { $\langle$ { \itshape #1 } $\rangle$  }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaV
+\NewDocumentCommand \mmv { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { \textquotedblleft \texttt {  #1 } \textquotedblright  }
+\tl_use:N \l_tmpa_tl
+
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Vars
+\tl_new:N \g_fc_ftext_tl
+\int_new:N \g_fc_glyphcode_int
+\tl_new:N \g_fc_glyphcode_tl
+\int_new:N \g_fc_numdigits_int
+\tl_new:N \g_fc_numdigits_tl
+
+\tl_new:N \g_fc_myblockname_tl    % for lookup
+\tl_new:N \g_fc_myblocksetname_tl % for lookup; will become font switch
+\tl_new:N \g_fc_myfontname_tl
+\tl_new:N \g_fc_prevblocksetname_tl
+%---
+\tl_new:N \g_fc_trtext_tl
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Functions
+
+%------------------
+	\cs_set:Npn \fc_funcprinttrscheme:n #1 {
+% 1=item: string (tr); number (glyphcode)
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+
+
+		\tl_set:Nx \l_tmpa_tl % the tr
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpb_tl % the glyphcode
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+		% print
+%		\space
+		\par\noindent
+		\tl_use:N \l_tmpa_tl
+		\space
+		=
+		\space
+		{ 
+%%				\cs_if_free:cT
+%%					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+%%					{ X
+%%						\exp_args:Nxx
+%%							\newfontfamily
+%%							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+%%							{ \tl_use:N \g_fc_myfontname_tl }
+%%					}
+				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+
+			\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl }
+%%		,
+
+%		\ftext{}		
+}
+\newenvironment{myss}{%
+\noindent\Parbox[c]{1.5em}
+\bgroup\small}{\egroup}
+
+\newenvironment{mycolb}{%
+\noindent\Colorbox{blue!20}
+\bgroup}{\egroup}
+
+\newenvironment{mytextcol}{%
+\noindent\color{blue}
+\bgroup}{\egroup}
+
+
+\newenvironment{myreflb}{%
+\noindent\Reflectbox
+\bgroup}{\egroup}
+
+\newenvironment{myscaleb}{%
+\noindent\Scalebox{0.6}
+\bgroup}{\egroup}
+
+\newenvironment{myraiseb}{%
+\noindent\Raisebox{0.6ex}
+\bgroup}{\egroup}
+
+\newenvironment{myframeb}{%
+\noindent\Fbox
+\bgroup}{\egroup}
+
+
+
+
+
+
+
+\NewDocumentEnvironment { mysstack } { +b } {
+%					        \shortstack[c]
+%					        {#1}
+%\noindent\Makebox
+%\bgroup #1
+%#1
+					        }
+					        { 
+%					        \egroup 
+					        }
+
+
+
+
+
+
+%------------------
+	\cs_set:Npn \fc_functransliterate:n #1 { 
+	% 1=item: from-to
+
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+
+
+		\tl_set:Nx \l_tmpa_tl
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpb_tl
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+%\tl_show:N \l_tmpa_tl
+%\tl_show:N \l_tmpb_tl
+
+%\exp_args:Nxx
+	\tl_greplace_all:Nxx
+			\g_fc_trtext_tl
+			{
+				\tl_use:N \l_tmpa_tl
+			}
+			{
+				\Uchar
+				 \tl_use:N \l_tmpb_tl
+				 
+			}
+	
+%	\tl_show:N
+%			\g_fc_trtext_tl
+
+}
+
+
+
+\tl_new:N \l_eh_codeA_tl
+\tl_set:Nn \l_eh_codeA_tl { A }
+%------------------
+	\cs_set:Npn \fc_funcquadrats:n #1 { 
+	% 1=token
+		\tl_set:Nx \l_tmpa_tl { #1 }
+%		\tl_show:N \l_tmpa_tl
+\exp_args:Nx
+		\tl_case:NnF 
+			{ \tl_use:N \l_tmpa_tl }
+			{
+					 A  { 
+					        \group_begin:
+					        \setlength{\tabcolsep}{1pt}
+					        \renewcommand{\arraystretch}{0.6}
+					        \begin{tabular}[c]{c}
+%%					        #1
+%					        \\
+%%					        #2
+%					        \\\end{tabular}
+%					        \group_end:
+					       }
+					{ B } { 
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+					        \\
+%%					        #2
+%					        \\\end{tabular}
+%					        \group_end:
+					       }
+					{ C } { 
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+%					        \\
+%%					        #2
+					        \\\end{tabular}
+					        \group_end:
+					       }
+					{ D } { 
+										\myss%tack 
+										}
+					{ E } { %
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+					        \\[-1.0ex]
+%%					        #2
+%					        \\\end{tabular}
+%					        \group_end:
+					       }
+					{ F } { %
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+%					        \\
+%%					        #2
+%					        \\\end{tabular}
+					        \endmyss%tack
+%					        \group_end:
+					       }
+					{ G } { 
+					       \tiny
+					       }
+					{ H } { 
+					       \myscaleb
+					       }
+					{ h } { 
+					       \endmyscaleb
+					       }
+					{ I } { 
+					       \mycolb
+					       }
+					{ i } { 
+					       \endmycolb
+					       }
+					{ J } { 
+					       \myraiseb
+					       }
+					{ j } { 
+					       \endmyraiseb
+					       }					
+					{ K } { 
+					       \myreflb
+					       }
+					{ k } { 
+					       \endmyreflb
+					       }
+					{ L } { 
+					       \mytextcol
+					       }
+					{ l } { 
+					       \endmytextcol
+					       }
+					{ M } { 
+					       \myframeb
+					       }
+					{ m } { 
+					       \endmyframeb
+					       }
+
+			}
+%			{%T
+%				%
+%			}
+			{%F
+				\l_tmpa_tl%
+			}%
+}
+
+
+
+
+
+%------------------
+	\cs_set:Npn \fc_funcappplyfont:n #1 { 
+	% 1=text
+%	\tl_if_single_token:nTF { #1 } {
+			\int_gset:Nn 
+					\g_fc_glyphcode_int
+					{ `#1 }
+			
+			\tl_gset:NV 
+					\g_fc_glyphcode_tl
+					\g_fc_glyphcode_int
+
+			\tl_gset:Nn 
+					\g_fc_numdigits_tl
+					{ 
+						\tl_count_tokens:V 
+								\g_fc_glyphcode_tl 
+					}
+
+%			\seq_show:c
+%					{ g_fc_rwe 
+%					  list
+%					  \tl_use:N
+%					  		\g_fc_namespace_tl 
+%					  \tl_use:N 
+%					  		\g_fc_numdigits_tl
+%					  digits
+%					   _seq } 
+
+			\seq_map_function:cN 
+					{ g_fc_rwe 
+					  \tl_use:N
+					  		\g_fc_namespace_tl 
+					  list
+					  \tl_use:N 
+					  		\g_fc_numdigits_tl
+					  digits
+					   _seq } 
+					\fc_funcgetblock:n 
+
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+\int_case:nnF { \g_fc_glyphcode_int }
+{
+	{ `\僜 } { \par }
+	{ 127026 } { \itshape }
+	{ 127027 } { \upshape }
+	{ 127028 } { \c_space_token }
+	{ 127029 } { \c_space_token }
+	{ 127030 } { \bfseries }
+	{ 127031 } { \mdseries }
+	{ 127032 } { \hashtag }
+	{ 127033 } { \\ }
+}
+{ 
+
+	\bool_if:NTF
+		\g_fc_mirror_bool
+		{ 
+			\reflectbox{
+			\symbol{
+					\int_use:N 
+						 \g_fc_glyphcode_int 
+					}
+			}
+		}%T
+		{ 
+			\symbol{
+					\int_use:N 
+						 \g_fc_glyphcode_int 
+					}
+		}%F
+
+
+	}  
+%			}%end put right
+%}{ F:\use:n #1 }
+ 					
+}
+
+%------------------
+	\cs_set:Npn \fc_funcappplyfontb:n #1 { 
+	% 1=text
+%	\tl_if_single_token:nTF { #1 } {
+			\int_gset:Nn 
+					\g_fc_glyphcode_int
+					{ `#1 }
+			
+			\tl_gset:NV 
+					\g_fc_glyphcode_tl
+					\g_fc_glyphcode_int
+
+			\tl_gset:Nn 
+					\g_fc_numdigits_tl
+					{ 
+						\tl_count_tokens:V 
+								\g_fc_glyphcode_tl 
+					}
+
+%			\seq_show:c
+%					{ g_fc_rwe 
+%					  list
+%					  \tl_use:N
+%					  		\g_fc_namespace_tl 
+%					  \tl_use:N 
+%					  		\g_fc_numdigits_tl
+%					  digits
+%					   _seq } 
+
+			\seq_map_function:cN 
+					{ g_fc_rwe 
+					  \tl_use:N
+					  		\g_fc_namespace_tl 
+					  list
+					  \tl_use:N 
+					  		\g_fc_numdigits_tl
+					  digits
+					   _seq } 
+					\fc_funcgetblock:n 
+
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+\int_case:nnF { \g_fc_glyphcode_int }
+{
+	{ `\僜 } { \par }
+	{ 127026 } { \itshape }
+	{ 127027 } { \upshape }
+	{ 127028 } { \c_space_token }
+	{ 127029 } { \c_space_token }
+	{ 127030 } { \bfseries }
+	{ 127031 } { \mdseries }
+	{ 127032 } { \hashtag }
+	{ 127033 } { \\ }
+}
+{ 
+
+%	\bool_if:NTF
+%		\g_fc_mirror_bool
+%		{ 
+%			\reflectbox{
+%			\symbol{
+%					\int_use:N 
+%						 \g_fc_glyphcode_int 
+%					}
+%			}
+%		}%T
+%		{ 
+%			\symbol{
+%					\int_use:N 
+%						 \g_fc_glyphcode_int 
+%					}
+%		}%F
+%
+
+	}  
+%			}%end put right
+%}{ F:\use:n #1 }
+ 					
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcgetblock:n #1 { 
+	% 1=seq item
+
+
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+
+
+		\fc_funcgetfontnameb:nn
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+
+}
+
+
+\tl_new:N \g_fc_fontoptionsa_tl
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcgetfontnameb:nn #1#2 { 
+	% 1=startcode in block range
+	% 2=finishcode in block range
+	
+	\bool_if:nT
+	{
+\int_compare_p:n { #1  <=  \g_fc_glyphcode_int }
+ &&
+\int_compare_p:n { #2 >= \g_fc_glyphcode_int }	
+	}
+	{
+	
+					\tl_set:Nn 
+							\g_fc_myblockname_tl
+							{
+%					found:
+					   		\seq_item:Nn
+									\g_fc_currentb_seq 
+									{ 3 }
+							}
+
+
+
+
+%					\prop_show:c
+%							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+			\exp_args:Nxx
+					\prop_get:cnN%TF
+							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+							{ \g_fc_myblockname_tl }
+							\g_fc_myblocksetname_tl
+%							{ T }
+%							{ F }
+
+			\exp_args:Nxx
+					\prop_get:cnN
+							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+							{ \g_fc_myblocksetname_tl }
+							\g_fc_myfontname_tl
+
+
+			\exp_args:Nxx
+					\prop_get:cnNTF
+							{ g_fc_rwe \g_fc_namespace_tl blockset2fontoptions _prop }
+							{ \tl_use:N \g_fc_myblocksetname_tl }
+							\g_fc_fontoptionsa_tl
+
+							{
+%							T:
+				\regex_replace_all:nnN
+						{ \; }
+						{ \= }
+						\g_fc_fontoptionsa_tl
+				\regex_replace_all:nnN
+						{ \- }
+						{ \, }
+						\g_fc_fontoptionsa_tl
+							}{
+%							F:
+							\tl_clear:N \g_fc_fontoptionsa_tl
+							}
+
+
+%\tl_show:N\g_fc_namespace_tl\tl_show:N\g_fc_myblocksetname_tl
+
+			\tl_if_eq:NNF
+			\g_fc_prevblocksetname_tl
+			\g_fc_myblocksetname_tl
+			{
+				\cs_if_free:cT
+					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+					{ 
+						\exp_args:Nxx
+							\newfontfamily
+							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+							{ \tl_use:N \g_fc_myfontname_tl }
+							[
+								\tl_use:N \g_fc_fontoptionsa_tl		
+%								NFSSFamily = \tl_use:N \l_fc_rwenamespaceb_tl
+%								, 
+%								\l_fc_rwenamespacec_tl
+							]
+
+					}
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+%}
+				\tl_set_eq:NN
+					\g_fc_prevblocksetname_tl
+					\g_fc_myblocksetname_tl
+
+     		}
+						
+					 } % if glyphcode match found
+
+}
+
+
+
+
+\bool_new:N \g_fc_mirror_bool
+\bool_new:N \g_fc_reversed_bool
+%****************************************************
+%*
+%****************************************************
+%-------------------- FTextM (mirrored)
+\NewDocumentCommand \ftextm { s o +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=text
+			\bool_set_true:N
+					\g_fc_mirror_bool
+			\tl_set:Nn 
+					\g_fc_trtext_tl 
+					{ #3 }
+%			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+
+			\bool_set_false:N
+					\g_fc_mirror_bool
+
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRFTextM (mirrored)
+\NewDocumentCommand \trftextm { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\bool_set_true:N
+					\g_fc_mirror_bool
+					
+			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+
+			\bool_set_false:N
+					\g_fc_mirror_bool
+
+}
+
+
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- PrintItemRef
+\NewDocumentCommand \printitemref { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\trtextnop[#2]{#3}{#4}
+			{ \large
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+			}
+			\textsuperscript{{\small #4}}
+			\textsubscript{{\small\scshape #3}}
+}
+
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRFText
+\NewDocumentCommand \trftext { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+%			\tl_gset:Nx 
+%					\g_fc_trtext_tl
+%					{ #3 }
+%
+%%			\tl_show:N
+%%					\g_fc_trtext_tl
+%					
+%				\IfNoValueTF { #1 } 
+%						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+%						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #1 } }
+%%\tl_show:N \g_fc_namespace_tl
+%						
+%						
+%		\group_begin:				
+%			\exp_args:Nx
+%			\seq_map_function:cN 
+%					{ g_fc_rwe \g_fc_trbnamespace_tl #2 _seq } 
+%					\fc_functransliterate:n
+%		\group_end:
+%
+%			\tl_use:N
+%					\g_fc_trtext_tl
+%
+}
+
+
+
+
+
+
+\tl_new:N \l_fc_uregex_tl
+\tl_new:N \g_fc_namespace_tl
+
+\tl_new:N \g_fc_trbnamespace_tl
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRTextNOP
+\NewDocumentCommand \trtextnop { o m +m } { 
+%% 1=font namespace
+%% 2=translit scheme
+%% 3=text
+			\tl_gset:Nx 
+					\g_fc_trtext_tl
+					{ #3 }
+
+%			\tl_show:N
+%					\g_fc_trtext_tl
+					
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #1 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbnamespace_tl #2 _seq } 
+					\fc_functransliterate:n
+		\group_end:
+
+%			\tl_use:N
+%					\g_fc_trtext_tl
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRText
+\NewDocumentCommand \trtext { s o m +m } { 
+%% 1=*, RTL
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\tl_gset:Nx 
+					\g_fc_trtext_tl
+					{ #4 }
+
+%			\tl_show:N
+%					\g_fc_trtext_tl
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbnamespace_tl #3 _seq } 
+					\fc_functransliterate:n
+		\group_end:
+
+			\tl_use:N
+					\g_fc_trtext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+
+}
+
+
+
+
+%%\tl_new:N
+%%					\g_fc_textout_tl
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- FText
+\NewDocumentCommand \ftext { s o +m } { 
+% 1=* RTL arrow, 2=namespace, 3=text
+%			\exp_args:NNx
+			\tl_gset:Nx 
+					\g_fc_ftext_tl
+					{ #3 }
+
+
+
+
+
+%%			\tl_clear:N
+%%					\g_fc_ftextout_tl
+%			\tl_show:N
+%					\g_fc_ftext_tl
+
+%%			\exp_args:NNx
+%			\tl_set:Nx 
+%					\l_tmpa_tl
+%					{ \tl_use:N \g_fc_ftext_tl }
+%
+%			\tl_show:N
+%					\l_tmpa_tl
+		
+		
+		
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_ftext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_ftext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_ftext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_ftext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+					\bool_if:NF
+							\g_fc_reversed_bool
+							{ \tl_reverse:N \g_fc_ftext_tl }
+				}						
+						
+		\group_begin:				
+%			\exp_args:NV
+			\tl_map_function:cN 
+					{ g_fc_ftext_tl } 
+					\fc_funcappplyfont:n
+		\group_end:
+		
+			\IfBooleanT { #1 }
+				{ 
+%					\tl_gput_right:Nn
+%						 \g_fc_textout_tl 
+%						 { 
+						 $^\leftarrow$
+%						  }
+			\bool_set_false:N
+					\g_fc_reversed_bool
+					}
+%\tl_show:N
+%					\g_fc_textout_tl		
+%%			\tl_use:N
+%%					\g_fc_textout_tl
+
+}
+
+
+
+
+
+\tl_new:N \g_fc_trnamespace_tl
+%****************************************************
+%*
+%****************************************************
+%-------------------- FTrText
+\NewDocumentCommand \ftrtext { s o o m +m } { 
+% 1=*, RTL
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfont:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- mFTrText
+\NewDocumentCommand \mftrtext { s o o m +m } { 
+% 1=*, RTL
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfontb:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+%			\IfBooleanT { #1 }
+%				{ 
+%						 $^\leftarrow$
+%				  }
+%=======================
+
+				\regex_replace_all:nnN
+						{ (.)(verts)(.) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\c{sbh} \1
+							\cE\}
+							\cB\{
+							\c{sbh} \3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(begin)(.)(hor)(.)(end) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{%
+
+							\c{hstack}
+							\cB\{
+							\4
+							\cE\}
+							\cB\{
+							\6
+							\cE\}
+
+							\cE\}%
+						 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(.)(hor)(.) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{%
+
+							\c{hstack}
+							\cB\{
+							\3
+							\cE\}
+							\cB\{
+							\5
+							\cE\}
+
+							\cE\}%
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(centre) }
+						{ 
+							\c{vstackc}
+							\cB\{
+							\1
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(.) }
+						{ 
+							\c{sstack}
+							\cB\{
+							\c{sbh} \1
+							\cE\}
+							\cB\{
+							\c{sbh} \3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ (.)(hor)(.) }
+						{ 
+							\c{hstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{
+							\3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+						
+						\tex_par:D
+						>>
+						\group_begin:
+							\fegyh						
+						\tl_use:N
+						\g_fc_trtext_tl
+						\group_end:
+						<<
+
+}
+
+\newcommand\vstack[2]{
+{\setlength{\tabcolsep}{1pt}\renewcommand{\arraystretch}{0.6}\begin{tabular}[c]{c}#1\\#2\\\end{tabular}}
+}
+\newcommand\hstack[2]{%
+{\setlength{\tabcolsep}{1pt}\begin{tabular}{cc}#1&#2\\\end{tabular}}
+}
+\newcommand\vstackc[1]{
+{\setlength{\tabcolsep}{1pt}\begin{tabular}[c]{c}#1\\[0.8ex]\end{tabular}}
+}
+
+\newcommand\sbh[1]{\scalebox{0.6}[0.6]{#1}}
+
+\newcommand\sstack[2]{
+\shortstack[c]{#1\\#2}
+}
+
+\newcommand\sstacku[2]{
+\raisebox{0.5ex}{\shortstack[c]{#1\\#2}}
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- nFTrText
+\NewDocumentCommand \nftrtext { s o o m +m } { 
+% 1=*, RTL
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfontb:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+%			\IfBooleanT { #1 }
+%				{ 
+%						 $^\leftarrow$
+%				  }
+%=======================
+
+						\group_begin:
+							\fegyh						
+			\exp_args:Nx
+			\tl_map_function:NN 
+					\g_fc_trtext_tl 
+					\fc_funcquadrats:n
+%						\g_fc_trtext_tl
+						\group_end:
+
+						
+%						\tex_par:D
+%						>>
+%						\group_begin:
+%							\fegyh						
+%						\tl_use:N
+%						\g_fc_trtext_tl
+%						\group_end:
+%						<<
+
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Print a transliteration scheme
+\NewDocumentCommand \printtrscheme { s o o m m O{6}} { 
+% 1=*, don't sort
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=blocksetname, for font
+% 6=number of columns
+
+			\tl_gset:Nn 
+					\g_fc_myblocksetname_tl
+					{ #5 }
+					
+%			\tl_gset:Nn 
+%					\g_fc_myfontname_tl
+%					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+			\exp_args:Nxx
+					\prop_get:cnN
+							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+							{ \g_fc_myblocksetname_tl }
+							\g_fc_myfontname_tl
+
+			\seq_gset_eq:Nc
+					\g_tmpa_seq
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+		
+		\IfBooleanTF {#1}
+			{ }
+			{			
+			\ic_funcsortseqnumgen:cnn
+					{ g_tmpa_seq } 
+					{ > } % ascending
+					{ 2 } % sort field
+			}
+			
+				\cs_if_free:cT
+					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+					{ %X
+						\exp_args:Nxx
+							\newfontfamily
+							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+							{ \tl_use:N \g_fc_myfontname_tl }
+					}			
+			
+			\begin{multicols}{#6}
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_tmpa_seq } 
+					\fc_funcprinttrscheme:n
+			\end{multicols}
+					
+		{ \tiny
+	~	FS ~ ns ~[ \tl_use:N \g_fc_namespace_tl ]~ 
+		TS ~ ns ~[ \tl_use:N \g_fc_trnamespace_tl ]~ 
+		TS ~ ( #4 ) ~ 
+		bsn ~[ \tl_use:N \g_fc_myblocksetname_tl ]~
+		fn ~[ \tl_use:N \g_fc_myfontname_tl ]~
+		}
+
+
+}
+
+
+
+
+\tl_new:N \l_tmpu_tl
+\tl_new:N \l_tmpv_tl
+\tl_new:N \l_tmpw_tl
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Uchar Method
+\NewDocumentCommand \umethod { m m } { 
+% 1=LHS
+% 2=RHS
+
+
+
+			\tl_set:Nn 
+					\l_tmpa_tl
+					{ #1 }
+
+			\tl_set:Nn 
+					\l_tmpb_tl
+					{ #2 }
+
+			\regex_replace_all:nnN
+					{ U\+ }
+					{ ꀐ }
+					\l_tmpa_tl
+
+			\regex_replace_all:nnN
+					{ ꀐ }
+					{ \c{Uchar}" }
+					\l_tmpa_tl
+					
+			\regex_replace_all:nnN
+					{ U\+ }
+					{ ꀐ }
+					\l_tmpb_tl
+			\regex_replace_all:nnN
+					{ ꀐ }
+					{ \c{Uchar}" }
+					\l_tmpb_tl
+					
+
+			\tl_set:Nx 
+					\l_tmpv_tl 
+					{ \tl_use:N \l_tmpa_tl }
+
+			\tl_set:Nx 
+					\l_tmpw_tl 
+					{ \tl_use:N \l_tmpb_tl }
+
+			\tl_use:N
+					\l_tmpv_tl
+					\space $\mapsto$ ~
+			\tl_use:N
+					\l_tmpw_tl
+
+
+			\tl_set_eq:NN 
+					\l_tmpu_tl
+					\l_tmpv_tl
+
+			\regex_replace_all:xxN
+					{ \tl_use:N \l_tmpa_tl }
+					{ \tl_use:N \l_tmpb_tl }
+					\l_tmpu_tl
+
+			\space : \space
+			\tl_use:N
+					\l_tmpu_tl
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- suc
+\NewDocumentCommand \suc { m } { 
+	\int_set:Nn \l_tmpa_int { `#1 }
+	\int_use:N \l_tmpa_int
+	=
+	\int_to_Hex:n { \l_tmpa_int }
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- hashtag
+\NewDocumentCommand \hashtag { } { \# }
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- transliterate
+\NewExpandableDocumentCommand \trxlk {  } { ^^^^0915 }
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Underliner
+\NewExpandableDocumentCommand \underliner { o m } {
+% 1=character to use as marker
+% 2=text
+ 				\IfNoValueTF { #1 } 
+						{ \tl_gset:Nn \g_tmpa_tl { _ } } 
+						{ \tl_gset:Nn \g_tmpa_tl { #1 } }
+
+			\tl_set:Nn \l_tmpa_tl { #2 }
+
+%				\regex_replace_all:nnN
+%						{ \c[S](.) }
+%						{ 🀴 }
+%						\l_tmpa_tl
+%						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\l_tmpa_tl
+						
+
+
+
+		\group_begin:				
+			\ttfamily
+			\large
+			\begin{quotation}
+%			\center
+			\noindent
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \l_tmpa_tl }
+					\fc_funcunderline:n
+			\end{quotation}
+		\group_end:				
+
+}
+
+
+
+\ExplSyntaxOff
+
+%------------------------------------------------------------------------------
+
+
+
+
+
+%Data
+
+\mfsloadaseq{list2digits}{
+32;99;Basic Latin
+}
+
+\mfsloadaseq{list3digits}{
+100;127;Basic Latin
+,128;255;Latin-1 Supplement
+,256;383;Latin Extended-A
+,384;591;Latin Extended-B
+,592;687;IPA Extensions
+,688;767;Spacing Modifier Letters
+,768;879;Combining Diacritical Marks
+,880;999;Greek and Coptic
+}
+
+\mfsloadaseq{list4digits}{
+1000;1023;Greek and Coptic
+,1024;1279;Cyrillic
+,1280;1327;Cyrillic Supplement
+,7296;7304;Cyrillic Extended-C
+,1328;1423;Armenian
+,2304;2431;Devanagari
+,4256;4351;Georgian
+,7312;7359;Georgian Extended
+,7936;8063;Greek Extended
+}
+
+\mfsloadaseq{list5digits}{
+11520;11567;Georgian Supplement
+,11744;11775;Cyrillic Extended-A
+,42560;42655;Cyrillic Extended-B
+
+,43232;43263;Devanagari Extended
+,66432;66463;Ugaritic
+,77824;78895;Egyptian Hieroglyphs
+}
+
+\mfsloadaseq{list6digits}{
+129280;129535;Supplemental Symbols and Pictographs
+}
+%129379
+
+
+\mfsloadaprop{block2blockset}{
+Basic Latin=latin
+,Latin-1 Supplement=latin
+,Latin Extended-A=latin
+,Latin Extended-B=latin
+,IPA Extensions=latin
+,Spacing Modifier Letters=latin
+,Combining Diacritical Marks=latin
+,Greek and Coptic=greek
+,Greek Extended=greek
+,Cyrillic=cyrillic
+,Cyrillic Extended-A=cyrillic
+,Cyrillic Extended-B=cyrillic
+,Cyrillic Extended-C=cyrillic
+,Cyrillic Supplement=cyrillic
+,Armenian=armenian
+,Georgian=georgian
+,Georgian Extended=georgian
+,Georgian Supplement=georgian
+,Supplemental Symbols and Pictographs=symbols
+,Devanagari=devanagari
+,Devanagari Extended=devanagari
+,Ugaritic=ugaritic
+,Egyptian Hieroglyphs=egyptian
+}
+
+\mfsloadaprop{blockset2font}{
+latin=Noto Serif
+,greek=Noto Serif
+,cyrillic=Noto Serif
+,armenian=Noto Serif Armenian
+,georgian=Noto Serif Georgian
+,symbols=Segoe UI Emoji%EmojiOne Color
+,devanagari=Shobhika
+,ugaritic=Noto Sans Ugaritic
+,egyptian=Noto Sans Egyptian Hieroglyphs
+}
+
+\mfsloadaprop{blockset2fontoptions}{
+latin=Colour;blue%-Scale;2
+,devanagari=Script;Devanagari
+,greek=Colour;violet-Scale;1.1
+}
+			
+
+
+
+
+
+%Data
+
+\mfsloadaseq[lyc]{list2digits}{
+32;99;Basic Latin
+}
+
+\mfsloadaseq[lyc]{list3digits}{
+100;127;Basic Latin
+}
+%
+%
+%\mfsloadaseq[dq]{list4digits}{
+%2304;2431;Devanagari
+%,8216;8223;quotes
+%}
+%
+\mfsloadaseq[lyc]{list5digits}{
+66176;66207;Lycian
+}
+
+
+
+\mfsloadaprop[lyc]{block2blockset}{
+Lycian=lycian
+,Basic Latin=latin
+}
+
+\mfsloadaprop[lyc]{blockset2font}{
+lycian=Noto Sans Lycian
+,latin=Noto Serif
+}
+
+\mfsloadaprop[lyc]{blockset2fontoptions}{
+lycian=Colour;blue-Scale;1.2
+}
+
+
+
+
+
+%---
+\mfsloadaseq[lyc]{lyctran}{
+a;66176
+,e;66177
+,b;66178
+,bh;66179
+,g;66180
+,d;66181
+,i;66182
+,w;66183
+,z;66184
+,th;66185
+,j;66186
+,k;66187
+,q;66188
+,l;66189
+,m;66190
+,n;66191
+,mm;66192
+,nn;66193
+,u;66194
+,p;66195
+,kk;66196
+,r;66197
+,s;66198
+,t;66199
+,tt;66200
+,an;66201
+,en;66202
+,h;66203
+,x;66204
+}
+
+\mfssortaseq[lyc]{lyctran}{<}
+
+
+%---
+\mfsloadaseq{irtran}{
+aa;225
+}
+
+
+
+\newcommand\dma{^^^^092e}
+\newcommand\lsq{^^^^2018}
+\newcommand\rsq{^^^^2019}
+
+
+
+
+%===============================================================
+
+%Data - ancient
+
+\mfsloadaseq[ancient]{list2digits}{
+32;99;Basic Latin
+}
+
+\mfsloadaseq[ancient]{list3digits}{
+100;127;Basic Latin
+}
+%
+%
+\mfsloadaseq[ancient]{list4digits}{
+1792;1871;Syriac
+,2112;2142;Mandaic
+,2048;2110;Samaritan
+%2304;2431;Devanagari
+,5760;5788;Ogham
+%,8216;8223;quotes
+}
+%
+\mfsloadaseq[ancient]{list5digits}{
+65536;65613;Linear B Syllabary
+,65664;65786;Linear B Ideograms
+,66000;66045;Phaistos Disc
+,66176;66207;Lycian
+,66208;66271;Carian
+,66304;66351;Old Italic
+,66432;66463;Ugaritic
+,66464;66517;Old Persian
+,67072;67431;Linear A
+,67584;67647;Cypriot Syllabary
+,67840;67871;Phoenician
+,67872;67903;Lydian
+,67968;67999;Meroitic Hieroglyphs
+,68000;68095;Meroitic Cursive
+,68192;68223;Old South Arabian
+,68352;68415;Avestan
+,68608;68680;Old Turkic
+,77824;78894;Egyptian Hieroglyphs
+,82944;83583;Anatolian Hieroglyphs
+}
+
+
+
+\mfsloadaprop[ancient]{block2blockset}{
+Lycian=lycian
+,Lydian=lydian
+,Basic Latin=latin
+,Anatolian Hieroglyphs=anatolian
+,Carian=carian
+,Cypriot Syllabary=cypriotsyllabary
+,Mandaic=mandaic
+,Ogham=ogham
+,Avestan=avestan
+,Egyptian Hieroglyphs=egyptianhieroglyphs
+,Linear A=lineara
+,Linear B Ideograms=linearb
+,Linear B Syllabary=linearb
+,Meroitic Cursive=meroiticc
+,Meroitic Hieroglyphs=meroitich
+,Old Italic=olditalic
+,Old Persian=oldpersian
+,Old South Arabian=oldsoutharabian
+,Old Turkic=oldturkic
+,Phaistos Disc=phaistosdisc
+,Phoenician=phoenician
+,Samaritan=samaritan
+,Syriac=syriac
+,Ugaritic=ugaritic
+}
+
+\mfsloadaprop[ancient]{blockset2font}{
+lycian=Noto Sans Lycian
+,lydian=Noto Sans Lydian
+,latin=Noto Serif
+,anatolian=Noto Sans Anatolian Hieroglyphs
+,carian=Noto Sans Carian
+,cypriotsyllabary=Noto Sans Cypriot
+,egyptianhieroglyphs=Noto Sans Egyptian Hieroglyphs
+,lineara=NotoSansLinearA-Regular.ttf%Aegean
+,linearb=Noto Sans Linear B
+,mandaic=Noto Sans Mandaic
+,ogham=Noto Sans Ogham
+,avestan=Noto Sans Avestan
+,meroiticc=Nilus
+,meroitich=Nilus
+,olditalic=Noto Sans Old Italic
+,oldpersian=Noto Sans Old Persian
+,oldsoutharabian=Noto Sans Old South Arabian
+,oldturkic=Noto Sans Old Turkic
+,phaistosdisc=Noto Sans Symbols2
+,phoenician=Noto Sans Phoenician
+,samaritan=Noto Sans Samaritan
+,syriac=Noto Sans Syriac Eastern
+,ugaritic=Noto Sans Ugaritic
+}
+
+\mfsloadaprop[ancient]{blockset2fontoptions}{
+lycian=Colour;blue-Scale;1.2
+,anatolian=Scale;1.2
+,carian=Scale;1.2
+,cypriotsyllabary=Scale;1.2
+,lydian=Scale;1.2
+,mandaic=Scale;1.2-Renderer;HarfBuzz-Script;Mandaic
+,ogham=Scale;1.2
+,avestan=Scale;1.2-Renderer;HarfBuzz-Script;Avestan
+,egyptianhieroglyphs=Scale;1.2
+,lineara=Scale;1.2
+,linearb=Scale;1.2
+,meroiticc=Scale;1.2
+,meroitich=Scale;1.2
+,olditalic=Scale;1.2
+,oldpersian=Scale;1.2
+,oldsoutharabian=Scale;1.2
+,oldturkic=Scale;1.2
+,phaistosdisc=Scale;1.2
+,phoenician=Scale;1.2
+,samaritan=Scale;1.2
+,syriac=Scale;1.2-Script;Syriac-Renderer;HarfBuzz
+,ugaritic=Scale;1.2
+}
+
+
+
+
+%Data - ancient - eh only
+
+\mfsloadaseq[ancienteh]{list2digits}{
+32;32;space
+}
+%
+%
+%
+\mfsloadaseq[ancienteh]{list5digits}{
+77824;78894;Egyptian Hieroglyphs
+}
+
+
+
+\mfsloadaprop[ancienteh]{block2blockset}{
+space=egyptianhieroglyphs
+,Egyptian Hieroglyphs=egyptianhieroglyphs
+}
+
+\mfsloadaprop[ancienteh]{blockset2font}{
+egyptianhieroglyphs=Noto Sans Egyptian Hieroglyphs
+}
+
+\mfsloadaprop[ancienteh]{blockset2fontoptions}{
+egyptianhieroglyphs=Scale;1.2
+}
+
+
+%---
+\mfsloadaseq[ancient]{lyctran}{
+a;66176
+,e;66177
+,b;66178
+,bh;66179
+,g;66180
+,d;66181
+,i;66182
+,w;66183
+,z;66184
+,th;66185
+,j;66186
+,k;66187
+,q;66188
+,l;66189
+,m;66190
+,n;66191
+,mm;66192
+,nn;66193
+,u;66194
+,p;66195
+,kk;66196
+,r;66197
+,s;66198
+,t;66199
+,tt;66200
+,an;66201
+,en;66202
+,h;66203
+,x;66204
+}
+
+\mfssortaseq[ancient]{lyctran}{<}
+
+
+\mfsloadaseq[red]{list5digits}{
+66176;66207;Lycian
+,66208;66271;Carian
+}
+
+
+
+\mfsloadaprop[red]{block2blockset}{
+Carian=carian
+,Lycian=lycian
+}
+
+\mfsloadaprop[red]{blockset2font}{
+carian=Noto Sans Carian
+,lycian=Noto Sans Lycian
+}
+
+\mfsloadaprop[red]{blockset2fontoptions}{
+carian=Scale;1.2-Colour;red
+,lycian=Scale;1.2-Colour;red
+}
+
+
+\mfsloadaseq[serif]{list5digits}{
+66176;66207;Lycian
+,66208;66271;Carian
+}
+
+
+
+\mfsloadaprop[serif]{block2blockset}{
+Carian=carian
+,Lycian=lycian
+}
+
+\mfsloadaprop[serif]{blockset2font}{
+carian=Noto Sans Carian
+,lycian=Quivira
+}
+
+\mfsloadaprop[serif]{blockset2fontoptions}{
+carian=Scale;1.2%-Colour;red
+,lycian=Scale;1.2%-Colour;red
+}
+
+
+
+
+
+
+
+
+
+
+
+%---
+\mfsloadaseq[ancient]{anatran}{
+a001;82944
+,a002;82945
+,a003;82946
+,a004;82947
+,a005;82948
+,a006;82949
+,a007;82950
+,a008;82951
+,a009;82952
+,a010;82953
+,a010a;82954
+,a011;82955
+,a012;82956
+,a013;82957
+,a014;82958
+,a015;82959
+,a016;82960
+,a017;82961
+,a018;82962
+,a019;82963
+,a020;82964
+,a021;82965
+,a022;82966
+,a023;82967
+,a024;82968
+,a025;82969
+,a026;82970
+,a026a;82971
+,a027;82972
+,a028;82973
+,a029;82974
+,a030;82975
+,a031;82976
+,a032;82977
+,a033;82978
+,a034;82979
+,a035;82980
+,a036;82981
+,a037;82982
+,a038;82983
+,a039;82984
+,a039a;82985
+,a040;82986
+,a041;82987
+,a041a;82988
+,a042;82989
+,a043;82990
+,a044;82991
+,a045;82992
+,a045a;82993
+,a046;82994
+,a046a;82995
+,a046b;82996
+,a047;82997
+,a048;82998
+,a049;82999
+,a050;83000
+,a051;83001
+,a052;83002
+,a053;83003
+,a054;83004
+,a055;83005
+,a056;83006
+,a057;83007
+,a058;83008
+,a059;83009
+,a060;83010
+,a061;83011
+,a062;83012
+,a063;83013
+,a064;83014
+,a065;83015
+,a066;83016
+,a066a;83017
+,a066b;83018
+,a066c;83019
+,a067;83020
+,a068;83021
+,a069;83022
+,a070;83023
+,a071;83024
+,a072;83025
+,a073;83026
+,a074;83027
+,a075;83028
+,a076;83029
+,a077;83030
+,a078;83031
+,a079;83032
+,a080;83033
+,a081;83034
+,a082;83035
+,a083;83036
+,a084;83037
+,a085;83038
+,a086;83039
+,a087;83040
+,a088;83041
+,a089;83042
+,a090;83043
+,a091;83044
+,a092;83045
+,a093;83046
+,a094;83047
+,a095;83048
+,a096;83049
+,a097;83050
+,a097a;83051
+,a098;83052
+,a098a;83053
+,a099;83054
+,a100;83055
+,a100a;83056
+,a101;83057
+,a101a;83058
+,a102;83059
+,a102a;83060
+,a103;83061
+,a104;83062
+,a104a;83063
+,a104b;83064
+,a104c;83065
+,a105;83066
+,a105a;83067
+,a105b;83068
+,a106;83069
+,a107;83070
+,a107a;83071
+,a107b;83072
+,a107c;83073
+,a108;83074
+,a109;83075
+,a110;83076
+,a110a;83077
+,a110b;83078
+,a111;83079
+,a112;83080
+,a113;83081
+,a114;83082
+,a115;83083
+,a115a;83084
+,a116;83085
+,a117;83086
+,a118;83087
+,a119;83088
+,a120;83089
+,a121;83090
+,a122;83091
+,a123;83092
+,a124;83093
+,a125;83094
+,a125a;83095
+,a126;83096
+,a127;83097
+,a128;83098
+,a129;83099
+,a130;83100
+,a131;83101
+,a132;83102
+,a133;83103
+,a134;83104
+,a135;83105
+,a135a;83106
+,a136;83107
+,a137;83108
+,a138;83109
+,a139;83110
+,a140;83111
+,a141;83112
+,a142;83113
+,a143;83114
+,a144;83115
+,a145;83116
+,a146;83117
+,a147;83118
+,a148;83119
+,a149;83120
+,a150;83121
+,a151;83122
+,a152;83123
+,a153;83124
+,a154;83125
+,a155;83126
+,a156;83127
+,a157;83128
+,a158;83129
+,a159;83130
+,a160;83131
+,a161;83132
+,a162;83133
+,a163;83134
+,a164;83135
+,a165;83136
+,a166;83137
+,a167;83138
+,a168;83139
+,a169;83140
+,a170;83141
+,a171;83142
+,a172;83143
+,a173;83144
+,a174;83145
+,a175;83146
+,a176;83147
+,a177;83148
+,a178;83149
+,a179;83150
+,a180;83151
+,a181;83152
+,a182;83153
+,a183;83154
+,a184;83155
+,a185;83156
+,a186;83157
+,a187;83158
+,a188;83159
+,a189;83160
+,a190;83161
+,a191;83162
+,a192;83163
+,a193;83164
+,a194;83165
+,a195;83166
+,a196;83167
+,a197;83168
+,a198;83169
+,a199;83170
+,a200;83171
+,a201;83172
+,a202;83173
+,a202a;83174
+,a202b;83175
+,a203;83176
+,a204;83177
+,a205;83178
+,a206;83179
+,a207;83180
+,a207a;83181
+,a208;83182
+,a209;83183
+,a209a;83184
+,a210;83185
+,a211;83186
+,a212;83187
+,a213;83188
+,a214;83189
+,a215;83190
+,a215a;83191
+,a216;83192
+,a216a;83193
+,a217;83194
+,a218;83195
+,a219;83196
+,a220;83197
+,a221;83198
+,a222;83199
+,a223;83200
+,a224;83201
+,a225;83202
+,a226;83203
+,a227;83204
+,a227a;83205
+,a228;83206
+,a229;83207
+,a230;83208
+,a231;83209
+,a232;83210
+,a233;83211
+,a234;83212
+,a235;83213
+,a236;83214
+,a237;83215
+,a238;83216
+,a239;83217
+,a240;83218
+,a241;83219
+,a242;83220
+,a243;83221
+,a244;83222
+,a245;83223
+,a246;83224
+,a247;83225
+,a248;83226
+,a249;83227
+,a250;83228
+,a251;83229
+,a252;83230
+,a253;83231
+,a254;83232
+,a255;83233
+,a256;83234
+,a257;83235
+,a258;83236
+,a259;83237
+,a260;83238
+,a261;83239
+,a262;83240
+,a263;83241
+,a264;83242
+,a265;83243
+,a266;83244
+,a267;83245
+,a267a;83246
+,a268;83247
+,a269;83248
+,a270;83249
+,a271;83250
+,a272;83251
+,a273;83252
+,a274;83253
+,a275;83254
+,a276;83255
+,a277;83256
+,a278;83257
+,a279;83258
+,a280;83259
+,a281;83260
+,a282;83261
+,a283;83262
+,a284;83263
+,a285;83264
+,a286;83265
+,a287;83266
+,a288;83267
+,a289;83268
+,a289a;83269
+,a290;83270
+,a291;83271
+,a292;83272
+,a293;83273
+,a294;83274
+,a294a;83275
+,a295;83276
+,a296;83277
+,a297;83278
+,a298;83279
+,a299;83280
+,a299a;83281
+,a300;83282
+,a301;83283
+,a302;83284
+,a303;83285
+,a304;83286
+,a305;83287
+,a306;83288
+,a307;83289
+,a308;83290
+,a309;83291
+,a309a;83292
+,a310;83293
+,a311;83294
+,a312;83295
+,a313;83296
+,a314;83297
+,a315;83298
+,a316;83299
+,a317;83300
+,a318;83301
+,a319;83302
+,a320;83303
+,a321;83304
+,a322;83305
+,a323;83306
+,a324;83307
+,a325;83308
+,a326;83309
+,a327;83310
+,a328;83311
+,a329;83312
+,a329a;83313
+,a330;83314
+,a331;83315
+,a332a;83316
+,a332b;83317
+,a332c;83318
+,a333;83319
+,a334;83320
+,a335;83321
+,a336;83322
+,a336a;83323
+,a336b;83324
+,a336c;83325
+,a337;83326
+,a338;83327
+,a339;83328
+,a340;83329
+,a341;83330
+,a342;83331
+,a343;83332
+,a344;83333
+,a345;83334
+,a346;83335
+,a347;83336
+,a348;83337
+,a349;83338
+,a350;83339
+,a351;83340
+,a352;83341
+,a353;83342
+,a354;83343
+,a355;83344
+,a356;83345
+,a357;83346
+,a358;83347
+,a359;83348
+,a359a;83349
+,a360;83350
+,a361;83351
+,a362;83352
+,a363;83353
+,a364;83354
+,a364a;83355
+,a365;83356
+,a366;83357
+,a367;83358
+,a368;83359
+,a368a;83360
+,a369;83361
+,a370;83362
+,a371;83363
+,a371a;83364
+,a372;83365
+,a373;83366
+,a374;83367
+,a375;83368
+,a376;83369
+,a377;83370
+,a378;83371
+,a379;83372
+,a380;83373
+,a381;83374
+,a381a;83375
+,a382;83376
+,a383;83377
+,a383a;83378
+,a384;83379
+,a385;83380
+,a386;83381
+,a386a;83382
+,a387;83383
+,a388;83384
+,a389;83385
+,a390;83386
+,a391;83387
+,a392;83388
+,a393;83389
+,a394;83390
+,a395;83391
+,a396;83392
+,a397;83393
+,a398;83394
+,a399;83395
+,a400;83396
+,a401;83397
+,a402;83398
+,a403;83399
+,a404;83400
+,a405;83401
+,a406;83402
+,a407;83403
+,a408;83404
+,a409;83405
+,a410;83406
+,a410a;83407
+,a411;83408
+,a412;83409
+,a413;83410
+,a414;83411
+,a415;83412
+,a416;83413
+,a417;83414
+,a418;83415
+,a419;83416
+,a420;83417
+,a421;83418
+,a422;83419
+,a423;83420
+,a424;83421
+,a425;83422
+,a426;83423
+,a427;83424
+,a428;83425
+,a429;83426
+,a430;83427
+,a431;83428
+,a432;83429
+,a433;83430
+,a434;83431
+,a435;83432
+,a436;83433
+,a437;83434
+,a438;83435
+,a439;83436
+,a440;83437
+,a441;83438
+,a442;83439
+,a443;83440
+,a444;83441
+,a445;83442
+,a446;83443
+,a447;83444
+,a448;83445
+,a449;83446
+,a450;83447
+,a450a;83448
+,a451;83449
+,a452;83450
+,a453;83451
+,a454;83452
+,a455;83453
+,a456;83454
+,a457;83455
+,a457a;83456
+,a458;83457
+,a459;83458
+,a460;83459
+,a461;83460
+,a462;83461
+,a463;83462
+,a464;83463
+,a465;83464
+,a466;83465
+,a467;83466
+,a468;83467
+,a469;83468
+,a470;83469
+,a471;83470
+,a472;83471
+,a473;83472
+,a474;83473
+,a475;83474
+,a476;83475
+,a477;83476
+,a478;83477
+,a479;83478
+,a480;83479
+,a481;83480
+,a482;83481
+,a483;83482
+,a484;83483
+,a485;83484
+,a486;83485
+,a487;83486
+,a488;83487
+,a489;83488
+,a490;83489
+,a491;83490
+,a492;83491
+,a493;83492
+,a494;83493
+,a495;83494
+,a496;83495
+,a497;83496
+,a501;83497
+,a502;83498
+,a503;83499
+,a504;83500
+,a505;83501
+,a506;83502
+,a507;83503
+,a508;83504
+,a509;83505
+,a510;83506
+,a511;83507
+,a512;83508
+,a513;83509
+,a514;83510
+,a515;83511
+,a516;83512
+,a517;83513
+,a518;83514
+,a519;83515
+,a520;83516
+,a521;83517
+,a522;83518
+,a523;83519
+,a524;83520
+,a525;83521
+,a526;83522
+,a527;83523
+,a528;83524
+,a529;83525
+,a530;83526
+}
+
+\mfssortaseq[ancient]{anatran}{<}
+
+%---
+\mfsloadaseq[ancient]{cartran}{
+a;66208
+,p2;66209
+,d;66210
+,l;66211
+,uuu;66212
+,r;66213
+,ld;66214
+,a2;66215
+,q;66216
+,b;66217
+,m;66218
+,o;66219
+,d2;66220
+,t;66221
+,sh;66222
+,sh2;66223
+,s;66224
+,c-18;66225
+,u;66226
+,nn;66227
+,x;66228
+,n;66229
+,tt2;66230
+,p;66231
+,ss;66232
+,i;66233
+,e;66234
+,uuuu;66235
+,k;66236
+,k2;66237
+,nd;66238
+,uu;66239
+,g;66240
+,g2;66241
+,st;66242
+,st2;66243
+,ng;66244
+,ii;66245
+,c-39;66246
+,tt;66247
+,uuu2;66248
+,rr;66249
+,mb;66250
+,mb2;66251
+,mb3;66252
+,mb4;66253
+,ld2;66254
+,e2;66255
+,uuu3;66256
+}
+\mfssortaseq[ancient]{cartran}{<}
+
+
+
+
+% Data
+\mfsloadaseq[ancient]{lydtran}{
+a;67872
+,b;67873
+,g;67874
+,d;67875
+,e;67876
+,v;67877
+,i;67878
+,y;67879
+,k;67880
+,l;67881
+,m;67882
+,n;67883
+,o;67884
+,r;67885
+,ss;67886
+,t;67887
+,u;67888
+,f;67889
+,q;67890
+,s;67891
+,tt;67892
+,an;67893
+,en;67894
+,ly;67895
+,nn;67896
+,c;67897
+,mark;67903
+}\mfssortaseq[ancient]{lydtran}{<}
+
+
+%%%
+\mfsloadaseq[ancient]{mantran}{
+hq;2112
+,b;2113
+,g;2114
+,d;2115
+,h;2116
+,ush;2117
+,z;2118
+, it;2119
+, att;2120
+,x;2121
+,k;2122
+,l;2123
+,m;2124
+,n;2125
+,s;2126
+,n;2127
+,p;2128
+,sz;2129
+,q;2130
+,r;2131
+,sh;2132
+,t;2133
+,dush;2134
+,kh;2135
+,?;2136
+,aff;2137
+,voc;2138
+,gem;2139
+,.;2142
+}\mfssortaseq[ancient]{mantran}{<}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mfsloadaseq[ancient]{oghtran}{
+sp;5760
+,b;5761
+,l;5762
+,f;5763
+,s;5764
+,n;5765
+,u;5766
+,d;5767
+,t;5768
+,k;5769
+,c;5770
+,m;5771
+,g;5772
+,ng;5773
+,str;5774
+,r;5775
+,ai;5776
+,o;5777
+,ur;5778
+,eadh;5779
+,iiodh;5780
+,eabh;5781
+,or;5782
+,ui;5783
+,i;5784
+,eamh;5785
+,p;5786
+,fe;5787
+,rfe;5788
+}\mfssortaseq[ancient]{oghtran}{<}
+
+
+
+
+% --------------------------------------- 
+\mfsloadaseq[ancient]{avetran}{
+a;68352
+,aa;68353
+,ao;68354
+,aao;68355
+,an;68356
+,aan;68357
+,ae;68358
+,aee;68359
+,e;68360
+,ee;68361
+,o;68362
+,oo;68363
+,i;68364
+,ii;68365
+,u;68366
+,uu;68367
+,ke;68368
+,xe;68369
+,xye;68370
+,xve;68371
+,ge;68372
+,gge;68373
+,ghe;68374
+,ce;68375
+,i;68376
+,te;68377
+,the;68378
+,de;68379
+,dhe;68380
+,tte;68381
+,pe;68382
+,fe;68383
+,be;68384
+,bhe;68385
+,nge;68386
+,ngye;68387
+,ngve;68388
+,ne;68389
+,nye;68390
+,nne;68391
+,me;68392
+,hme;68393
+,yye;68394
+,ye;68395
+,ve;68396
+,re;68397
+,le;68398
+,se;68399
+,ze;68400
+,she;68401
+,zhe;68402
+,shye;68403
+,sshe;68404
+,he;68405
+,abbrv;68409
+,t2;68410
+,s2;68411
+,l2;68412
+,l1;68413
+,l2r;68414
+,l1r;68415
+}\mfssortaseq[ancient]{avetran}{<}
+
+
+
+\mfsloadaseq[ancient]{cyptran}{
+a;67584
+,e;67585
+,i;67586
+,o;67587
+,u;67588
+,ja;67589
+,jo;67592
+,ka;67594
+,ke;67595
+,ki;67596
+,ko;67597
+,ku;67598
+,la;67599
+,le;67600
+,li;67601
+,lo;67602
+,lu;67603
+,ma;67604
+,me;67605
+,mi;67606
+,mo;67607
+,mu;67608
+,na;67609
+,ne;67610
+,ni;67611
+,no;67612
+,nu;67613
+,pa;67614
+,pe;67615
+,pi;67616
+,po;67617
+,pu;67618
+,ra;67619
+,re;67620
+,ri;67621
+,ro;67622
+,ru;67623
+,sa;67624
+,se;67625
+,si;67626
+,so;67627
+,su;67628
+,ta;67629
+,te;67630
+,ti;67631
+,to;67632
+,tu;67633
+,wa;67634
+,we;67635
+,wi;67636
+,wo;67637
+,xa;67639
+,xe;67640
+,za;67644
+,zo;67647
+}\mfssortaseq[ancient]{cyptran}{<}
+
+
+
+
+
+% --------------------------------------- 
+\mfsloadaseq[ancient]{merctran}{
+a;68000
+,e;68001
+,i;68002
+,o;68003
+,ya;68004
+,wa;68005
+,ba;68006
+,pa;68007
+,ma;68008
+,na;68009
+,ne;68010
+,ra;68011
+,la;68012
+,kha;68013
+,hha;68014
+,sa;68015
+,archsa;68016
+,se;68017
+,ka;68018
+,qa;68019
+,ta;68020
+,te;68021
+,to;68022
+,da;68023
+,1112;68028
+,0.5;68029
+,rmt;68030
+,imn;68031
+,1;68032
+,2;68033
+,3;68034
+,4;68035
+,5;68036
+,6;68037
+,7;68038
+,8;68039
+,9;68040
+,10;68041
+,20;68042
+,30;68043
+,40;68044
+,50;68045
+,60;68046
+,70;68047
+,100;68050
+,200;68051
+,300;68052
+,400;68053
+,500;68054
+,600;68055
+,700;68056
+,800;68057
+,900;68058
+,1000;68059
+,2000;68060
+,3000;68061
+,4000;68062
+,5000;68063
+,6000;68064
+,7000;68065
+,8000;68066
+,9000;68067
+,10000;68068
+,20000;68069
+,30000;68070
+,40000;68071
+,50000;68072
+,60000;68073
+,70000;68074
+,80000;68075
+,90000;68076
+,100000;68077
+,200000;68078
+,300000;68079
+,400000;68080
+,500000;68081
+,600000;68082
+,700000;68083
+,800000;68084
+,900000;68085
+,112;68086
+,212;68087
+,312;68088
+,412;68089
+,512;68090
+,612;68091
+,712;68092
+,812;68093
+,912;68094
+,1012;68095
+}\mfssortaseq[ancient]{merctran}{<}
+
+\mfsloadaseq[ancient]{merhtran}{
+a;67968
+,e;67969
+,i;67970
+,o;67971
+,ya;67972
+,wa;67973
+,ba;67974
+,ba-2;67975
+,pa;67976
+,ma;67977
+,na;67978
+,na-2;67979
+,ne;67980
+,ne-2;67981
+,ra;67982
+,ra-2;67983
+,la;67984
+,kha;67985
+,hha;67986
+,sa;67987
+,sa-2;67988
+,se;67989
+,ka;67990
+,qa;67991
+,ta;67992
+,ta-2;67993
+,te;67994
+,te-2;67995
+,to;67996
+,da;67997
+,vidj;67998
+,vidj-2;67999
+}\mfssortaseq[ancient]{merhtran}{<}
+
+
+
+\mfsloadaseq[ancient]{oittran}{
+a;66304
+,b;66305
+,c;66306
+,d;66307
+,e;66308
+,v;66309
+,z;66310
+,h;66311
+,th;66312
+,i;66313
+,k;66314
+,l;66315
+,m;66316
+,n;66317
+,sh;66318
+,o;66319
+,p;66320
+,ss;66321
+,q;66322
+,r;66323
+,s;66324
+,t;66325
+,u;66326
+,x;66327
+,ph;66328
+,kh;66329
+,f;66330
+,rr;66331
+,ch;66332
+,ii;66333
+,uu;66334
+,ess;66335
+,1;66336
+,5;66337
+,10;66338
+,50;66339
+,y;66349
+,nts;66350
+,sts;66351
+}\mfssortaseq[ancient]{oittran}{<}
+
+
+
+
+\mfsloadaseq[ancient]{opetran}{
+a;66464
+,i;66465
+,u;66466
+,ka;66467
+,ku;66468
+,ga;66469
+,gu;66470
+,xa;66471
+,ca;66472
+,ja;66473
+,ji;66474
+,ta;66475
+,tu;66476
+,da;66477
+,di;66478
+,du;66479
+,tha;66480
+,pa;66481
+,ba;66482
+,fa;66483
+,na;66484
+,nu;66485
+,ma;66486
+,mi;66487
+,mu;66488
+,ya;66489
+,va;66490
+,vi;66491
+,ra;66492
+,ru;66493
+,la;66494
+,sa;66495
+,za;66496
+,sha;66497
+,ssa;66498
+,ha;66499
+,am;66504
+,am2;66505
+,amh;66506
+,xsh;66507
+,dya;66508
+,dya2;66509
+,bag;66510
+,buu;66511
+,div;66512
+,1;66513
+,2;66514
+,10;66515
+,20;66516
+,100;66517
+}\mfssortaseq[ancient]{opetran}{<}
+
+
+
+
+
+\mfsloadaseq[ancient]{osatran}{
+h;68192
+,l;68193
+,hh;68194
+,m;68195
+,q;68196
+,w;68197
+,sh;68198
+,r;68199
+,b;68200
+,t;68201
+,s;68202
+,k;68203
+,n;68204
+,kh;68205
+,ss;68206
+,sm;68207
+,f;68208
+,a;68209
+,ayn;68210
+,dh;68211
+,g;68212
+,d;68213
+,gh;68214
+,tt;68215
+,z;68216
+,ddh;68217
+,y;68218
+,th;68219
+,tth;68220
+,1;68221
+,50;68222
+,num;68223
+}\mfssortaseq[ancient]{osatran}{<}
+
+
+\mfsloadaseq[ancient]{otutran}{
+a;68608
+,ya;68609
+,yae;68610
+,i;68611
+,yi;68612
+,ye;68613
+,o;68614
+,oe;68615
+,yoe;68616
+,ab;68617
+,yab;68618
+,aeb;68619
+,yaeb;68620
+,ag;68621
+,yag;68622
+,aeg;68623
+,yaeg;68624
+,ad;68625
+,yad;68626
+,aed;68627
+,ez;68628
+,yez;68629
+,ay;68630
+,yay;68631
+,aey;68632
+,yaey;68633
+,aek;68634
+,yaek;68635
+,oek;68636
+,yoek;68637
+,al;68638
+,yal;68639
+,ael;68640
+,elt;68641
+,em;68642
+,an;68643
+,aen;68644
+,yaen;68645
+,ent;68646
+,yent;68647
+,enc;68648
+,yenc;68649
+,eny;68650
+,yeny;68651
+,yang;68652
+,eng;68653
+,yaeng;68654
+,ep;68655
+,op;68656
+,ic;68657
+,ec;68658
+,yec;68659
+,aq;68660
+,yaq;68661
+,iq;68662
+,yiq;68663
+,oq;68664
+,yoq;68665
+,ar;68666
+,yar;68667
+,aer;68668
+,as;68669
+,aes;68670
+,ash;68671
+,yash;68672
+,esh;68673
+,yesh;68674
+,at;68675
+,yat;68676
+,aet;68677
+,yaet;68678
+,ot;68679
+,bash;68680
+}\mfssortaseq[ancient]{otutran}{<}
+
+
+
+\mfsloadaseq[ancient]{phatran}{
+pedestrian;66000
+,phead;66001
+,thead;66002
+,captive;66003
+,child;66004
+,woman;66005
+,helmet;66006
+,gauntlet;66007
+,tiara;66008
+,arrow;66009
+,bow;66010
+,shield;66011
+,club;66012
+,manacles;66013
+,mattock;66014
+,saw;66015
+,lid;66016
+,boomerang;66017
+,plane;66018
+,dolium;66019
+,comb;66020
+,sling;66021
+,column;66022
+,beehive;66023
+,ship;66024
+,horn;66025
+,hide;66026
+,bullsleg;66027
+,cat;66028
+,ram;66029
+,eagle;66030
+,dove;66031
+,tunny;66032
+,bee;66033
+,ptree;66034
+,vine;66035
+,papyrus;66036
+,rosette;66037
+,lily;66038
+,oxback;66039
+,flute;66040
+,grater;66041
+,strainer;66042
+,smallaxe;66043
+,wavy;66044
+,oblique;66045
+}\mfssortaseq[ancient]{phatran}{<}
+
+
+\mfsloadaseq[ancient]{photran}{
+a;67840
+,b;67841
+,g;67842
+,d;67843
+,h;67844
+,w;67845
+,z;67846
+,hh;67847
+,tt;67848
+,I;67849
+,k;67850
+,l;67851
+,m;67852
+,n;67853
+,s;67854
+,?;67855
+,p;67856
+,ss;67857
+,q;67858
+,r;67859
+,sh;67860
+,t;67861
+,1;67862
+,10;67863
+,20;67864
+,100;67865
+,2;67866
+,3;67867
+,div;67871
+}\mfssortaseq[ancient]{photran}{<}
+
+
+
+\mfsloadaseq[ancient]{samtran}{
+alaf;2048
+,bit;2049
+,gaman;2050
+,dalat;2051
+,iy;2052
+,baa;2053
+,zen;2054
+,it;2055
+,tit;2056
+,yut;2057
+,kaaf;2058
+,labat;2059
+,mim;2060
+,nun;2061
+,singaat;2062
+,in;2063
+,fi;2064
+,tsaadiy;2065
+,quf;2066
+,rish;2067
+,shan;2068
+,taaf;2069
+,in;2070
+,in-alaf;2071
+,occl;2072
+,dagesh;2073
+,ep;2074
+,epy;2075
+,ee;2076
+,ee;2077
+,aaa-;2078
+,aa-;2079
+,a-;2080
+,aaa;2081
+,aa;2082
+,a;2083
+,a.;2084
+,a..;2085
+,uu;2086
+,u;2087
+,i.;2088
+,ii;2089
+,i;2090
+,o;2091
+,sukun;2092
+,nequdaa;2093
+,nequdaa;2096
+,afsaaq;2097
+,anged;2098
+,bau;2099
+,atmaau;2100
+,shiyyaalaa;2101
+,ation mark;2102
+,qitsa;2103
+,ziqaa;2104
+,qitsa;2105
+,zaef;2106
+,turu;2107
+,arkaanu;2108
+,sof mashfaat;2109
+,annaau;2110
+}\mfssortaseq[ancient]{samtran}{<}
+
+
+
+
+
+
+\mfsloadaseq[ancient]{syrtran}{
+eop;1792
+,pfs;1793
+,bfs;1794
+,pc;1795
+,bc;1796
+,hc;1797
+,csl;1798
+,csr;1799
+,pcsl;1800
+,bcsr;1801
+,con;1802
+,ho;1803
+,hm;1804
+,ha;1805
+,abbr;1807
+,a;1808
+,pa;1809
+,b;1810
+,g;1811
+,gg;1812
+,d;1813
+,ddr;1814
+,h;1815
+,w;1816
+,z;1817
+,hh;1818
+,tt;1819
+,ttg;1820
+,y;1821
+,yh;1822
+,k;1823
+,l;1824
+,m;1825
+,n;1826
+,s;1827
+,s-;1828
+,e;1829
+,pe;1830
+,rpe;1831
+,ss;1832
+,q;1833
+,r;1834
+,sh;1835
+,t;1836
+,pb;1837
+,pgh;1838
+,pdh;1839
+,pta;1840
+,ptb;1841
+,pt.;1842
+,zqa;1843
+,zqb;1844
+,zq.;1845
+,rba;1846
+,rbb;1847
+,.zlh;1848
+,.zla;1849
+,hba;1850
+,hbb;1851
+,hbe.;1852
+,esa;1853
+,esb;1854
+,rw;1855
+,f.;1856
+,qu;1857
+,ru;1858
+,..a;1859
+,..b;1860
+,...a;1861
+,...b;1862
+,ola;1863
+,olb;1864
+,mu;1865
+,ba;1866
+,szh;1869
+,skh;1870
+,sf;1871
+}\mfssortaseq[ancient]{syrtran}{<}
+
+
+
+
+
+\mfsloadaseq[ancient]{ugatran}{
+alpa;66432
+,beta;66433
+,gamla;66434
+,kha;66435
+,delta;66436
+,ho;66437
+,wo;66438
+,zeta;66439
+,hota;66440
+,tet;66441
+,yod;66442
+,kaf;66443
+,shin;66444
+,lamda;66445
+,mem;66446
+,dhal;66447
+,nun;66448
+,zu;66449
+,samka;66450
+,ain;66451
+,pu;66452
+,sade;66453
+,qopa;66454
+,rasha;66455
+,thanna;66456
+,ghain;66457
+,to;66458
+,i;66459
+,u;66460
+,ssu;66461
+,div;66463
+}\mfssortaseq[ancient]{ugatran}{<}
+
+\mfsloadaseq[ancient]{uga2tran}{
+a;66432
+,b;66433
+,g;66434
+,kh;66435
+,d;66436
+,h;66437
+,w;66438
+,z;66439
+,hh;66440
+,t;66441
+,y;66442
+,k;66443
+,sh;66444
+,l;66445
+,m;66446
+,dh;66447
+,n;66448
+,zu;66449
+,s;66450
+,?;66451
+,p;66452
+,ss;66453
+,q;66454
+,r;66455
+,th;66456
+,gh;66457
+,to;66458
+,i;66459
+,u;66460
+,ssu;66461
+,div;66463
+}\mfssortaseq[ancient]{uga2tran}{<}
+
+
+\mfsloadaseq[ancient]{egytran}{
+a001;77824
+,a002;77825
+,a003;77826
+,a004;77827
+,a005;77828
+,a005a;77829
+,a006;77830
+,a006a;77831
+,a006b;77832
+,a007;77833
+,a008;77834
+,a009;77835
+,a010;77836
+,a011;77837
+,a012;77838
+,a013;77839
+,a014;77840
+,a014a;77841
+,a015;77842
+,a016;77843
+,a017;77844
+,a017a;77845
+,a018;77846
+,a019;77847
+,a020;77848
+,a021;77849
+,a022;77850
+,a023;77851
+,a024;77852
+,a025;77853
+,a026;77854
+,a027;77855
+,a028;77856
+,a029;77857
+,a030;77858
+,a031;77859
+,a032;77860
+,a032a;77861
+,a033;77862
+,a034;77863
+,a035;77864
+,a036;77865
+,a037;77866
+,a038;77867
+,a039;77868
+,a040;77869
+,a040a;77870
+,a041;77871
+,a042;77872
+,a042a;77873
+,a043;77874
+,a043a;77875
+,a044;77876
+,a045;77877
+,a045a;77878
+,a046;77879
+,a047;77880
+,a048;77881
+,a049;77882
+,a050;77883
+,a051;77884
+,a052;77885
+,a053;77886
+,a054;77887
+,a055;77888
+,a056;77889
+,a057;77890
+,a058;77891
+,a059;77892
+,a060;77893
+,a061;77894
+,a062;77895
+,a063;77896
+,a064;77897
+,a065;77898
+,a066;77899
+,a067;77900
+,a068;77901
+,a069;77902
+,a070;77903
+,b001;77904
+,b002;77905
+,b003;77906
+,b004;77907
+,b005;77908
+,b005a;77909
+,b006;77910
+,b007;77911
+,b008;77912
+,b009;77913
+,c001;77914
+,c002;77915
+,c002a;77916
+,c002b;77917
+,c002c;77918
+,c003;77919
+,c004;77920
+,c005;77921
+,c006;77922
+,c007;77923
+,c008;77924
+,c009;77925
+,c010;77926
+,c010a;77927
+,c011;77928
+,c012;77929
+,c013;77930
+,c014;77931
+,c015;77932
+,c016;77933
+,c017;77934
+,c018;77935
+,c019;77936
+,c020;77937
+,c021;77938
+,c022;77939
+,c023;77940
+,c024;77941
+,d001;77942
+,d002;77943
+,d003;77944
+,d004;77945
+,d005;77946
+,d006;77947
+,d007;77948
+,d008;77949
+,d008a;77950
+,d009;77951
+,d010;77952
+,d011;77953
+,d012;77954
+,d013;77955
+,d014;77956
+,d015;77957
+,d016;77958
+,d017;77959
+,d018;77960
+,d019;77961
+,d020;77962
+,d021;77963
+,d022;77964
+,d023;77965
+,d024;77966
+,d025;77967
+,d026;77968
+,d027;77969
+,d027a;77970
+,d028;77971
+,d029;77972
+,d030;77973
+,d031;77974
+,d031a;77975
+,d032;77976
+,d033;77977
+,d034;77978
+,d034a;77979
+,d035;77980
+,d036;77981
+,d037;77982
+,d038;77983
+,d039;77984
+,d040;77985
+,d041;77986
+,d042;77987
+,d043;77988
+,d044;77989
+,d045;77990
+,d046;77991
+,d046a;77992
+,d047;77993
+,d048;77994
+,d048a;77995
+,d049;77996
+,d050;77997
+,d050a;77998
+,d050b;77999
+,d050c;78000
+,d050d;78001
+,d050e;78002
+,d050f;78003
+,d050g;78004
+,d050h;78005
+,d050i;78006
+,d051;78007
+,d052;78008
+,d052a;78009
+,d053;78010
+,d054;78011
+,d054a;78012
+,d055;78013
+,d056;78014
+,d057;78015
+,d058;78016
+,d059;78017
+,d060;78018
+,d061;78019
+,d062;78020
+,d063;78021
+,d064;78022
+,d065;78023
+,d066;78024
+,d067;78025
+,d067a;78026
+,d067b;78027
+,d067c;78028
+,d067d;78029
+,d067e;78030
+,d067f;78031
+,d067g;78032
+,d067h;78033
+,e001;78034
+,e002;78035
+,e003;78036
+,e004;78037
+,e005;78038
+,e006;78039
+,e007;78040
+,e008;78041
+,e008a;78042
+,e009;78043
+,e009a;78044
+,e010;78045
+,e011;78046
+,e012;78047
+,e013;78048
+,e014;78049
+,e015;78050
+,e016;78051
+,e016a;78052
+,e017;78053
+,e017a;78054
+,e018;78055
+,e019;78056
+,e020;78057
+,e020a;78058
+,e021;78059
+,e022;78060
+,e023;78061
+,e024;78062
+,e025;78063
+,e026;78064
+,e027;78065
+,e028;78066
+,e028a;78067
+,e029;78068
+,e030;78069
+,e031;78070
+,e032;78071
+,e033;78072
+,e034;78073
+,e034a;78074
+,e036;78075
+,e037;78076
+,e038;78077
+,f001;78078
+,f001a;78079
+,f002;78080
+,f003;78081
+,f004;78082
+,f005;78083
+,f006;78084
+,f007;78085
+,f008;78086
+,f009;78087
+,f010;78088
+,f011;78089
+,f012;78090
+,f013;78091
+,f013a;78092
+,f014;78093
+,f015;78094
+,f016;78095
+,f017;78096
+,f018;78097
+,f019;78098
+,f020;78099
+,f021;78100
+,f021a;78101
+,f022;78102
+,f023;78103
+,f024;78104
+,f025;78105
+,f026;78106
+,f027;78107
+,f028;78108
+,f029;78109
+,f030;78110
+,f031;78111
+,f031a;78112
+,f032;78113
+,f033;78114
+,f034;78115
+,f035;78116
+,f036;78117
+,f037;78118
+,f037a;78119
+,f038;78120
+,f038a;78121
+,f039;78122
+,f040;78123
+,f041;78124
+,f042;78125
+,f043;78126
+,f044;78127
+,f045;78128
+,f045a;78129
+,f046;78130
+,f046a;78131
+,f047;78132
+,f047a;78133
+,f048;78134
+,f049;78135
+,f050;78136
+,f051;78137
+,f051a;78138
+,f051b;78139
+,f051c;78140
+,f052;78141
+,f053;78142
+,g001;78143
+,g002;78144
+,g003;78145
+,g004;78146
+,g005;78147
+,g006;78148
+,g006a;78149
+,g007;78150
+,g007a;78151
+,g007b;78152
+,g008;78153
+,g009;78154
+,g010;78155
+,g011;78156
+,g011a;78157
+,g012;78158
+,g013;78159
+,g014;78160
+,g015;78161
+,g016;78162
+,g017;78163
+,g018;78164
+,g019;78165
+,g020;78166
+,g020a;78167
+,g021;78168
+,g022;78169
+,g023;78170
+,g024;78171
+,g025;78172
+,g026;78173
+,g026a;78174
+,g027;78175
+,g028;78176
+,g029;78177
+,g030;78178
+,g031;78179
+,g032;78180
+,g033;78181
+,g034;78182
+,g035;78183
+,g036;78184
+,g036a;78185
+,g037;78186
+,g037a;78187
+,g038;78188
+,g039;78189
+,g040;78190
+,g041;78191
+,g042;78192
+,g043;78193
+,g043a;78194
+,g044;78195
+,g045;78196
+,g045a;78197
+,g046;78198
+,g047;78199
+,g048;78200
+,g049;78201
+,g050;78202
+,g051;78203
+,g052;78204
+,g053;78205
+,g054;78206
+,h001;78207
+,h002;78208
+,h003;78209
+,h004;78210
+,h005;78211
+,h006;78212
+,h006a;78213
+,h007;78214
+,h008;78215
+,i001;78216
+,i002;78217
+,i003;78218
+,i004;78219
+,i005;78220
+,i005a;78221
+,i006;78222
+,i007;78223
+,i008;78224
+,i009;78225
+,i009a;78226
+,i010;78227
+,i010a;78228
+,i011;78229
+,i011a;78230
+,i012;78231
+,i013;78232
+,i014;78233
+,i015;78234
+,k001;78235
+,k002;78236
+,k003;78237
+,k004;78238
+,k005;78239
+,k006;78240
+,k007;78241
+,k008;78242
+,l001;78243
+,l002;78244
+,l002a;78245
+,l003;78246
+,l004;78247
+,l005;78248
+,l006;78249
+,l006a;78250
+,l007;78251
+,l008;78252
+,m001;78253
+,m001a;78254
+,m001b;78255
+,m002;78256
+,m003;78257
+,m003a;78258
+,m004;78259
+,m005;78260
+,m006;78261
+,m007;78262
+,m008;78263
+,m009;78264
+,m010;78265
+,m010a;78266
+,m011;78267
+,m012;78268
+,m012a;78269
+,m012b;78270
+,m012c;78271
+,m012d;78272
+,m012e;78273
+,m012f;78274
+,m012g;78275
+,m012h;78276
+,m013;78277
+,m014;78278
+,m015;78279
+,m015a;78280
+,m016;78281
+,m016a;78282
+,m017;78283
+,m017a;78284
+,m018;78285
+,m019;78286
+,m020;78287
+,m021;78288
+,m022;78289
+,m022a;78290
+,m023;78291
+,m024;78292
+,m024a;78293
+,m025;78294
+,m026;78295
+,m027;78296
+,m028;78297
+,m028a;78298
+,m029;78299
+,m030;78300
+,m031;78301
+,m031a;78302
+,m032;78303
+,m033;78304
+,m033a;78305
+,m033b;78306
+,m034;78307
+,m035;78308
+,m036;78309
+,m037;78310
+,m038;78311
+,m039;78312
+,m040;78313
+,m040a;78314
+,m041;78315
+,m042;78316
+,m043;78317
+,m044;78318
+,n001;78319
+,n002;78320
+,n003;78321
+,n004;78322
+,n005;78323
+,n006;78324
+,n007;78325
+,n008;78326
+,n009;78327
+,n010;78328
+,n011;78329
+,n012;78330
+,n013;78331
+,n014;78332
+,n015;78333
+,n016;78334
+,n017;78335
+,n018;78336
+,n018a;78337
+,n018b;78338
+,n019;78339
+,n020;78340
+,n021;78341
+,n022;78342
+,n023;78343
+,n024;78344
+,n025;78345
+,n025a;78346
+,n026;78347
+,n027;78348
+,n028;78349
+,n029;78350
+,n030;78351
+,n031;78352
+,n032;78353
+,n033;78354
+,n033a;78355
+,n034;78356
+,n034a;78357
+,n035;78358
+,n035a;78359
+,n036;78360
+,n037;78361
+,n037a;78362
+,n038;78363
+,n039;78364
+,n040;78365
+,n041;78366
+,n042;78367
+,nl001;78368
+,nl002;78369
+,nl003;78370
+,nl004;78371
+,nl005;78372
+,nl005a;78373
+,nl006;78374
+,nl007;78375
+,nl008;78376
+,nl009;78377
+,nl010;78378
+,nl011;78379
+,nl012;78380
+,nl013;78381
+,nl014;78382
+,nl015;78383
+,nl016;78384
+,nl017;78385
+,nl017a;78386
+,nl018;78387
+,nl019;78388
+,nl020;78389
+,nu001;78390
+,nu002;78391
+,nu003;78392
+,nu004;78393
+,nu005;78394
+,nu006;78395
+,nu007;78396
+,nu008;78397
+,nu009;78398
+,nu010;78399
+,nu010a;78400
+,nu011;78401
+,nu011a;78402
+,nu012;78403
+,nu013;78404
+,nu014;78405
+,nu015;78406
+,nu016;78407
+,nu017;78408
+,nu018;78409
+,nu018a;78410
+,nu019;78411
+,nu020;78412
+,nu021;78413
+,nu022;78414
+,nu022a;78415
+,o001;78416
+,o001a;78417
+,o002;78418
+,o003;78419
+,o004;78420
+,o005;78421
+,o005a;78422
+,o006;78423
+,o006a;78424
+,o006b;78425
+,o006c;78426
+,o006d;78427
+,o006e;78428
+,o006f;78429
+,o007;78430
+,o008;78431
+,o009;78432
+,o010;78433
+,o010a;78434
+,o010b;78435
+,o010c;78436
+,o011;78437
+,o012;78438
+,o013;78439
+,o014;78440
+,o015;78441
+,o016;78442
+,o017;78443
+,o018;78444
+,o019;78445
+,o019a;78446
+,o020;78447
+,o020a;78448
+,o021;78449
+,o022;78450
+,o023;78451
+,o024;78452
+,o024a;78453
+,o025;78454
+,o025a;78455
+,o026;78456
+,o027;78457
+,o028;78458
+,o029;78459
+,o029a;78460
+,o030;78461
+,o030a;78462
+,o031;78463
+,o032;78464
+,o033;78465
+,o033a;78466
+,o034;78467
+,o035;78468
+,o036;78469
+,o036a;78470
+,o036b;78471
+,o036c;78472
+,o036d;78473
+,o037;78474
+,o038;78475
+,o039;78476
+,o040;78477
+,o041;78478
+,o042;78479
+,o043;78480
+,o044;78481
+,o045;78482
+,o046;78483
+,o047;78484
+,o048;78485
+,o049;78486
+,o050;78487
+,o050a;78488
+,o050b;78489
+,o051;78490
+,p001;78491
+,p001a;78492
+,p002;78493
+,p003;78494
+,p003a;78495
+,p004;78496
+,p005;78497
+,p006;78498
+,p007;78499
+,p008;78500
+,p009;78501
+,p010;78502
+,p011;78503
+,q001;78504
+,q002;78505
+,q003;78506
+,q004;78507
+,q005;78508
+,q006;78509
+,q007;78510
+,r001;78511
+,r002;78512
+,r002a;78513
+,r003;78514
+,r003a;78515
+,r003b;78516
+,r004;78517
+,r005;78518
+,r006;78519
+,r007;78520
+,r008;78521
+,r009;78522
+,r010;78523
+,r010a;78524
+,r011;78525
+,r012;78526
+,r013;78527
+,r014;78528
+,r015;78529
+,r016;78530
+,r016a;78531
+,r017;78532
+,r018;78533
+,r019;78534
+,r020;78535
+,r021;78536
+,r022;78537
+,r023;78538
+,r024;78539
+,r025;78540
+,r026;78541
+,r027;78542
+,r028;78543
+,r029;78544
+,s001;78545
+,s002;78546
+,s002a;78547
+,s003;78548
+,s004;78549
+,s005;78550
+,s006;78551
+,s006a;78552
+,s007;78553
+,s008;78554
+,s009;78555
+,s010;78556
+,s011;78557
+,s012;78558
+,s013;78559
+,s014;78560
+,s014a;78561
+,s014b;78562
+,s015;78563
+,s016;78564
+,s017;78565
+,s017a;78566
+,s018;78567
+,s019;78568
+,s020;78569
+,s021;78570
+,s022;78571
+,s023;78572
+,s024;78573
+,s025;78574
+,s026;78575
+,s026a;78576
+,s026b;78577
+,s027;78578
+,s028;78579
+,s029;78580
+,s030;78581
+,s031;78582
+,s032;78583
+,s033;78584
+,s034;78585
+,s035;78586
+,s035a;78587
+,s036;78588
+,s037;78589
+,s038;78590
+,s039;78591
+,s040;78592
+,s041;78593
+,s042;78594
+,s043;78595
+,s044;78596
+,s045;78597
+,s046;78598
+,t001;78599
+,t002;78600
+,t003;78601
+,t003a;78602
+,t004;78603
+,t005;78604
+,t006;78605
+,t007;78606
+,t007a;78607
+,t008;78608
+,t008a;78609
+,t009;78610
+,t009a;78611
+,t010;78612
+,t011;78613
+,t011a;78614
+,t012;78615
+,t013;78616
+,t014;78617
+,t015;78618
+,t016;78619
+,t016a;78620
+,t017;78621
+,t018;78622
+,t019;78623
+,t020;78624
+,t021;78625
+,t022;78626
+,t023;78627
+,t024;78628
+,t025;78629
+,t026;78630
+,t027;78631
+,t028;78632
+,t029;78633
+,t030;78634
+,t031;78635
+,t032;78636
+,t032a;78637
+,t033;78638
+,t033a;78639
+,t034;78640
+,t035;78641
+,t036;78642
+,u001;78643
+,u002;78644
+,u003;78645
+,u004;78646
+,u005;78647
+,u006;78648
+,u006a;78649
+,u006b;78650
+,u007;78651
+,u008;78652
+,u009;78653
+,u010;78654
+,u011;78655
+,u012;78656
+,u013;78657
+,u014;78658
+,u015;78659
+,u016;78660
+,u017;78661
+,u018;78662
+,u019;78663
+,u020;78664
+,u021;78665
+,u022;78666
+,u023;78667
+,u023a;78668
+,u024;78669
+,u025;78670
+,u026;78671
+,u027;78672
+,u028;78673
+,u029;78674
+,u029a;78675
+,u030;78676
+,u031;78677
+,u032;78678
+,u032a;78679
+,u033;78680
+,u034;78681
+,u035;78682
+,u036;78683
+,u037;78684
+,u038;78685
+,u039;78686
+,u040;78687
+,u041;78688
+,u042;78689
+,v001;78690
+,v001a;78691
+,v001b;78692
+,v001c;78693
+,v001d;78694
+,v001e;78695
+,v001f;78696
+,v001g;78697
+,v001h;78698
+,v001i;78699
+,v002;78700
+,v002a;78701
+,v003;78702
+,v004;78703
+,v005;78704
+,v006;78705
+,v007;78706
+,v007a;78707
+,v007b;78708
+,v008;78709
+,v009;78710
+,v010;78711
+,v011;78712
+,v011a;78713
+,v011b;78714
+,v011c;78715
+,v012;78716
+,v012a;78717
+,v012b;78718
+,v013;78719
+,v014;78720
+,v015;78721
+,v016;78722
+,v017;78723
+,v018;78724
+,v019;78725
+,v020;78726
+,v020a;78727
+,v020b;78728
+,v020c;78729
+,v020d;78730
+,v020e;78731
+,v020f;78732
+,v020g;78733
+,v020h;78734
+,v020i;78735
+,v020j;78736
+,v020k;78737
+,v020l;78738
+,v021;78739
+,v022;78740
+,v023;78741
+,v023a;78742
+,v024;78743
+,v025;78744
+,v026;78745
+,v027;78746
+,v028;78747
+,v028a;78748
+,v029;78749
+,v029a;78750
+,v030;78751
+,v030a;78752
+,v031;78753
+,v031a;78754
+,v032;78755
+,v033;78756
+,v033a;78757
+,v034;78758
+,v035;78759
+,v036;78760
+,v037;78761
+,v037a;78762
+,v038;78763
+,v039;78764
+,v040;78765
+,v040a;78766
+,w001;78767
+,w002;78768
+,w003;78769
+,w003a;78770
+,w004;78771
+,w005;78772
+,w006;78773
+,w007;78774
+,w008;78775
+,w009;78776
+,w009a;78777
+,w010;78778
+,w010a;78779
+,w011;78780
+,w012;78781
+,w013;78782
+,w014;78783
+,w014a;78784
+,w015;78785
+,w016;78786
+,w017;78787
+,w017a;78788
+,w018;78789
+,w018a;78790
+,w019;78791
+,w020;78792
+,w021;78793
+,w022;78794
+,w023;78795
+,w024;78796
+,w024a;78797
+,w025;78798
+,x001;78799
+,x002;78800
+,x003;78801
+,x004;78802
+,x004a;78803
+,x004b;78804
+,x005;78805
+,x006;78806
+,x006a;78807
+,x007;78808
+,x008;78809
+,x008a;78810
+,y001;78811
+,y001a;78812
+,y002;78813
+,y003;78814
+,y004;78815
+,y005;78816
+,y006;78817
+,y007;78818
+,y008;78819
+,z001;78820
+,z002;78821
+,z002a;78822
+,z002b;78823
+,z002c;78824
+,z002d;78825
+,z003;78826
+,z003a;78827
+,z003b;78828
+,z004;78829
+,z004a;78830
+,z005;78831
+,z005a;78832
+,z006;78833
+,z007;78834
+,z008;78835
+,z009;78836
+,z010;78837
+,z011;78838
+,z012;78839
+,z013;78840
+,z014;78841
+,z015;78842
+,z015a;78843
+,z015b;78844
+,z015c;78845
+,z015d;78846
+,z015e;78847
+,z015f;78848
+,z015g;78849
+,z015h;78850
+,z015i;78851
+,z016;78852
+,z016a;78853
+,z016b;78854
+,z016c;78855
+,z016d;78856
+,z016e;78857
+,z016f;78858
+,z016g;78859
+,z016h;78860
+,aa001;78861
+,aa002;78862
+,aa003;78863
+,aa004;78864
+,aa005;78865
+,aa006;78866
+,aa007;78867
+,aa007a;78868
+,aa007b;78869
+,aa008;78870
+,aa009;78871
+,aa010;78872
+,aa011;78873
+,aa012;78874
+,aa013;78875
+,aa014;78876
+,aa015;78877
+,aa016;78878
+,aa017;78879
+,aa018;78880
+,aa019;78881
+,aa020;78882
+,aa021;78883
+,aa022;78884
+,aa023;78885
+,aa024;78886
+,aa025;78887
+,aa026;78888
+,aa027;78889
+,aa028;78890
+,aa029;78891
+,aa030;78892
+,aa031;78893
+,aa032;78894
+%,vert;78896
+%,hor;78897
+,st;78898
+,sb;78899
+,et;78900
+,eb;78901
+,overlay;78902
+%,begin;78903
+%,end;78904
+}\mfssortaseq[ancient]{egytran}{<}
+
+
+
+\mfsloadaseq[ancient]{linatran}{
+ab001;67072
+,ab002;67073
+,ab003;67074
+,ab004;67075
+,ab005;67076
+,ab006;67077
+,ab007;67078
+,ab008;67079
+,ab009;67080
+,ab010;67081
+,ab011;67082
+,ab013;67083
+,ab016;67084
+,ab017;67085
+,ab020;67086
+,ab021;67087
+,ab021f;67088
+,ab021m;67089
+,ab022;67090
+,ab022f;67091
+,ab022m;67092
+,ab023;67093
+,ab023m;67094
+,ab024;67095
+,ab026;67096
+,ab027;67097
+,ab028;67098
+,a028b;67099
+,ab029;67100
+,ab030;67101
+,ab031;67102
+,ab034;67103
+,ab037;67104
+,ab038;67105
+,ab039;67106
+,ab040;67107
+,ab041;67108
+,ab044;67109
+,ab045;67110
+,ab046;67111
+,ab047;67112
+,ab048;67113
+,ab049;67114
+,ab050;67115
+,ab051;67116
+,ab053;67117
+,ab054;67118
+,ab055;67119
+,ab056;67120
+,ab057;67121
+,ab058;67122
+,ab059;67123
+,ab060;67124
+,ab061;67125
+,ab065;67126
+,ab066;67127
+,ab067;67128
+,ab069;67129
+,ab070;67130
+,ab073;67131
+,ab074;67132
+,ab076;67133
+,ab077;67134
+,ab078;67135
+,ab079;67136
+,ab080;67137
+,ab081;67138
+,ab082;67139
+,ab085;67140
+,ab086;67141
+,ab087;67142
+,a100-102;67143
+,ab118;67144
+,ab120;67145
+,a120b;67146
+,ab122;67147
+,ab123;67148
+,ab131a;67149
+,ab131b;67150
+,a131c;67151
+,ab164;67152
+,ab171;67153
+,ab180;67154
+,ab188;67155
+,ab191;67156
+,a301;67157
+,a302;67158
+,a303;67159
+,a304;67160
+,a305;67161
+,a306;67162
+,a307;67163
+,a308;67164
+,a309a;67165
+,a309b;67166
+,a309c;67167
+,a310;67168
+,a311;67169
+,a312;67170
+,a313a;67171
+,a313b;67172
+,a313c;67173
+,a314;67174
+,a315;67175
+,a316;67176
+,a317;67177
+,a318;67178
+,a319;67179
+,a320;67180
+,a321;67181
+,a322;67182
+,a323;67183
+,a324;67184
+,a325;67185
+,a326;67186
+,a327;67187
+,a328;67188
+,a329;67189
+,a330;67190
+,a331;67191
+,a332;67192
+,a333;67193
+,a334;67194
+,a335;67195
+,a336;67196
+,a337;67197
+,a338;67198
+,a339;67199
+,a340;67200
+,a341;67201
+,a342;67202
+,a343;67203
+,a344;67204
+,a345;67205
+,a346;67206
+,a347;67207
+,a348;67208
+,a349;67209
+,a350;67210
+,a351;67211
+,a352;67212
+,a353;67213
+,a354;67214
+,a355;67215
+,a356;67216
+,a357;67217
+,a358;67218
+,a359;67219
+,a360;67220
+,a361;67221
+,a362;67222
+,a363;67223
+,a364;67224
+,a365;67225
+,a366;67226
+,a367;67227
+,a368;67228
+,a369;67229
+,a370;67230
+,a371;67231
+,a400-vas;67232
+,a401-vas;67233
+,a402-vas;67234
+,a403-vas;67235
+,a404-vas;67236
+,a405-vas;67237
+,a406-vas;67238
+,a407-vas;67239
+,a408-vas;67240
+,a409-vas;67241
+,a410-vas;67242
+,a411-vas;67243
+,a412-vas;67244
+,a413-vas;67245
+,a414-vas;67246
+,a415-vas;67247
+,a416-vas;67248
+,a417-vas;67249
+,a418-vas;67250
+,a501;67251
+,a502;67252
+,a503;67253
+,a504;67254
+,a505;67255
+,a506;67256
+,a508;67257
+,a509;67258
+,a510;67259
+,a511;67260
+,a512;67261
+,a513;67262
+,a515;67263
+,a516;67264
+,a520;67265
+,a521;67266
+,a523;67267
+,a524;67268
+,a525;67269
+,a526;67270
+,a527;67271
+,a528;67272
+,a529;67273
+,a530;67274
+,a531;67275
+,a532;67276
+,a534;67277
+,a535;67278
+,a536;67279
+,a537;67280
+,a538;67281
+,a539;67282
+,a540;67283
+,a541;67284
+,a542;67285
+,a545;67286
+,a547;67287
+,a548;67288
+,a549;67289
+,a550;67290
+,a551;67291
+,a552;67292
+,a553;67293
+,a554;67294
+,a555;67295
+,a556;67296
+,a557;67297
+,a559;67298
+,a563;67299
+,a564;67300
+,a565;67301
+,a566;67302
+,a568;67303
+,a569;67304
+,a570;67305
+,a571;67306
+,a572;67307
+,a573;67308
+,a574;67309
+,a575;67310
+,a576;67311
+,a577;67312
+,a578;67313
+,a579;67314
+,a580;67315
+,a581;67316
+,a582;67317
+,a583;67318
+,a584;67319
+,a585;67320
+,a586;67321
+,a587;67322
+,a588;67323
+,a589;67324
+,a591;67325
+,a592;67326
+,a594;67327
+,a595;67328
+,a596;67329
+,a598;67330
+,a600;67331
+,a601;67332
+,a602;67333
+,a603;67334
+,a604;67335
+,a606;67336
+,a608;67337
+,a609;67338
+,a610;67339
+,a611;67340
+,a612;67341
+,a613;67342
+,a614;67343
+,a615;67344
+,a616;67345
+,a617;67346
+,a618;67347
+,a619;67348
+,a620;67349
+,a621;67350
+,a622;67351
+,a623;67352
+,a624;67353
+,a626;67354
+,a627;67355
+,a628;67356
+,a629;67357
+,a634;67358
+,a637;67359
+,a638;67360
+,a640;67361
+,a642;67362
+,a643;67363
+,a644;67364
+,a645;67365
+,a646;67366
+,a648;67367
+,a649;67368
+,a651;67369
+,a652;67370
+,a653;67371
+,a654;67372
+,a655;67373
+,a656;67374
+,a657;67375
+,a658;67376
+,a659;67377
+,a660;67378
+,a661;67379
+,a662;67380
+,a663;67381
+,a664;67382
+,a701a;67392
+,a702b;67393
+,a703d;67394
+,a704e;67395
+,a705f;67396
+,a706h;67397
+,a707j;67398
+,a708k;67399
+,a709l;67400
+,a709-2l2;67401
+,a709-3l3;67402
+,a709-4l4;67403
+,a709-6l6;67404
+,a710w;67405
+,a711x;67406
+,a712y;67407
+,a713omega;67408
+,a714abb;67409
+,a715bb;67410
+,a717dd;67411
+,a726eyyy;67412
+,a732je;67413
+,a800;67424
+,a801;67425
+,a802;67426
+,a803;67427
+,a804;67428
+,a805;67429
+,a806;67430
+,a807;67431
+}\mfssortaseq[ancient]{linatran}{<}
+
+
+\mfsloadaseq[ancient]{linbtran}{
+B100;65664
+,B102;65665
+,B104;65666
+,B105;65667
+,B105F;65668
+,B105M;65669
+,B106F;65670
+,B106M;65671
+,B107F;65672
+,B107M;65673
+,B108F;65674
+,B108M;65675
+,B109F;65676
+,B109M;65677
+,B120;65678
+,B121;65679
+,B122;65680
+,B123;65681
+,B125;65682
+,B127;65683
+,B128;65684
+,B130;65685
+,B131;65686
+,B132;65687
+,B133;65688
+,B135;65689
+,B140;65690
+,B141;65691
+,B142;65692
+,B145;65693
+,B146;65694
+,B150;65695
+,B151;65696
+,B152;65697
+,B153;65698
+,B154;65699
+,B156;65700
+,B157;65701
+,B158;65702
+,B159;65703
+,B160;65704
+,B161;65705
+,B162;65706
+,B163;65707
+,B164;65708
+,B165;65709
+,B166;65710
+,B167;65711
+,B168;65712
+,B169;65713
+,B170;65714
+,B171;65715
+,B172;65716
+,B173;65717
+,B174;65718
+,B176;65719
+,B177;65720
+,B178;65721
+,B179;65722
+,B180;65723
+,B181;65724
+,B182;65725
+,B183;65726
+,B184;65727
+,B185;65728
+,B189;65729
+,B190;65730
+,B191;65731
+,B220;65732
+,B225;65733
+,B230;65734
+,B231;65735
+,B232;65736
+,B233;65737
+,B234;65738
+,B236;65739
+,B240;65740
+,B241;65741
+,B242;65742
+,B243;65743
+,B245;65744
+,B246;65745
+,B247;65746
+,B248;65747
+,B249;65748
+,B251;65749
+,B252;65750
+,B253;65751
+,B254;65752
+,B255;65753
+,B256;65754
+,B257;65755
+,B258;65756
+,B259;65757
+,VESSEL B155;65758
+,VESSEL B200;65759
+,VESSEL B201;65760
+,VESSEL B202;65761
+,VESSEL B203;65762
+,VESSEL B204;65763
+,VESSEL B205;65764
+,VESSEL B206;65765
+,VESSEL B207;65766
+,VESSEL B208;65767
+,VESSEL B209;65768
+,VESSEL B210;65769
+,VESSEL B211;65770
+,VESSEL B212;65771
+,VESSEL B213;65772
+,VESSEL B214;65773
+,VESSEL B215;65774
+,VESSEL B216;65775
+,VESSEL B217;65776
+,VESSEL B218;65777
+,VESSEL B219;65778
+,VESSEL B221;65779
+,VESSEL B222;65780
+,VESSEL B226;65781
+,VESSEL B227;65782
+,VESSEL B228;65783
+,VESSEL B229;65784
+,VESSEL B250;65785
+,VESSEL B305;65786
+,a;65536
+,e;65537
+,i;65538
+,o;65539
+,u;65540
+,da;65541
+,de;65542
+,di;65543
+,do;65544
+,du;65545
+,ja;65546
+,je;65547
+,jo;65549
+,ju;65550
+,ka;65551
+,ke;65552
+,ki;65553
+,ko;65554
+,ku;65555
+,ma;65556
+,me;65557
+,mi;65558
+,mo;65559
+,mu;65560
+,na;65561
+,ne;65562
+,ni;65563
+,no;65564
+,nu;65565
+,pa;65566
+,pe;65567
+,pi;65568
+,po;65569
+,pu;65570
+,qa;65571
+,qe;65572
+,qi;65573
+,qo;65574
+,ra;65576
+,re;65577
+,ri;65578
+,ro;65579
+,ru;65580
+,sa;65581
+,se;65582
+,si;65583
+,so;65584
+,su;65585
+,ta;65586
+,te;65587
+,ti;65588
+,to;65589
+,tu;65590
+,wa;65591
+,we;65592
+,wi;65593
+,wo;65594
+,za;65596
+,ze;65597
+,zo;65599
+,a2;65600
+,a3;65601
+,au;65602
+,dwe;65603
+,dwo;65604
+,nwa;65605
+,pu2;65606
+,pte;65607
+,ra2;65608
+,ra3;65609
+,ro2;65610
+,ta2;65611
+,twe;65612
+,two;65613
+}\mfssortaseq[ancient]{linbtran}{<}
+
+
+\mfsloadaseq[ancient2]{list2digits}{
+32;99;Basic Latin
+}
+
+\mfsloadaseq[ancient2]{list3digits}{
+100;127;Basic Latin
+}
+%
+%
+\mfsloadaseq[ancient2]{list5digits}{
+77824;78894;Egyptian Hieroglyphs
+,78896;78904;Egyptian Hieroglyph Format Controls
+}
+
+
+
+\mfsloadaprop[ancient2]{block2blockset}{
+Egyptian Hieroglyphs=egyptianhieroglyphs
+,Egyptian Hieroglyph Format Controls=egyptianhieroglyphs
+}
+
+\mfsloadaprop[ancient2]{blockset2font}{
+latin=Noto Serif
+,egyptianhieroglyphs=NewGardinerSMP.ttf%Aegyptus
+}
+
+\mfsloadaprop[ancient2]{blockset2fontoptions}{
+egyptianhieroglyphs=Scale;1.2
+}
+
+
+
+%===============================================================
+\begin{document}
+
+%\mm*{\ftrtext[ancient2][ancient]{egytran}{begina001vert begin o001 hor t001 end end hor st sb et eb overlay}}
+
+%\mftrtext[ancient][ancient]{egytran}{a001vertso001c001d003centre}
+
+
+%\mftrtext[ancient][ancient]{egytran}{a001vertbeginc001hord003end}
+%|| \mftrtext[ancient][ancient]{egytran}{a001vertc001hord003a001}
+%
+\mftrtext[ancient][ancient]{egytran}{o040verte023m017v004q003centreg001d046vertd021g001x001}
+%
+%%\mftrtext*[ancient][ancient]{egytran}{o040verte023m017v004q003centreg001d046vertd021g001x001}
+
+\nftrtext[ancient][ancient]{egytran}{Aa001Bo001Cc001d003}
+
+\nftrtext[ancient][ancient]{egytran}{Aa001Bo001c001Cd003}
+
+xx
+%\nftrtext[ancient][ancient]{egytran}{Do040Ee023Fm017v004q003g001Dd046Ed021Fg001x001}
+\nftrtext[ancient][ancient]{egytran}{Do040Ee023e023Fm017}
+xx
+
+\nftrtext[ancienteh][ancient]{egytran}{LKJHAo040BIe023iChjm017v004Jq003jg001AGd046BJGd021jCg001x001kl}
+
+\nftrtext[ancienteh][ancient]{egytran}{LKJHAo040BIe023m017iChjHJAv004BJq003jCjhg001AGd046BJGd021jCg001x001kl}
+
+\ExplSyntaxOn
+\nftrtext[ancienteh][ancient]{egytran}{
+LKJH
+		A
+				G o040 
+		B
+				I e023 i
+		C
+hj
+		m017 
+HJ
+		A 
+				v004 
+		B
+				J q003 j
+		C
+jh 
+		g001 
+		A
+			G d046 
+		B
+			JG d021 j
+		C 
+		g001 
+		x001 
+kl
+}
+
+\par\bigskip\setlength{\fboxsep}{1pt}
+\nftrtext[ancienteh][ancient]{egytran}{
+M
+LK
+M
+A
+JH
+		A
+				G o040 
+		B
+				I e023 i
+		C
+hj
+B
+		m017 
+HJ
+		A 
+				v004 
+		B
+				J q003 j
+		C
+jh
+B 
+	H
+		g001 
+		A
+			G d046 
+		B
+			JG d021 j
+		C 
+	h
+B
+	H
+		g001 
+		x001 
+	h
+C
+m
+kl
+m
+}
+
+
+\ExplSyntaxOff
+
+\end{document}
