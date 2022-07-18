@@ -48,6 +48,20 @@
 			{ xxN }
 
 %	\cs_generate_variant:Nn 
+%			\tl_case:NnF 
+%			{ NoF }
+
+	\cs_generate_variant:Nn 
+			\tl_set:Nn 
+			{ Nv }
+
+%	\cs_generate_variant:Nn 
+%			\tl_use:N
+%			{ V }
+
+
+
+%	\cs_generate_variant:Nn 
 %			\tl_show:N
 %			{ V }
 
@@ -546,11 +560,19 @@
 \noindent\adjustbox{stack=cc}%, margin*=0pt 1ex 0pt 0pt}
 \bgroup}{\egroup}
 
+\newenvironment{ehabstackb}{%
+\noindent\adjustbox{stack=cb}%, margin*=0pt 1ex 0pt 0pt}
+\bgroup}{\egroup}
+
+
 
 \newenvironment{ehabscale}{%
 \noindent\adjustbox{scale=0.8}
 \bgroup}{\egroup}
 
+\newenvironment{ehablarger}{%
+\noindent\adjustbox{scale=1.2}
+\bgroup}{\egroup}
 
 \newenvironment{ehabreflect}{%
 \noindent\adjustbox{reflect}
@@ -558,7 +580,7 @@
 
 
 \newenvironment{ehabframe}{%
-\noindent\adjustbox{fbox}
+\noindent\adjustbox{fbox,bgcolor=blue!5}
 \bgroup}{\egroup}
 
 \newenvironment{ehabcframe}{%
@@ -569,14 +591,24 @@
 \noindent\adjustbox{rndframe={color={red}, sep={3pt}}{4} ,bgcolor=yellow!21!red!3}
 \bgroup}{\egroup}
 
+\newcommand\ehraiseoptions{}
+\newcommand\ehraisepre{}
+\newcommand\ehraisepost{}
 \newenvironment{ehabraise}{%
-\noindent\adjustbox{raise=0.8ex}
-\bgroup}{\egroup}
+\noindent\adjustbox{raise=0.8ex,\ehraiseoptions}
+\bgroup\ehraisepre}{\ehraisepost\egroup}
 
 
+%\newenvironment{ehablower}{%
+%\noindent\adjustbox{raise=-0.4ex}
+%\bgroup}{\egroup}
+
+\newcommand\ehloweroptions{}
+\newcommand\ehlowerpre{}
+\newcommand\ehlowerpost{}
 \newenvironment{ehablower}{%
-\noindent\adjustbox{raise=-0.4ex}
-\bgroup}{\egroup}
+\noindent\adjustbox{raise=-0.4ex,\ehloweroptions}
+\bgroup\ehlowerpre}{\ehlowerpost\egroup}
 
 
 \newenvironment{ehabphantomh}{%
@@ -586,6 +618,57 @@
 \newenvironment{ehabphantomv}{%
 \noindent\adjustbox{phantom=v}
 \bgroup}{\egroup}
+
+
+\newenvironment{ehdisplay}{%
+\noindent\begin{quotation}\noindent
+}{\end{quotation}}
+
+
+
+\newenvironment{ehtranslit}{%manually
+\bgroup\usefont{T1}{lmr}{m}{n}\strut
+}{\egroup}
+
+
+\newcommand\ehbottomleftoptions{}
+\newcommand\ehbottomleftpre{}
+\newcommand\ehbottomleftpost{}
+\newenvironment{ehabbottomleft}{%
+\noindent\adjustbox{scale=0.72,raise=0.32ex,\ehbottomleftoptions}
+\bgroup\ehbottomleftpre}{\ehbottomleftpost\egroup\kern-0.4ex}
+%\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
+
+\newcommand\ehtoprightoptions{}
+\newcommand\ehtoprightpre{}
+\newcommand\ehtoprightpost{}
+\newenvironment{ehabtopright}{%
+\noindent\kern-0.6ex\adjustbox{scale=0.42,raise=1.2ex,\ehtoprightoptions}
+\bgroup\ehtoprightpre}{\ehtoprightpost\egroup}
+
+
+
+\newcommand\bigkern{\kern-0.8em}
+\newcommand\medkern{\kern-0.5em}
+\newcommand\smallkern{\kern-0.2em}
+\newcommand\ehnop{}
+
+
+%\newcommand\xxa{}
+\newenvironment{ehtransliterate}{%[1]{%auto
+%\def\xxa{#1}
+}{}%{\trbtext[ancient]{egy2tran}{\xxa}}
+
+%%\usepackage{environ}
+%%%\NewEnviron{foo}[1]{\BODY\ #1}
+%%\NewEnviron{ehtransliterate}{\trbtext[ancient]{egy2tran}{\BODY}}
+%\def\openbox#1{\setbox#1=\hbox\bgroup}
+%\def\closebox#1{\egroup\box#1}
+
+\tl_new:N \l_tmpzz_tl
+%\NewDocumentEnvironment { ehtransliterate } { +b } {
+%\tl_set:Nx \l_tmpzz_tl {#1}
+%} { \trbtext[ancient]{egy2tran}{\tl_use:N \l_tmpzz_tl} }
 
 
 
@@ -658,13 +741,72 @@
 
 
 
+
+
+
+\tl_new:N \l_tmpcc_tl
+\tl_new:N \l_tmpdd_tl
+%------------------
+	\cs_set:Npn \fc_functransliterateb:n #1 { 
+	% 1=item: from-to
+
+   \tl_set:Nx
+   	\l_tmpa_tl
+   	{
+				#1
+		}
+	\seq_set_split:NnV 
+			\l_tmpa_seq 
+			{ ; } 
+			\l_tmpa_tl
+
+
+		\tl_set:Nx \l_tmpcc_tl
+		{ 
+   		\seq_item:Nn
+				\l_tmpa_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpdd_tl
+		{
+   		\seq_item:Nn
+				\l_tmpa_seq 
+				{ 2 }
+		 } 
+
+
+	\tl_greplace_all:Nxx
+			\g_fc_trbtext_tl
+			{
+				\tl_use:N \l_tmpcc_tl
+			}
+			{
+				
+				 \tl_use:N \l_tmpdd_tl
+				 
+			}
+	
+%	\tl_show:N
+%			\g_fc_trtext_tl
+
+}
+
+
+
+
+
+
 \tl_new:N \l_eh_codeA_tl
 \tl_set:Nn \l_eh_codeA_tl { A }
 %------------------
 	\cs_set:Npn \fc_funcquadrats:n #1 { 
 	% 1=token
 		\tl_set:Nx \l_tmpa_tl { #1 }
+%		\tl_set:NV \l_eh_codeA_tl  \l_tmpa_tl  
+%		\tl_set:NV  \l_tmpa_tl  \l_eh_codeA_tl 
 %		\tl_show:N \l_tmpa_tl
+%		\tl_set:Nx \l_eh_codeA_tl { \l_tmpa_tl }
 \exp_args:Nx
 		\tl_case:NnF 
 			{ \tl_use:N \l_tmpa_tl }
@@ -674,22 +816,15 @@
 					        \setlength{\tabcolsep}{1pt}
 					        \renewcommand{\arraystretch}{0.6}
 					        \begin{adjustbox}{tabular=[c]{c}}
-%%					        #1
-%					        \\
-%%					        #2
-%					        \\\end{tabular}
-%					        \group_end:
+					       }
+					{ a } { 
+					        \tex_par:D
 					       }
 					{ B } { 
-%					        \group_begin:
-%					        \setlength{\tabcolsep}{1pt}
-%					        \renewcommand{\arraystretch}{0.6}
-%					        \begin{tabular}[c]{c}
-%%					        #1
 					        \\
-%%					        #2
-%					        \\\end{tabular}
-%					        \group_end:
+					       }
+					{ b } { 
+					        \tex_space:D
 					       }
 					{ C } { 
 %					        \group_begin:
@@ -702,32 +837,27 @@
 					        \end{adjustbox}
 					        \group_end:
 					       }
+					{ c } { 
+					        
+					       }
 					{ D } { 
 										\ehabstack 
 										}
-					{ E } { %
-%					        \group_begin:
-%					        \setlength{\tabcolsep}{1pt}
-%					        \renewcommand{\arraystretch}{0.6}
-%					        \begin{tabular}[c]{c}
-%%					        #1
+					{ d } { 
+										\bigkern 
+										}										
+					{ E } { 
 					        \\%[-1.0ex]
-%%					        #2
-%					        \\\end{tabular}
-%					        \group_end:
 					       }
-					{ F } { %
-%					        \group_begin:
-%					        \setlength{\tabcolsep}{1pt}
-%					        \renewcommand{\arraystretch}{0.6}
-%					        \begin{tabular}[c]{c}
-%%					        #1
-%					        \\
-%%					        #2
-%					        \\\end{tabular}
+					{ e } { 
+										\medkern 
+										}										
+					{ F } { 
 					        \endehabstack
-%					        \group_end:
 					       }
+					{ f } { 
+										\smallkern 
+										}										
 					{ G } { 
 					       \ehabscale
 					       }
@@ -782,6 +912,51 @@
 					{ o } { 
 					       \endehabphantomv
 					       }
+					{ Q } { 
+					       \ehdisplay
+					       }
+					{ q } { 
+					       \endehdisplay
+					       }					       
+					{ R } { 
+					       \ehablarger
+					       }
+					{ r } { 
+					       \endehablarger
+					       }					       					       
+					{ T } { 
+					       \ehtranslit
+					       }
+					{ t } { 
+					       \endehtranslit
+					       }					
+					{ U } { 
+										\ehabstackb 
+										}
+					{ V } { 
+					        \endehabstackb
+					       }
+%					{ W } { 
+%					       \ehtransliterate
+%					       					       }
+%					{ w } { 
+%					       \endehtransliterate
+%					       }					
+					 Ā  { 
+					       \ehabbottomleft
+					       					       }
+					 ā  { 
+					       \endehabbottomleft
+					       }										       
+					 Ă  { 
+					       \ehabtopright
+					       					       }
+					 ă  { 
+					       \endehabtopright
+					       }										       
+					 ſ  { 
+					       \ehnop
+					       }										       					       
 			}
 %			{%T
 %				%
@@ -863,10 +1038,11 @@
 			}
 		}%T
 		{ 
-			\symbol{
+%			\symbol{
+		\Uchar
 					\int_use:N 
 						 \g_fc_glyphcode_int 
-					}
+%					}
 		}%F
 
 
@@ -1332,6 +1508,62 @@
 
 			\tl_use:N
 					\g_fc_trtext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+
+}
+
+
+
+
+\tl_new:N \g_fc_trbtext_tl
+\tl_new:N \g_fc_trbbnamespace_tl
+\bool_new:N \g_fc_breversed_bool
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRbText
+\NewDocumentCommand \trbtext { s o m +m } { 
+%% 1=*, RTL
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\tl_gset:Nx 
+					\g_fc_trbtext_tl
+					{ #4 }
+
+			\tl_show:N
+					\g_fc_trbtext_tl
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_trbbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbbnamespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trbtext_tl 
+					\bool_set_true:N
+						\g_fc_breversed_bool
+					}
+
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbbnamespace_tl #3 _seq } 
+					\fc_functransliterateb:n
+		\group_end:
+%\seq_show:c					{ g_fc_rwe \g_fc_trbbnamespace_tl #3 _seq } 
+			\tl_use:N
+					\g_fc_trbtext_tl
+
+%			\tl_show:N
+%					\g_fc_trbtext_tl
 
 			\IfBooleanT { #1 }
 				{ 
@@ -4177,6 +4409,45 @@ a;66432
 ,div;66463
 }\mfssortaseq[ancient]{uga2tran}{<}
 
+\mfsloadaseq[ancient]{egy2tran}{
+g001;97;a
+%,^^^^^^01313f;a
+,o040;113;q
+,e023;108;l
+,m017;105;i 
+,v004;111;o 
+,q003;112;p
+,d046;100;d 
+,d021;114;r 
+,x001;116;t 
+%=a;97
+%,=b;98
+%,=c;99
+%,=d;100
+%,=e;101
+%,=f;102
+%,=g;103
+%,=h;104
+%,=i;105
+%,=j;106
+%,=k;107
+%,=l;108
+%,=m;109
+%,=n;110
+%,=o;111
+%,=p;112
+%,=q;113
+%,=r;114
+%,=s;115
+%,=t;116
+%,=u;117
+%,=v;118
+%,=w;119
+%,=x;120
+%,=y;121
+%,=z;122
+}\mfssortaseq[ancient]{egy2tran}{<}
+
 
 \mfsloadaseq[ancient]{egytran}{
 a001;77824
@@ -5252,13 +5523,79 @@ a001;77824
 ,aa032;78894
 %,vert;78896
 %,hor;78897
-,st;78898
-,sb;78899
-,et;78900
-,eb;78901
-,overlay;78902
+%,st;78898
+%,sb;78899
+%,et;78900
+%,eb;78901
+%,overlay;78902
 %,begin;78903
 %,end;78904
+%
+,=A;65
+,=B;66
+,=C;67
+,=D;68
+,=E;69
+,=F;70
+,=G;71
+,=H;72
+,=I;73
+,=J;74
+,=K;75
+,=L;76
+,=M;77
+,=N;78
+,=O;79
+,=P;80
+,=Q;81
+,=R;82
+,=S;83
+,=T;84
+,=U;85
+,=V;86
+,=W;87
+,=X;88
+,=Y;89
+,=Z;90
+%
+,=a;97
+,=b;98
+,=c;99
+,=d;100
+,=e;101
+,=f;102
+,=g;103
+,=h;104
+,=i;105
+,=j;106
+,=k;107
+,=l;108
+,=m;109
+,=n;110
+,=o;111
+,=p;112
+,=q;113
+,=r;114
+,=s;115
+,=t;116
+,=u;117
+,=v;118
+,=w;119
+,=x;120
+,=y;121
+,=z;122
+%
+,-q;78477
+,-l;78061
+,-i;78283
+,-o;78703
+,-p;78506
+,-a;78143
+,-d;77991
+,-r;77963
+,-t;78799%^x001
+,Amacron;256
+,amacron;257
 }\mfssortaseq[ancient]{egytran}{<}
 
 
@@ -5844,16 +6181,20 @@ egyptianhieroglyphs=Scale;1.2
 %===============================================================
 \begin{document}
 ABC tabular
+a/b/c par/space/
 DEF stack
-G smaller
-H reflect
-I  fbox
-J	cframe
-K rndframe
-L raise
-M lower
-N phantomh
-O phantomv
+d/e/f big/med/small kern
+Gg smaller
+Hh reflect
+Ii  fbox
+Jj	cframe (blue)
+Kk rndframe (red)
+Ll raise
+Mm lower
+Nn phantomh
+Oo phantomv
+Rr larger
+UEV bottom stack
 
 This version uses adjustbox environments for layout.
 x
@@ -5861,14 +6202,49 @@ x
 \par
 \nftrtext[ancienteh][ancient]{egytran}{
 g001
+bT:tb
 
-Ag001Bg001C
 
 %Ag001Bg002C
 
-Dg001Eg001F
 
-Gg001gHg001hIg001iJg001jKg001k
+UGg001gET=G=gtVb
+UHg001hET=H=htVb
+UIg001iET=I=itVb
+UJg001jET=J=jtVb
+UKg001kET=K=ktVb
+ULg001lET=L=ltVb
+UMg001mET=M=mtVb
+UJNg001njET=N=ntVb
+UJOg001ojET=O=otVb
+URg001rET=R=rtVb
+%UTWg001wtET=T=W=w=ttVb
+
+a
+T:tb
+Ag001Bg001CbT=A=B=Ctb
+T:tb
+Dg001Eg001FbT=D=E=Ftb
+T:tb
+Ug001Eg001VbT=U=E=Vtb
+
+%UQg001qET=Q=qtV
+
+a
+bT:tb
+UGGg001ggET=G=G=g=gtVb
+UHHg001hhET=H=H=h=htVb
+UIIg001iiET=I=I=i=itVb
+UJJg001jjET=J=J=j=jtVb
+UKKg001kkET=K=K=k=ktVb
+ULLg001llET=L=L=l=ltVb
+UMMg001mmET=M=M=m=mtVb
+UJNNg001nnjET=N=N=n=ntVb
+UJOOg001oojET=O=O=o=otVb
+URRg001rrET=R=R=r=rtVb
+
+
+
 
 \tex_par:D
 o040
@@ -5926,9 +6302,7 @@ g001
 x001 
 h
 k
-
-
-%======================
+		%======================
 \tex_par:D
 K
 H
@@ -5981,9 +6355,212 @@ x001
 C
 h
 k
+}
+\nftrtext[ancient][ancient]{egy2tran}{
+%o040}
+T
+K
+H
+A
+L
+%G
+%G
+D
+MMGGHo040hggmm
+E
+He023h
+F
+%g
+%g
+l
+B
+Hm017 h
+Nz015z015n%y006n%m029n%d067n
+L
+G
+G
+D
+GMMHv004hmmg
+E
+Hq003h
+F
+g
+g
+l
+B
+Hg001h 
+L
+G
+G
+%G
+%G
+D
+MMGGHd046hggmm
+E
+Hd021h
+F
+%g
+%g
+g
+g
+l
+B
+Hg001h 
+Hx001h
+C
+h
+k
+t
+}
+
+\nftrtext[ancienteh][ancient]{egytran}{
+
+Qg001Bg002g003g004g005h001h002Bo001o002o003Bi001Bk001q
+a
+T:t
+U-qET=qtV
+U-lET=ltV
+U-iET=itV
+U-oET=otV
+U-pET=ptV
+U-aET=atV
+U-dET=dtV
+U-rET=rtV
+U-aET=atV
+U-tET=ttV
+T:t
+
+E
+a001
+T:tb
+a002
+a003
+bb
+
+a
+b001
+bT:tb
+b002
+b003
+bb
+
+a
+c001
+bT:tb
+c002Tt
+c003
+bb
+
+a
+d001
+bT:tb
+d002
+d003
+bb
+
+a
+e001
+bT:tb
+e002
+e003
+bb
+
+a
+f001
+bT:tb
+f002
+f003
+bb
+
+a
+g001
+bT:tb
+g002
+g003
+bb
+
+a
+h001
+bT:tb
+h002
+h003
+bb
+
+a
+i001
+bT:tb
+i002
+i003
+bb
 
 
 }
+
+
+
+\tex_par:D
+\nftrtext[ancient][ancient]{egytran}{
+Āq003āg001bbg001Ăq003ăbbg017Ăd021ă%𓅓𓂋
+a
+i010i009n035d054b
+a
+
+A Ā M A GGi009gg B GGLn035lgg C m ā C d
+i010 
+
+
+d054 ſ
+bb
+e007 L z002 l bb
+G
+D
+	M e007 m
+E
+	LL z002 ll
+F 
+g bb
+
+e007 Ă L f z002 l ă
+
+bb
+g043 x001 bb
+G
+D
+	M g043 m
+E
+	LL x001 ll
+F 
+g bb
+
+g043 Ă L f x001 l ă
+
+a
+i010 L GGG z013 ggg M x001 m l
+bb
+A Ā A MMG z013 gmm B L x001 l C ā C e
+i010  
+bb
+M A GGG z013 ggg G x001 g C m df i010 
+
+
+}
+
+
 \ExplSyntaxOff
+
+%\begin{ehtransliterate}g001x001\end{ehtransliterate}
+
+%\makebox[2pt]{\raisebox{0.5ex}{\ o}}X
+%
+%\makebox[2pt]{\raisebox{0.5ex}{\hspace{2ex}o}}X
+%
+%\makebox[2pt]{\raisebox{0.5ex}{\hspace{4ex}o}}X
+%
+%\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
+%
+%o\kern-1.2exX
+
+%\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
+
 
 \end{document}
