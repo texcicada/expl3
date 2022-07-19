@@ -652,6 +652,8 @@
 \newcommand\medkern{\kern-0.5em}
 \newcommand\smallkern{\kern-0.2em}
 \newcommand\ehnop{}
+\newcommand\thinvspace{\vspace{0.2em}}
+\newcommand\negthinvspace{\vspace{-0.2em}}
 
 
 %\newcommand\xxa{}
@@ -815,7 +817,7 @@
 					        \group_begin:
 					        \setlength{\tabcolsep}{1pt}
 					        \renewcommand{\arraystretch}{0.6}
-					        \begin{adjustbox}{tabular=[c]{c}}
+					        \begin{adjustbox}{tabular=[c]{@{}c@{}}}
 					       }
 					{ a } { 
 					        \tex_par:D
@@ -933,9 +935,15 @@
 					{ U } { 
 										\ehabstackb 
 										}
+					{ u } { 
+										\thinvspace 
+										}										
 					{ V } { 
 					        \endehabstackb
 					       }
+					{ v } { 
+										\negthinvspace 
+										}										
 %					{ W } { 
 %					       \ehtransliterate
 %					       					       }
@@ -6195,6 +6203,10 @@ Nn phantomh
 Oo phantomv
 Rr larger
 UEV bottom stack
+u/v thin vspace/
+Āā bottom left
+Ăă top right
+
 
 This version uses adjustbox environments for layout.
 x
@@ -6540,8 +6552,51 @@ bb
 A Ā A MMG z013 gmm B L x001 l C ā C e
 i010  
 bb
-M A GGG z013 ggg G x001 g C m df i010 
+M A GGG z013 ggg G x001 g C m df i010 ſ
 
+a ſ
+a001 b001 z002 ſ bb
+D G M a001 b001 m g E LL R z002 r ll F bb
+D G M a001 m g E LLG i009 gll F bb
+D G M a001 m g E LLG n035 gll F bb
+D G a001 g E L v031 l F bb
+
+a
+% Cleopatra
+K
+H
+A L
+D
+ MM GG o040 gg mm %q
+E
+ R e023 r %l
+F
+	l
+B
+		m017 %i
+		v004  %o
+B
+	Ā	
+		q003 %p
+	ā 
+	g001 %a
+LGG
+D
+MMGGd046ggmm %d
+E
+d021 %r
+F
+ggl
+B
+%	A
+	g001 %a
+	Ă
+	x001 %t
+	ă
+%	C
+C
+h
+k
 
 }
 
@@ -6562,5 +6617,6 @@ M A GGG z013 ggg G x001 g C m df i010
 
 %\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
 
+%\ooalign{X \cr \kern0.25ex\raisebox{0.3ex}{o}}
 
 \end{document}
