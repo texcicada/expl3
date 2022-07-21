@@ -664,6 +664,11 @@
 \newcommand\negthinvspace{\vspace{-0.2em}}
 
 
+\newcommand\ehexclam{!}
+
+
+
+
 %\newcommand\xxa{}
 \newenvironment{ehtransliterate}{%[1]{%auto
 %\def\xxa{#1}
@@ -1059,6 +1064,7 @@
 					 { 🀴 }  {  % space placeholder
 					       \l_tmpa_tl % space/catcode
 					       }										       					       
+						{ 🁤 } { \ehexclam }
 			}
 %			{%T
 %				%
@@ -1073,6 +1079,187 @@
 			}% end case
 			}% end F bool: in ehtextmode?
 }
+
+
+
+
+%----------------------
+	\cs_set:Npn \fc_funcquadratstl:n #1 { 
+	% 1=token
+		\tl_set:Nn \l_tmpa_tl { #1 }
+%		\tl_set:NV \l_eh_codeA_tl  \l_tmpa_tl  
+%		\tl_set:NV  \l_tmpa_tl  \l_eh_codeA_tl 
+%		\tl_show:N \l_tmpa_tl
+%		\tl_set:Nx \l_eh_codeA_tl { \l_tmpa_tl }
+\exp_args:Nx
+		\tl_case:NnF 
+			{ \tl_use:N \l_tmpa_tl }
+			{
+					{ A }  { 
+					        \group_begin:
+					        \setlength{\tabcolsep}{1pt}
+					        \renewcommand{\arraystretch}{0.6}
+					        \begin{adjustbox}{tabular=[c]{c}}
+%					        \begin{adjustbox}{tabular=[c]{@{}c@{}}}
+					       }
+					{ a } { 
+					        \tex_par:D
+					       }
+					{ B } { 
+					        \\
+					       }
+					{ b } { 
+					        \tex_space:D
+					       }
+					{ C } { 
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+%					        \\
+%%					        #2
+					        \end{adjustbox}
+					        \group_end:
+					       }
+					{ c } { 
+					        
+					       }
+					{ D } { 
+										\ehabstack 
+										}
+					{ d } { 
+										\bigkern 
+										}										
+					{ E } { 
+					        \\%[-1.0ex]
+					       }
+					{ e } { 
+										\medkern 
+										}										
+					{ F } { 
+					        \endehabstack
+					       }
+					{ f } { 
+										\smallkern 
+										}										
+					{ G } { 
+					       \ehabscale
+					       }
+					{ g } { 
+					       \endehabscale
+					       }
+					{ H } { 
+					       \ehabreflect
+					       }
+					{ h } { 
+					       \endehabreflect
+					       }
+					{ I } { 
+					       \ehabframe
+					       }
+					{ i } { 
+					       \endehabframe
+					       }
+					{ J } { 
+					       \ehabcframe
+					       }
+					{ j } { 
+					       \endehabcframe
+					       }					
+					{ K } { 
+					       \ehabrndframe
+					       }
+					{ k } { 
+					       \endehabrndframe
+					       }
+					{ L } { 
+					       \ehabraise
+					       }
+					{ l } { 
+					       \endehabraise
+					       }
+					{ M } { 
+					       \ehablower
+					       }
+					{ m } { 
+					       \endehablower
+					       }
+					{ N } { 
+					       \ehabphantomh
+					       }
+					{ n } { 
+					       \endehabphantomh
+					       }
+					{ O } { 
+					       \ehabphantomv
+					       }
+					{ o } { 
+					       \endehabphantomv
+					       }
+					{ Q } { 
+					       \ehdisplay
+					       }
+					{ q } { 
+					       \endehdisplay
+					       }					       
+					{ R } { 
+					       \ehablarger
+					       }
+					{ r } { 
+					       \endehablarger
+					       }					       					       
+					{ T } { 
+					       \ehtranslit
+					       }
+					{ t } { 
+					       \endehtranslit
+					       }					
+					{ U } { 
+										\ehabstackb 
+										}
+					{ u } { 
+										\thinvspace 
+										}										
+					{ V } { 
+					        \endehabstackb
+					       }
+					{ v } { 
+										\negthinvspace 
+										}										
+%					{ W } { 
+%					       \ehtransliterate
+%					       					       }
+%					{ w } { 
+%					       \endehtransliterate
+%					       }					
+%						{ z } { \ehexclam }
+					 Ā  { \ehabbottomleft
+					       					       }
+					 ā  { 
+					       \endehabbottomleft
+					       }										       
+					 Ă  { 
+					       \ehabtopright
+					       					       }
+					 ă  { 
+					       \endehabtopright
+					       }										       
+					 ſ  { 
+					       \ehnop
+					       }										       					       
+						{ 🁤 } { \ehexclam }
+			}
+%			{%T
+%				%
+%			}
+			{%F
+				\l_tmpa_tl%
+			}%
+}
+
+
+
 
 
 
@@ -2203,29 +2390,48 @@
 }
 
 
+
+
+\NewDocumentCommand \testtwo { s s m } { 
+    \IfBooleanTF{#2}
+    { true }
+    { false }
+}
+
+
 %****************************************************
 %*
 %****************************************************
 %-------------------- nFTrText
-\NewDocumentCommand \nftrtext { s o o m +m } { 
+\NewDocumentCommand \nftrtext { s s o o m +m } { 
 % 1=*, RTL
-% 2=font namespace
-% 3=translit namespace
-% 4=translit seq
-% 5=text
+% 2=use TL quadrats
+% 3=font namespace
+% 4=translit namespace
+% 5=translit seq
+% 6=text
 			\tl_gset:Nn 
 					\g_fc_trtext_tl
-					{ #5 }
+					{ #6 }
 %\tl_show:N \g_fc_trtext_tl
 
-				\IfNoValueTF { #2 } 
-						{ \tl_clear:N \g_fc_namespace_tl } 
-						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
-%\tl_show:N \g_fc_namespace_tl
 				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #3 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #4 } 
 						{ \tl_clear:N \g_fc_trnamespace_tl } 
-						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #4 } }
 
+				\regex_replace_all:nnN
+						{ excl }
+						{ 🁤 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_ftext_tl
 
 				\regex_replace_all:nnN
 						{ \c{par} }
@@ -2279,7 +2485,7 @@
 %--- translit (tr)
 			\exp_args:Nx
 			\seq_map_function:cN 
-					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					{ g_fc_rwe \g_fc_trnamespace_tl #5 _seq } 
 					\fc_functransliterate:n
 %%\tl_show:N \g_fc_trtext_tl
 
@@ -2303,10 +2509,13 @@
 						
 			\IfBooleanT { #1 }
 				{ 
+			\IfBooleanF { #2 }
+				{ 
 					\tl_reverse:N 
 						\g_fc_trtext_tl 
 					\bool_set_true:N
 						\g_fc_reversed_bool
+					}
 					}
 						
 						
@@ -2326,6 +2535,20 @@
 %=======================
 %\tl_show:N \g_fc_trtext_tl 
 %\tl_use:N \g_fc_trtext_tl 
+    \IfBooleanTF{#2}
+    { 
+%		\tl_show:N \g_fc_trtext_tl
+						\group_begin:
+%							\fegyh						
+%			\exp_args:Nx
+			\tl_map_function:NN 
+					\g_fc_trtext_tl 
+					\fc_funcquadratstl:n
+%						\g_fc_trtext_tl
+						\group_end:
+    }
+    { 
+
 						\group_begin:
 							\fegyh						
 %			\exp_args:Nx
@@ -2334,7 +2557,7 @@
 					\fc_funcquadrats:n
 %						\g_fc_trtext_tl
 						\group_end:
-
+      }
 						
 %						\tex_par:D
 %						>>
@@ -5720,6 +5943,8 @@ a001;77824
 ,=x;120
 ,=y;121
 ,=z;122
+%,=!;33
+%,=?;63
 %
 ,-q;78477
 ,-l;78061
@@ -6381,6 +6606,7 @@ UMg001mE!=M=m!Vb
 UJNg001njE!=N=n!Vb
 UJOg001ojE!=O=o!Vb
 URg001rE!=R=r!Vb
+U!text!E!<excl>text<excl>!Vb
 %U!Wg001w!E!=!=W=w=!!Vb
 
 a
@@ -6527,63 +6753,64 @@ h
 k
 }
 
-%{
+{
 %\ns
-%\nftrtext[ancient][ancient]{egy2tran}{
-%%o040}
-%K
-%H
-%A
-%L
-%%G
-%%G
-%D
-%MMGGHo040hggmm
-%E
-%He023h
-%F
-%%g
-%%g
-%l
-%B
-%Hm017 h
-%Nz015z015n%y006n%m029n%d067n
-%L
+\nftrtext**[ancient][ancient]{egy2tran}{
+%T
+K
+H
+A
+L
 %G
 %G
-%D
-%GMMHv004hmmg
-%E
-%Hq003h
-%F
+D
+MMGGHo040hggmm
+E
+He023h
+F
 %g
 %g
-%l
-%B
-%Hg001h 
-%L
+l
+B
+Hm017 h
+Nz015z015n%y006n%m029n%d067n
+L
+G
+G
+D
+GMMHv004hmmg
+E
+Hq003h
+F
+g
+g
+l
+B
+Hg001h 
+L
+G
+G
 %G
 %G
-%%G
-%%G
-%D
-%MMGGHd046hggmm
-%E
-%Hd021h
-%F
-%%g
-%%g
+D
+MMGGHd046hggmm
+E
+Hd021h
+F
 %g
 %g
-%l
-%B
-%Hg001h 
-%Hx001h
-%C
-%h
-%k
-%}
-%}
+g
+g
+l
+B
+Hg001h 
+Hx001h
+C
+h
+k
+%t
+}
+}
 
 \nftrtext[ancienteh][ancient]{egytran}{
 
@@ -6780,5 +7007,20 @@ k
 %\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
 
 %\ooalign{X \cr \kern0.25ex\raisebox{0.3ex}{o}}
+
+%%\testtwo{0} \testtwo*{1} \testtwo**{2}
+%\ExplSyntaxOn
+%{%\fegyh
+%\nftrtext**[ancient][ancient]{egy2tran}{
+%%T
+%%K
+%H
+%q003
+%h
+%%k
+%}
+%}
+%\ExplSyntaxOff
+
 
 \end{document}
