@@ -13,6 +13,7 @@
 \newfontfamily\nsl{Noto Sans Lycian}[Renderer=HarfBuzz]
 \newfontfamily\ns{Noto Serif}
 
+%\newcommand\𓀀{𓀀𓀀𓀀$∁∂∃∰∀$}
 \newfontface\fegyh{Noto Sans Egyptian Hieroglyphs}
 %...............................................................................................
 \ExplSyntaxOn
@@ -523,9 +524,20 @@
 %%							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
 %%							{ \tl_use:N \g_fc_myfontname_tl }
 %%					}
-				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+			\int_set:Nn \l_tmpa_int { \tl_use:N \l_tmpb_tl }
+			\int_compare:nNnTF 
+					{ \l_tmpa_int }  > { 77823 }
+					{ \use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } 
+					\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl
+					}
+					{ \use:c { ns } 
+					\color{red} \Uchar \tl_use:N \l_tmpb_tl
+					}
+					
+%				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
 
-			\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl }
+%			\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl
+			 }
 %%		,
 
 %		\ftext{}		
@@ -7022,5 +7034,10 @@ k
 %}
 %\ExplSyntaxOff
 
+%\fegyh
+%\𓀀
+
+\small
+\printtrscheme[ancient][ancient]{egytran}{egyptianhieroglyphs}[5]
 
 \end{document}
