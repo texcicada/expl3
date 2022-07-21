@@ -540,6 +540,14 @@
 			 }
 %%		,
 
+
+
+
+
+
+
+
+
 %		\ftext{}		
 }
 \newenvironment{myss}{%
@@ -647,7 +655,10 @@
 
 
 \newenvironment{ehtranslit}{%manually
-\bgroup\usefont{T1}{lmr}{m}{n}\strut
+\bgroup
+\ns\small
+%\usefont{T1}{lmr}{m}{n}
+\strut
 }{\egroup}
 
 
@@ -3138,6 +3149,9 @@ lycian=Colour;blue-Scale;1.2
 32;32;space
 }
 %
+\mfsloadaseq[ancienteh]{list3digits}{
+256;300;latin
+}
 %
 %
 \mfsloadaseq[ancienteh]{list5digits}{
@@ -3148,11 +3162,13 @@ lycian=Colour;blue-Scale;1.2
 
 \mfsloadaprop[ancienteh]{block2blockset}{
 space=egyptianhieroglyphs
+,latin=latinx
 ,Egyptian Hieroglyphs=egyptianhieroglyphs
 }
 
 \mfsloadaprop[ancienteh]{blockset2font}{
 egyptianhieroglyphs=Noto Sans Egyptian Hieroglyphs
+,latinx=Noto Serif
 }
 
 \mfsloadaprop[ancienteh]{blockset2fontoptions}{
@@ -6619,6 +6635,27 @@ UJNg001njE!=N=n!Vb
 UJOg001ojE!=O=o!Vb
 URg001rE!=R=r!Vb
 U!text!E!<excl>text<excl>!Vb
+%
+U	
+	Amacron %Ā	
+		q003 %p
+	amacron %ā 
+	g001 %a
+E
+!Amacronamacron!
+Vb
+%
+U	
+  g001
+	Ă
+	x001
+	ă
+E
+!
+	Abreve
+	abreve
+!
+Vb
 %U!Wg001w!E!=!=W=w=!!Vb
 
 a
