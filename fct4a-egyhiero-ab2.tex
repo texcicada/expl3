@@ -664,9 +664,10 @@
 
 
 
+\newcommand\ehtranslitfont{\ns\small}
 \newenvironment{ehtranslit}{%manually
 \bgroup
-\ns\small
+\ehtranslitfont
 %\usefont{T1}{lmr}{m}{n}
 \strut
 }{\egroup}
@@ -686,8 +687,11 @@
 \newcommand\ehtoprightoptions{}
 \newcommand\ehtoprightpre{}
 \newcommand\ehtoprightpost{}
+\newcommand\ehabtrsc{0.42}
+\newcommand\ehabtrraise{1.2ex}
+\newcommand\ehabtrkern{-0.6ex}
 \newenvironment{ehabtopright}{%
-\noindent\kern-0.6ex\adjustbox{scale=0.42,raise=1.2ex,\ehtoprightoptions}
+\noindent\kern\ehabtrkern\adjustbox{scale=\ehabtrsc,raise=\ehabtrraise,\ehtoprightoptions}
 \bgroup\ehtoprightpre}{\ehtoprightpost\egroup}
 
 
@@ -914,10 +918,19 @@
 										\str_case_e:nnF 
 			 									{ \l_tmpa_tl }
 			 									{
-			 										{ ! } {}
+			 									{!}{}
+%			 										{ ƀ } { ! }
+			 									}
+											{
+										\str_case_e:nnF 
+			 									{ \l_tmpa_tl }
+			 									{
+
+			 										{ ƀ } { ! }
 			 									}
 											{
 											\l_tmpa_tl 
+											}
 											}
 								}
 								
@@ -925,7 +938,8 @@
 		\str_case_e:nnF 
 			 { \l_tmpb_tl }
 			{
-					{ ! } {}
+			{!}{}
+%					{ ƀ } { ! }
 					{ A }  { 
 						\bool_if:NF
 								\g_fc_ehtextmode_bool	
@@ -1100,7 +1114,7 @@
 					 { 🀴 }  {  % space placeholder
 					       \l_tmpa_tl % space/catcode
 					       }										       					       
-						{ 🁤 } { \ehexclam }
+%						{ 🁤 } { \ehexclam }
 			}
 %			{%T
 %				%
@@ -1284,7 +1298,7 @@
 					 ſ  { 
 					       \ehnop
 					       }										       					       
-						{ 🁤 } { \ehexclam }
+%						{ ƀ } { ! } %{ 🁤 } { \ehexclam }
 			}
 %			{%T
 %				%
@@ -6000,6 +6014,8 @@ a001;77824
 ,amacron;257
 ,Abreve;258
 ,abreve;259
+,ehnop;383 % long s: ſ
+,ehexclam;384 % ƀ
 }\mfssortaseq[ancient]{egytran}{<}
 
 
@@ -6595,7 +6611,7 @@ egyptianhieroglyphs=Scale;1.2
 	b
 	b
 	!
-	An001ByCz!
+	A=xB=yC=z!
 	Aa001Ba001C
 }
 \ExplSyntaxOff
@@ -7106,7 +7122,7 @@ UMg001mE!=M=m!Vb
 UJNg001njE!=N=n!Vb
 UJOg001ojE!=O=o!Vb
 URg001rE!=R=r!Vb
-U!text!E!<excl>text<excl>!Vb
+U!text!E!ehexclamtextehexclam!Vb
 %
 U 
 	Amacron %Ā	
@@ -7199,6 +7215,14 @@ U	g001Ă	x001ă E ! 	Abreve abreve ! Vb
 
 
 \descitem{UAmacronq003amacrong001E!Amacronamacron!V}{BottomLeft}{Positions a glyph, \mmi{a}, with scale of \mmi{ehabblsc}, initially \ehabblsc, and raising it by \mmi{ehabblraise}, initially \ehabblraise. The following glyph, \mmi{B\/}, outside the environment, is kerned by \mmi{ehabblkern} amount, initially \ehabblkern: \ehglyph{Amacron!=a!amacron!=B!}. The environment is \mmc{ehabbottomleft}.}
+
+
+\descitem{Ug001Abrevex001abreveE!Abreveabreve!V}{TopRight}{Positions a glyph, \mmi{b}, with scale of \mmi{ehabtrsc}, initially \ehabtrsc, and raising it by \mmi{ehabtrraise}, initially \ehabtrraise\ and kerns the environment onto the preceding glyph, \mmi{A}, by \mmi{ehabtrkern} amount, initially \ehabtrkern: \ehglyph{!=A!Abreve!=b!abreve}. The environment is \mmc{ehabtopright}.}
+
+%\ehglyph{!ehexclam=t=e=x=tehexclam!}
+
+
+\descitem{Ua001!text!a001E!ehexclamtextehexclam!V}{TextMode}{To display non-glyph text inline in a glyph stream in font \mmi{ehtranslitfont}, initially Noto Serif, small, use exclamation mark \mmi{!} as delimiter. The environment is \mmc{ehtranslit}.}
 
 
 \end{document}
