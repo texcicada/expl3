@@ -594,12 +594,14 @@
 
 
 
+\newcommand\ehabscalesc{0.8}
 \newenvironment{ehabscale}{%
-\noindent\adjustbox{scale=0.8}
+\noindent\adjustbox{scale=\ehabscalesc}
 \bgroup}{\egroup}
 
+\newcommand\ehablargersc{1.2}
 \newenvironment{ehablarger}{%
-\noindent\adjustbox{scale=1.2}
+\noindent\adjustbox{scale=\ehablargersc}
 \bgroup}{\egroup}
 
 \newenvironment{ehabreflect}{%
@@ -607,23 +609,30 @@
 \bgroup}{\egroup}
 
 
+\newcommand\ehabframebg{blue!5}
 \newenvironment{ehabframe}{%
-\noindent\adjustbox{fbox,bgcolor=blue!5}
+\noindent\adjustbox{fbox,bgcolor=\ehabframebg}
 \bgroup}{\egroup}
 
+\newcommand\ehabcframecol{blue}
 \newenvironment{ehabcframe}{%
-\noindent\adjustbox{cframe=blue}
+\noindent\adjustbox{cframe=\ehabcframecol}
 \bgroup}{\egroup}
 
+\newcommand\ehabrndframecol{red}
+\newcommand\ehabrndframesep{3pt}
+\newcommand\ehabrndframernd{4}
+\newcommand\ehabrndframebg{yellow!21!red!3}
 \newenvironment{ehabrndframe}{%
-\noindent\adjustbox{rndframe={color={red}, sep={3pt}}{4} ,bgcolor=yellow!21!red!3}
+\noindent\adjustbox{rndframe={color={\ehabrndframecol}, sep={\ehabrndframesep}}{\ehabrndframernd} ,bgcolor=\ehabrndframebg}
 \bgroup}{\egroup}
 
 \newcommand\ehraiseoptions{}
 \newcommand\ehraisepre{}
 \newcommand\ehraisepost{}
+\newcommand\ehraiseamount{0.8ex}
 \newenvironment{ehabraise}{%
-\noindent\adjustbox{raise=0.8ex,\ehraiseoptions}
+\noindent\adjustbox{raise=\ehraiseamount,\ehraiseoptions}
 \bgroup\ehraisepre}{\ehraisepost\egroup}
 
 
@@ -634,8 +643,9 @@
 \newcommand\ehloweroptions{}
 \newcommand\ehlowerpre{}
 \newcommand\ehlowerpost{}
+\newcommand\ehloweramount{-0.4ex}
 \newenvironment{ehablower}{%
-\noindent\adjustbox{raise=-0.4ex,\ehloweroptions}
+\noindent\adjustbox{raise=\ehloweramount,\ehloweroptions}
 \bgroup\ehlowerpre}{\ehlowerpost\egroup}
 
 
@@ -665,9 +675,12 @@
 \newcommand\ehbottomleftoptions{}
 \newcommand\ehbottomleftpre{}
 \newcommand\ehbottomleftpost{}
+\newcommand\ehabblsc{0.72}
+\newcommand\ehabblraise{0.32ex}
+\newcommand\ehabblkern{-0.4ex}
 \newenvironment{ehabbottomleft}{%
-\noindent\adjustbox{scale=0.72,raise=0.32ex,\ehbottomleftoptions}
-\bgroup\ehbottomleftpre}{\ehbottomleftpost\egroup\kern-0.4ex}
+\noindent\adjustbox{scale=\ehabblsc,raise=\ehabblraise,\ehbottomleftoptions}
+\bgroup\ehbottomleftpre}{\ehbottomleftpost\egroup\kern\ehabblkern}
 %\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
 
 \newcommand\ehtoprightoptions{}
@@ -7076,5 +7089,116 @@ k
 
 \small
 \printtrscheme[ancient][ancient]{egytran}{egyptianhieroglyphs}[5]
+
+
+
+\ExplSyntaxOn
+
+\nftrtext[ancienteh][ancient]{egytran}{
+
+UGg001gE!=G=g!Vb
+UHg001hE!=H=h!Vb
+UIg001iE!=I=i!Vb
+UJg001jE!=J=j!Vb
+UKg001kE!=K=k!Vb
+ULg001lE!=L=l!Vb
+UMg001mE!=M=m!Vb
+UJNg001njE!=N=n!Vb
+UJOg001ojE!=O=o!Vb
+URg001rE!=R=r!Vb
+U!text!E!<excl>text<excl>!Vb
+%
+U 
+	Amacron %Ā	
+		q003 %p
+	amacron %ā 
+	g001 %a
+E
+!Amacronamacron!
+Vb
+%
+U	g001Ă	x001ă E ! 	Abreve abreve ! Vb
+}
+\ExplSyntaxOff
+
+\newcommand\ehglyph[1]{%
+\nftrtext[ancienteh][ancient]{egytran}{#1}}
+%
+\newcommand\ehglyphb[1]{%
+\ehglyph{#1} (#1)}
+
+%
+\newcommand\descitem[3]{%
+\bigskip\noindent\begin{tabular}{cl}
+\begin{tabular}[t]{c}
+\fbox{%
+\begin{minipage}[][][c]{4em}
+\begin{center}
+\nftrtext[ancienteh][ancient]{egytran}{#1}
+\end{center}
+\end{minipage}
+}
+\\
+\ttfamily
+#2
+\end{tabular}
+& 
+\begin{minipage}{0.6\textwidth}
+#3
+\end{minipage}
+ \\
+\end{tabular}
+}
+
+%\noindent\begin{tabular}{cl}
+%\begin{tabular}[t]{c}
+%\fbox{%
+%\begin{minipage}[][][c]{4em}
+%\begin{center}
+%\nftrtext[ancienteh][ancient]{egytran}{UGg001gE!=G=g!Vb}
+%\end{center}
+%\end{minipage}
+%}
+%\\
+%\ttfamily
+%Smaller
+%\end{tabular}
+%& 
+%\begin{minipage}{0.6\textwidth}
+%Scales the contents by 80\%. The environment is \mmc{ehabscale}.
+%\end{minipage}
+% \\
+%\end{tabular}
+
+
+\descitem{UGg001gE!=G=g!V}{Smaller}{Scales the contents down to \mmi{ehabscalesc}, initially 80\%. The environment is \mmc{ehabscale}.}
+
+\descitem{UHg001hE!=H=h!V}{Reflect}{Reflects the contents horizontally, like a mirror. The environment is \mmc{ehabreflect}.}
+
+\descitem{UIg001iE!=I=i!V}{Frame}{Frames the contents with an fbox with background colour of \mmi{ehabframebg}, initially blue!5. The environment is \mmc{ehabframe}.}
+
+
+\descitem{UJg001jE!=J=j!V}{CFrame}{Tightly frames the contents with a frame of colour \mmi{ehabcframecol}, initially blue. The environment is \mmc{ehabcframe}.}
+
+
+\descitem{UKg001kE!=K=k!V}{RndFrame}{In emulation of a cartouche, frames its contents with a frame of colour \mmi{ehabrndframecol}, initially \ehabrndframecol; margin of  \mmi{ehabrndframesep}, initially \ehabrndframesep; rounded corners of factor \mmi{ehabrndframernd}, initially \ehabrndframernd; and background colour of  \mmi{ehabrndframebg}, initially \ehabrndframebg. The environment is \mmc{ehabrndframe}.}
+
+\descitem{U!x!Lg001l!x!E!=L=l!V}{Raise}{Raises its contents by \mmi{ehraiseamount}, initially \ehraiseamount. The environment is \mmc{ehabraise}.}
+
+\descitem{U!x!Mg001m!x!E!=M=m!V}{Lower}{Lowers its contents by \mmi{ehloweramount}, initially \ehloweramount. The environment is \mmc{ehablower}.}
+
+\descitem{U!x!Nz015z015n!x!E!=N=n!V}{HPhantom}{Converts its contents to a horizontal phantom. Intended for incremental spacing purposes, for example with \ehglyphb{z015}. The environment is \mmc{ehabphantomh}.}
+
+
+\descitem{UD!x!EOz015oE!x!FE!=O=o!V}{VPhantom}{Converts its contents to a vertical phantom. Intended for incremental spacing purposes, for example with \ehglyphb{z015}. The environment is \mmc{ehabphantomv}.}
+
+\descitem{URg001rE!=R=r!V}{Larger}{Scales the contents up to \mmi{ehablargersc}, initially \ehablargersc\ times. The environment is \mmc{ehablarger}.}
+
+
+%\descitem{URg001rE!=R=r!V}{Larger}{Scales the contents up to \mmi{ehablargersc}, initially \ehablargersc\ times. The environment is \mmc{ehablarger}.}
+
+
+\descitem{UAmacronq003amacrong001E!Amacronamacron!V}{BottomLeft}{Positions a glyph, \mmi{a}, with scale of \mmi{ehabblsc}, initially \ehabblsc, and raising it by \mmi{ehabblraise}, initially \ehabblraise. The following glyph, \mmi{B\/}, outside the environment, is kerned by \mmi{ehabblkern} amount, initially \ehabblkern: \ehglyph{Amacron!=a!amacron!=B!}. The environment is \mmc{ehabbottomleft}.}
+
 
 \end{document}
