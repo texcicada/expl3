@@ -579,17 +579,21 @@
 \noindent\Fbox
 \bgroup}{\egroup}
 
+
+\newcommand\ehabtabcolspec{c}
 \newenvironment{ehabtabular}{%
-\noindent\adjustbox{tabular=c}
+\noindent\adjustbox{tabular=\ehabtabcolspec}
 \bgroup}{\egroup}
 
 
+\newcommand\ehabstackspec{cc}
 \newenvironment{ehabstack}{%
-\noindent\adjustbox{stack=cc}%, margin*=0pt 1ex 0pt 0pt}
+\noindent\adjustbox{stack=cc,}%\ehabstackspec}%, margin*=0pt 1ex 0pt 0pt}
 \bgroup}{\egroup}
 
+\newcommand\ehabstackbspec{cb}
 \newenvironment{ehabstackb}{%
-\noindent\adjustbox{stack=cb}%, margin*=0pt 1ex 0pt 0pt}
+\noindent\adjustbox{stack=cb,}%\ehabstackbspec}%, margin*=0pt 1ex 0pt 0pt}
 \bgroup}{\egroup}
 
 
@@ -3063,6 +3067,7 @@ aa;225
 %2304;2431;Devanagari
 ,5760;5788;Ogham
 %,8216;8223;quotes
+,8594;8594;arrows
 }
 %
 \mfsloadaseq[ancient]{list5digits}{
@@ -3098,6 +3103,7 @@ Lycian=lycian
 ,Cypriot Syllabary=cypriotsyllabary
 ,Mandaic=mandaic
 ,Ogham=ogham
+,arrows=arrows
 ,Avestan=avestan
 ,Egyptian Hieroglyphs=egyptianhieroglyphs
 ,Linear A=lineara
@@ -3121,6 +3127,7 @@ lycian=Noto Sans Lycian
 ,lydian=Noto Sans Lydian
 ,latin=Noto Serif
 ,anatolian=Noto Sans Anatolian Hieroglyphs
+,arrows=Noto Sans Symbol
 ,carian=Noto Sans Carian
 ,cypriotsyllabary=Noto Sans Cypriot
 ,egyptianhieroglyphs=Noto Sans Egyptian Hieroglyphs
@@ -3180,6 +3187,9 @@ lycian=Colour;blue-Scale;1.2
 256;300;latin
 }
 %
+\mfsloadaseq[ancienteh]{list4digits}{
+8594;8594;arrows
+}
 %
 \mfsloadaseq[ancienteh]{list5digits}{
 77824;78894;Egyptian Hieroglyphs
@@ -3191,11 +3201,13 @@ lycian=Colour;blue-Scale;1.2
 space=egyptianhieroglyphs
 ,latin=latinx
 ,Egyptian Hieroglyphs=egyptianhieroglyphs
+,arrows=arrowsx
 }
 
 \mfsloadaprop[ancienteh]{blockset2font}{
 egyptianhieroglyphs=Noto Sans Egyptian Hieroglyphs
 ,latinx=Noto Serif
+,arrowsx=Noto Sans Symbols
 }
 
 \mfsloadaprop[ancienteh]{blockset2fontoptions}{
@@ -6016,6 +6028,7 @@ a001;77824
 ,abreve;259
 ,ehnop;383 % long s: ſ
 ,ehexclam;384 % ƀ
+,ehrarrow;8594
 }\mfssortaseq[ancient]{egytran}{<}
 
 
@@ -6597,6 +6610,38 @@ egyptianhieroglyphs=Scale;1.2
 }
 
 
+\newcommand\ehglyph[1]{%
+\nftrtext[ancienteh][ancient]{egytran}{#1}}
+%
+\newcommand\ehglyphb[1]{%
+\ehglyph{#1} (#1)}
+
+%
+\newcommand\descitem[3]{%
+\bigskip\noindent\begin{tabular}{cl}
+\begin{tabular}[t]{c}
+\fbox{%
+\begin{minipage}[][][c]{4em}
+\begin{center}
+\nftrtext[ancienteh][ancient]{egytran}{#1}
+\end{center}
+\end{minipage}
+}
+\\
+\ttfamily
+#2
+\end{tabular}
+& 
+\begin{minipage}{0.6\textwidth}
+#3
+\end{minipage}
+ \\
+\end{tabular}
+}
+
+
+
+
 
 %===============================================================
 \begin{document}
@@ -7103,13 +7148,51 @@ k
 %\fegyh
 %\𓀀
 
+\paragraph{Transliteration Scheme}
+
+{
 \small
 \printtrscheme[ancient][ancient]{egytran}{egyptianhieroglyphs}[5]
+}
+
+
+\bigskip
+\paragraph{Basic Layout Metacommands}
+
+\bigskip
+\subparagraph{Stacking} 
+Tabulation can be done by stacking (when in horizontal runs), or by placing glyphs horizontally adjacent to each other (when in vertical runs).
+
+{
+\descitem{U!x!Ag001Bg001C!x!E!=A=B=C!V}{Tabular}{A one-column centre-aligned tabular, with column specification of \mmi{ehabtabcolspec}, initially \ehabtabcolspec, stacks items row by row. The \ehglyph{!=A!} metacommand begins the tabular, and \ehglyph{!=C!} ends it, while \ehglyph{!=B!} marks the end of each row: \ehglyphb{An001Bx001C}. The environment is \mmc{ehabtabular}.}
+}
+
+{
+\descitem{D!x!Dg001Eg001F!x!E!=D=E=F!F}{ShrtStack}{A vertically and horizontally centre-aligned short stack, with column specification 
+hard-coded as \ehabstackspec,
+%of \mmi{ehabstackspec}, initially \ehabstackspec, 
+stacks items row by row. The \ehglyph{!=D!} metacommand begins the short stack, and \ehglyph{!=F!} ends it, while \ehglyph{!=E!} marks the end of each row: \ehglyphb{Dn001Ex001F}. The environment is \mmc{ehabstack}.}
+}
+%\ehglyphb{Dn001Ex001F}
+
+{
+\descitem{U!x!Ug001Eg001V!x!E!=U=E=V!V}{StackB}{A vertically bottom-aligned and horizontally centre-aligned short stack, with column specification 
+hard-coded as \ehabstackbspec,
+%of \mmi{ehabstackbspec}, initially \ehabstackbspec,
+ stacks items row by row. The \ehglyph{!=U!} metacommand begins the short stack, and \ehglyph{!=V!} ends it, while \ehglyph{!=E!} marks the end of each row: \ehglyphb{Un001Ex001V}. The environment is \mmc{ehabstackb}.}
+}
+%\ehglyphb{Un001Ex001V}
 
 
 
+
+\bigskip
+\subparagraph{Transformations}
+Scaling, mirroring and position-shifts are transformtions that can be done with metacommands.
+
+\bigskip
+\bigskip
 \ExplSyntaxOn
-
 \nftrtext[ancienteh][ancient]{egytran}{
 
 UGg001gE!=G=g!Vb
@@ -7136,35 +7219,6 @@ Vb
 U	g001Ă	x001ă E ! 	Abreve abreve ! Vb
 }
 \ExplSyntaxOff
-
-\newcommand\ehglyph[1]{%
-\nftrtext[ancienteh][ancient]{egytran}{#1}}
-%
-\newcommand\ehglyphb[1]{%
-\ehglyph{#1} (#1)}
-
-%
-\newcommand\descitem[3]{%
-\bigskip\noindent\begin{tabular}{cl}
-\begin{tabular}[t]{c}
-\fbox{%
-\begin{minipage}[][][c]{4em}
-\begin{center}
-\nftrtext[ancienteh][ancient]{egytran}{#1}
-\end{center}
-\end{minipage}
-}
-\\
-\ttfamily
-#2
-\end{tabular}
-& 
-\begin{minipage}{0.6\textwidth}
-#3
-\end{minipage}
- \\
-\end{tabular}
-}
 
 %\noindent\begin{tabular}{cl}
 %\begin{tabular}[t]{c}
@@ -7222,7 +7276,47 @@ U	g001Ă	x001ă E ! 	Abreve abreve ! Vb
 %\ehglyph{!ehexclam=t=e=x=tehexclam!}
 
 
-\descitem{Ua001!text!a001E!ehexclamtextehexclam!V}{TextMode}{To display non-glyph text inline in a glyph stream in font \mmi{ehtranslitfont}, initially Noto Serif, small, use exclamation mark \mmi{!} as delimiter. The environment is \mmc{ehtranslit}.}
+\descitem{Ua001!text!a001E!ehexclamtextehexclam!V}{TextMode}{Displays non-glyph text inline in a glyph stream in font \mmi{ehtranslitfont}, initially Noto Serif, small. To print an exclamation mark in text mode, use \mmi{ehexclam}: \ehglyphb{!ehexclamtextehexclam!}. The environment is \mmc{ehtranslit}.}
+
+%\newcommand\Smaller[1]{\ehglyph{G#1g}}
+%\newcommand\Reflect[1]{\ehglyph{H#1h}}
+%\Smaller{a001}\Reflect{a001}
+
+
+\subparagraph{Nesting} Within a quadrat string, items may be nested.
+
+\descitem{UIIg001iiE!=II=ii!V}{}{Double frame}
+
+\descitem{UKIRRHg001hrrikE!KIRRH!E!hrrik!V}{}{Cartouche, frame, larger, larger, reflected.}
+
+
+\subparagraph{Adjustments} 
+x
+
+
+\descitem{!=a!}{Par}{New paragraph:
+ \ehglyph{GGGg001g001gggaGGGg001g001ggg}}
+
+
+\descitem{!=b!}{Space}{Insert a space:
+ \ehglyph{GGGg001g001gggbGGGg001g001ggg}}
+ 
+ 
+\descitem{!=c!}{-}{Unassigned}
+
+\descitem{!=d!}{BigKern}{Insert a bigkern:
+ \ehglyph{g001x001b!>!bg001dx001}}
+% \ehglyph{g001dx001}
+
+\descitem{!=e!}{MedKern}{Insert a medkern:
+ \ehglyph{g001x001b!>!bg001ex001}}
+
+
+\descitem{!=f!}{SmallKern}{Insert a smallkern:
+ \ehglyph{g001x001b!>!bg001fx001}}
+
+
+
 
 
 \end{document}
