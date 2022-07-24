@@ -983,7 +983,7 @@
 									}
 					       }
 					{ c } { 
-					        
+					       \textcolor{red} 
 					       }
 					{ D } { 
 										\ehabstack 
@@ -7314,6 +7314,61 @@ x
 
 \descitem{!=f!}{SmallKern}{Insert a smallkern:
  \ehglyph{g001x001b!>!bg001fx001}}
+
+\descitem{!=u!}{ThinV}{Insert a thinvspace:\par
+ \ehglyphb{Ag001Bx001Cb!>!bAg001uBx001C}}
+
+
+\descitem{!=v!}{NegThinV}{Insert a negthinvspace:\par
+ \ehglyphb{Ag001Bx001Cb!>!bAg001vBx001C}}
+
+
+%a
+%i010i009n035d054b
+%a
+%
+%A Ā M A GGi009gg B GGLn035lgg C m ā C d
+%i010 
+
+\subparagraph{Example} 
+
+\ExplSyntaxOn
+\ehglyph{i010i009n035d054b}
+\ExplSyntaxOff
+becomes
+\ExplSyntaxOn
+\ehglyph{
+A 
+	Ā 
+		M 
+			A 
+				GG i009 gg 
+			B 
+				GG L n035 l gg 
+			C 
+		m 
+	ā 
+C 
+d
+i010 
+d054
+}
+\ExplSyntaxOff
+
+Shrink (\ehglyph{!GG..gg!}) both \ehglyph{i009} and \ehglyph{n035}: \ehglyph{i010GGi009ggGGn035ggd054}.
+
+Put them into a table (\ehglyph{!A..B..C!}): \ehglyph{i010AGGi009ggBGGn035ggCd054}.
+
+Attach the table to \ehglyph{i010} as bottom left (\ehglyph{!Amacron..amacron!}): \ehglyph{AmacronAGGi009ggBGGn035ggCamacroni010d054}.
+
+Raise \ehglyph{n035} a touch (\ehglyph{!L..l!}): \ehglyph{AmacronAGGi009ggBGGLn035lggCamacroni010d054}.
+
+Kern into the table (\ehglyph{!..d..!}): \ehglyph{AmacronAGGi009ggBGGLn035lggCamacrondi010d054}.
+
+Lower the attached table a touch (\ehglyph{!M..m!}): \ehglyph{MAmacronAGGi009ggBGGLn035lggCamacronmdi010d054}.
+
+Put the attached table into its own table (\ehglyph{!A..C!}) for some tiny spacing: \ehglyph{AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010d054}.
+
 
 
 
