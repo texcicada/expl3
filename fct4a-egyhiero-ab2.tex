@@ -6630,6 +6630,7 @@ egyptianhieroglyphs=Scale;1.2
 \mfsloadaprop[ancient]{egyvocab}{
 dfn=AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010
 ,walk=d054
+,utchef=g043AMAmacronAGGi009ggCamacronmCdi010LGGGd054gggl
 %,x=y
 }
 
@@ -6642,6 +6643,22 @@ dfn=AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010
 %
 \NewDocumentCommand { \ehglyphb } { m } {
 \ehglyph{#1} (#1)
+}
+
+%
+
+\NewDocumentCommand { \ehvb } { o m } {
+	\IfValueTF { #1 }
+	{
+	\ehvocab {#2} ~ ( #2: ~ \textit {#1} )
+	}
+	{
+	\ehvocab {#2} ~ (#2)
+	}
+}%
+
+\NewDocumentCommand { \ehv } { m } {
+	\ehvocab {#1}
 }
 %
 \tl_new:N \l_fc_kvalue_tl
@@ -7386,22 +7403,22 @@ x
  
 \descitem{!=c!}{-}{Unassigned}
 
-\descitem{!=d!}{BigKern}{Insert a bigkern:
+\descitem{!=d!}{BigKern}{Insert a bigkern (-0.8em):
  \ehglyph{g001x001b!>!bg001dx001}}
 % \ehglyph{g001dx001}
 
-\descitem{!=e!}{MedKern}{Insert a medkern:
+\descitem{!=e!}{MedKern}{Insert a medkern (-0.5em):
  \ehglyph{g001x001b!>!bg001ex001}}
 
 
-\descitem{!=f!}{SmallKern}{Insert a smallkern:
+\descitem{!=f!}{SmallKern}{Insert a smallkern (-0.2em):
  \ehglyph{g001x001b!>!bg001fx001}}
 
-\descitem{!=u!}{ThinV}{Insert a thinvspace:\par
+\descitem{!=u!}{ThinV}{Insert a thinvspace (0.2em):\par
  \ehglyphb{Ag001Bx001Cb!>!bAg001uBx001C}}
 
 
-\descitem{!=v!}{NegThinV}{Insert a negthinvspace:\par
+\descitem{!=v!}{NegThinV}{Insert a negthinvspace (-0.2em):\par
  \ehglyphb{Ag001Bx001Cb!>!bAg001vBx001C}}
 
 
@@ -7453,8 +7470,11 @@ Put the attached table into its own table (\ehglyph{!A..C!}) for some tiny spaci
 
 
 %\ehvocab{x}
-\ehvocab{dfn}
-\ehvocab{walk}
+\subparagraph{Vocabulary} 
+\ehvb{dfn}
+\ehvb{walk}
+\ehvb[to tarry, to delay]{utchef}
+
 
 
 
