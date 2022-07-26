@@ -558,8 +558,9 @@
 \noindent\Colorbox{blue!20}
 \bgroup}{\egroup}
 
-\newenvironment{mytextcol}{%
-\noindent\color{blue}
+\newcommand\ehtextcolourspec{blue}
+\newenvironment{ehabtextcolour}{%
+\noindent\adjustbox{color=\ehtextcolourspec,}%\noindent\color{blue}
 \bgroup}{\egroup}
 
 
@@ -983,7 +984,7 @@
 									}
 					       }
 					{ c } { 
-					       \textcolor{red} 
+%					       \color{red} 
 					       }
 					{ D } { 
 										\ehabstack 
@@ -1112,6 +1113,12 @@
 					 { ă }  { %ă
 					       \endehabtopright
 					       }										       
+					 { Ą }  {
+					       \ehabtextcolour
+					       }
+					{ ą }  {
+					       \endehabtextcolour
+					       }
 					 { ſ }  { 
 					       \ehnop
 					       }										       					       
@@ -1299,6 +1306,12 @@
 					 ă  { 
 					       \endehabtopright
 					       }										       
+					 { Ą }  {
+					       \ehabtextcolour
+					       }
+					{ ą }  {
+					       \endehabtextcolour
+					       }
 					 ſ  { 
 					       \ehnop
 					       }										       					       
@@ -6026,6 +6039,8 @@ a001;77824
 ,amacron;257
 ,Abreve;258
 ,abreve;259
+,Aogonek;260
+,aogonek;261
 ,ehnop;383 % long s: ſ
 ,ehexclam;384 % ƀ
 ,ehrarrow;8594
@@ -6610,11 +6625,73 @@ egyptianhieroglyphs=Scale;1.2
 }
 
 
-\newcommand\ehglyph[1]{%
-\nftrtext[ancienteh][ancient]{egytran}{#1}}
+
+
+\mfsloadaprop[ancient]{egyvocab}{
+dfn=AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010
+,walk=d054
+%,x=y
+}
+
+\ExplSyntaxOn
+
 %
-\newcommand\ehglyphb[1]{%
-\ehglyph{#1} (#1)}
+\NewDocumentCommand { \ehglyph } { m } {
+\nftrtext[ancienteh][ancient]{egytran}{#1}
+}
+%
+\NewDocumentCommand { \ehglyphb } { m } {
+\ehglyph{#1} (#1)
+}
+%
+\tl_new:N \l_fc_kvalue_tl
+\NewDocumentCommand { \ehvocab } { m } {
+%  #1
+	\tl_set:Nn \l_tmpa_tl { #1 }
+	\exp_args:Nx
+	\ehglyph
+			{ 
+				\prop_item:cn 	
+						{ g_fc_rwe ancient egyvocab _prop }
+						{ #1 }
+			}%\tl_use:N \l_tmpa_tl } }
+%	\tl_clear:N \l_fc_kvalue_tl 
+
+%							\tl_show:N \l_tmpa_tl
+%				\exp_args:Nxx
+%					\prop_get:cnN
+%							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+%							{ \g_fc_myblocksetname_tl }
+%							\g_fc_myfontname_tl
+%%					\prop_show:c
+%%							{ g_fc_rwe ancient egyvocab _prop }
+%			\exp_args:Nnx
+%%%					\prop_get:cVNTF
+%%%							{ g_fc_rwe ancient egyvocab _prop }
+%%%						 \l_tmpa_tl 
+%%%							\l_fc_kvalue_tl 
+%%%							{ %T
+%%%							\tl_show:N \l_fc_kvalue_tl 
+%%%							\ehglyph {	\tl_use:N \l_fc_kvalue_tl }
+%%%		}
+%%%		{ %F
+%%%		  [\textcolor{red}{x \l_tmpa_tl x}]
+%%%		}	
+}
+
+\ExplSyntaxOff
+
+
+
+
+
+
+%
+%\newcommand\ehglyph[1]{%
+%\nftrtext[ancienteh][ancient]{egytran}{#1}}
+%
+%\newcommand\ehglyphb[1]{%
+%	\ehglyph{#1} (#1)}
 
 %
 \newcommand\descitem[3]{%
@@ -7167,20 +7244,20 @@ Tabulation can be done by stacking (when in horizontal runs), or by placing glyp
 \descitem{U!x!Ag001Bg001C!x!E!=A=B=C!V}{Tabular}{A one-column centre-aligned tabular, with column specification of \mmi{ehabtabcolspec}, initially \ehabtabcolspec, stacks items row by row. The \ehglyph{!=A!} metacommand begins the tabular, and \ehglyph{!=C!} ends it, while \ehglyph{!=B!} marks the end of each row: \ehglyphb{An001Bx001C}. The environment is \mmc{ehabtabular}.}
 }
 
-{
+
 \descitem{D!x!Dg001Eg001F!x!E!=D=E=F!F}{ShrtStack}{A vertically and horizontally centre-aligned short stack, with column specification 
 hard-coded as \ehabstackspec,
 %of \mmi{ehabstackspec}, initially \ehabstackspec, 
 stacks items row by row. The \ehglyph{!=D!} metacommand begins the short stack, and \ehglyph{!=F!} ends it, while \ehglyph{!=E!} marks the end of each row: \ehglyphb{Dn001Ex001F}. The environment is \mmc{ehabstack}.}
-}
+
 %\ehglyphb{Dn001Ex001F}
 
-{
+
 \descitem{U!x!Ug001Eg001V!x!E!=U=E=V!V}{StackB}{A vertically bottom-aligned and horizontally centre-aligned short stack, with column specification 
 hard-coded as \ehabstackbspec,
 %of \mmi{ehabstackbspec}, initially \ehabstackbspec,
  stacks items row by row. The \ehglyph{!=U!} metacommand begins the short stack, and \ehglyph{!=V!} ends it, while \ehglyph{!=E!} marks the end of each row: \ehglyphb{Un001Ex001V}. The environment is \mmc{ehabstackb}.}
-}
+
 %\ehglyphb{Un001Ex001V}
 
 
@@ -7273,6 +7350,11 @@ U	g001Ă	x001ă E ! 	Abreve abreve ! Vb
 
 \descitem{Ug001Abrevex001abreveE!Abreveabreve!V}{TopRight}{Positions a glyph, \mmi{b}, with scale of \mmi{ehabtrsc}, initially \ehabtrsc, and raising it by \mmi{ehabtrraise}, initially \ehabtrraise\ and kerns the environment onto the preceding glyph, \mmi{A}, by \mmi{ehabtrkern} amount, initially \ehabtrkern: \ehglyph{!=A!Abreve!=b!abreve}. The environment is \mmc{ehabtopright}.}
 
+\descitem{UAogonekg001aogonekE!Aogonekaogonek!V}{Colour}{Colours its contents with \mmi{ehtextcolourspec}, initially set to \ehtextcolourspec. The environment is \mmc{ehabtextcolour}.}
+
+
+
+
 %\ehglyph{!ehexclam=t=e=x=tehexclam!}
 
 
@@ -7355,22 +7437,24 @@ d054
 }
 \ExplSyntaxOff
 
-Shrink (\ehglyph{!GG..gg!}) both \ehglyph{i009} and \ehglyph{n035}: \ehglyph{i010GGi009ggGGn035ggd054}.
+Shrink (\ehglyph{!GG..gg!}) both \ehglyph{i009} and \ehglyph{n035}:  \dotfill\ehglyph{i010GGi009ggGGn035ggd054}.
 
-Put them into a table (\ehglyph{!A..B..C!}): \ehglyph{i010AGGi009ggBGGn035ggCd054}.
+Put them into a table (\ehglyph{!A..B..C!}): \dotfill \ehglyph{i010AGGi009ggBGGn035ggCd054}.
 
-Attach the table to \ehglyph{i010} as bottom left (\ehglyph{!Amacron..amacron!}): \ehglyph{AmacronAGGi009ggBGGn035ggCamacroni010d054}.
+Attach the table to \ehglyph{i010} as bottom left (\ehglyph{!Amacron..amacron!}): \dotfill \ehglyph{AmacronAGGi009ggBGGn035ggCamacroni010d054}.
 
-Raise \ehglyph{n035} a touch (\ehglyph{!L..l!}): \ehglyph{AmacronAGGi009ggBGGLn035lggCamacroni010d054}.
+Raise \ehglyph{n035} a touch (\ehglyph{!L..l!}): \dotfill \ehglyph{AmacronAGGi009ggBGGLn035lggCamacroni010d054}.
 
-Kern into the table (\ehglyph{!..d..!}): \ehglyph{AmacronAGGi009ggBGGLn035lggCamacrondi010d054}.
+Kern into the table (\ehglyph{!..d..!}): \dotfill \ehglyph{AmacronAGGi009ggBGGLn035lggCamacrondi010d054}.
 
-Lower the attached table a touch (\ehglyph{!M..m!}): \ehglyph{MAmacronAGGi009ggBGGLn035lggCamacronmdi010d054}.
+Lower the attached table a touch (\ehglyph{!M..m!}): \dotfill \ehglyph{MAmacronAGGi009ggBGGLn035lggCamacronmdi010d054}.
 
-Put the attached table into its own table (\ehglyph{!A..C!}) for some tiny spacing: \ehglyph{AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010d054}.
+Put the attached table into its own table (\ehglyph{!A..C!}) for some tiny spacing: \dotfill \ehglyph{AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010d054}.
 
 
-
+%\ehvocab{x}
+\ehvocab{dfn}
+\ehvocab{walk}
 
 
 
