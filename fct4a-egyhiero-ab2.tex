@@ -6630,12 +6630,23 @@ egyptianhieroglyphs=Scale;1.2
 \mfsloadaprop[ancient]{egyvocab}{
 dfn=AMAmacronAGGi009ggBGGLn035lggCamacronmCdi010
 ,walk=d054
-,utchef=g043AMAmacronAGGi009ggCamacronmCdi010LGGGd054gggl
+,utchef=Aogonekg043AMAmacronAGGi009ggCamacronmCdi010aogonekLGGGd054gggl
+,-u=g043
+,-tchef=AMAmacronAGGi009ggCamacronmCdi010
+,-walk=LGGGd054gggl
 %,x=y
 }
 
 \ExplSyntaxOn
 
+%
+\NewDocumentCommand { \ehg } { m } {
+\ehglyph{#1}
+}
+%
+\NewDocumentCommand { \ehgb } { m } {
+\ehglyphb{#1}
+}
 %
 \NewDocumentCommand { \ehglyph } { m } {
 \nftrtext[ancienteh][ancient]{egytran}{#1}
@@ -7473,9 +7484,15 @@ Put the attached table into its own table (\ehglyph{!A..C!}) for some tiny spaci
 \subparagraph{Vocabulary} 
 \ehvb{dfn}
 \ehvb{walk}
-\ehvb[to tarry, to delay]{utchef}
 
+\paragraph{\ehvb[to tarry, to delay]{utchef}}
+=
+\ehvb{-u}+\ehvb{-tchef}+\ehvb{-walk}
 
-
+.heru-.teshr
+Red Horus
+the planet Mars
+\ehg{g005g028ALGGGn014gggluC};
+\ehg{g005Abrevez015abrevebLGGGA-dBn037auCggglALGGGn014gggluC}
 
 \end{document}
