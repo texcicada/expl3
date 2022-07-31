@@ -1,0 +1,3591 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\usepackage{multicol}
+\usepackage{xparse}
+\usepackage{realboxes}
+\pagecolor{brown!5}
+\usepackage{adjustbox}
+\usepackage{pgfcalendar}
+
+
+
+\newfontfamily\nsd{Noto Serif Devanagari}[Script=Devanagari,Renderer=HarfBuzz]
+\newfontfamily\nsl{Noto Sans Lycian}[Renderer=HarfBuzz]
+\newfontfamily\ns{Noto Serif}
+
+%\newcommand\𓀀{𓀀𓀀𓀀$∁∂∃∰∀$}
+\newfontface\fegyh{Noto Sans Egyptian Hieroglyphs}
+%...............................................................................................
+\ExplSyntaxOn
+
+
+		\cs_generate_variant:Nn 
+			\seq_set_split:Nnn 
+			{ cno }
+
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ cno }
+
+	\cs_generate_variant:Nn 
+			\tl_count_tokens:n 
+			{ V }
+
+	\cs_generate_variant:Nn 
+			\tl_greplace_all:Nnn
+			{ Nxx }
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn
+			{ Nxx }
+
+	\cs_generate_variant:Nn 
+			\tl_replace_all:Nnn
+			{ Nvv }
+
+	\cs_generate_variant:Nn 
+			\regex_replace_all:nnN
+			{ xxN }
+
+%	\cs_generate_variant:Nn 
+%		\tl_case:NnF 
+%			{ VnF }
+		
+%	\cs_generate_variant:Nn 
+%			\tl_case:NnF 
+%			{ NxF }
+
+	\cs_generate_variant:Nn 
+			\tl_set:Nn 
+			{ Nv }
+
+%	\cs_generate_variant:Nn 
+%			\tl_set:Nn 
+%			{ Ne }
+
+%	\cs_generate_variant:Nn 
+%			\tl_use:N
+%			{ V }
+
+
+
+%	\cs_generate_variant:Nn 
+%			\tl_show:N
+%			{ V }
+
+
+	\seq_new:N 
+			\l_fc_rweq_seq
+	\seq_new:N 
+			\l_fc_rweqz_seq
+	\seq_new:N 
+			\l_fc_rweqy_seq
+	\tl_new:N 
+			\l_fc_rweqz_tl
+	\seq_new:N 
+			\l_fc_rweqyy_seq
+	\int_new:N 
+			\l_fc_rweqz_int
+	\int_new:N 
+			\l_fc_rweqy_int
+
+	\tl_new:N 
+			\g_fc_rwenamespace_tl
+
+	\tl_gset:Nn 
+			\g_fc_rwenamespace_tl
+			{mfs}
+
+	\tl_new:N 
+			\l_fc_rwenamespacea_tl
+	\tl_new:N 
+			\l_fc_rwenamespaceb_tl
+	\tl_new:N 
+			\l_fc_rwenamespacec_tl
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_samplerprint:n #1 {
+	% 1=character
+%	\exp_args:Nnx
+	\ftext[noto]{#1} ~ %\-
+}
+%------------------
+	\cs_set:Npn \fc_sampler:n #1 {
+	% 1=character number
+	\exp_args:Nx
+	\fc_samplerprint:n {\Uchar #1}
+}
+
+\tl_new:N \l_tmpc_tl
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcunderline:n #1 {
+	% 1=character
+
+%	\int_set:Nn \l_tmpa_int { 32 }
+%	\bool_if:nTF
+%	{
+%		\int_compare_p:n { `\#1  = 32 }
+%	}
+%\tl_set:Nn \l_tmpc_tl { \c_space_token }
+%	\if_charcode:w { #1 }{\c_space_token }  
+\tl_if_blank:eTF
+		{ #1 }
+		{
+		\tl_set:Nn \l_tmpc_tl { \c_space_token }
+		}
+%	else:
+	{
+		\tl_set:Nn \l_tmpc_tl {
+				#1 
+				\llap {
+				\g_tmpa_tl
+				}
+		}
+%	\fi:
+	}
+%	\tl_show:N \l_tmpc_tl
+	\tl_use:N \l_tmpc_tl	
+}
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseq:cn #1#2 { % 1=seq, 2=order (<:descending, >:ascending) 
+	\seq_sort:cn  { #1 } %\l_fc_rweq_seq 
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\tl_count_tokens:V 
+								\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\tl_count_tokens:V 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseqnumgen:cnn #1#2#3 { 
+	% 1=seq, 
+	% 2=order (<:descending, >:ascending) 
+	% 3=sort field
+	\seq_sort:cn  { #1 } %  
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{ #3 } 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{ #3 } 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \ic_funcsortseqnum:cn #1#2 { % 1=seq, 2=order (<:descending, >:ascending) 
+	\seq_sort:cn  { #1 } % A;B are both numbers 
+		{
+			\seq_clear:N 
+					\l_fc_rweqz_seq 
+			\seq_clear:N 
+					\l_fc_rweqy_seq 
+			\seq_set_split:Nnn 
+					\l_fc_rweqz_seq 
+					{ ; } 
+					{ ##1 }
+			\seq_set_split:Nnn 
+					\l_fc_rweqy_seq 
+					{ ; } 
+					{ ##2 }
+			\tl_set:Nx 
+					\l_fc_rweqz_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqz_seq 
+								{1} 
+					}
+			\tl_set:Nx 
+					\l_fc_rweqy_tl 
+					{ 
+						\seq_item:Nn 
+								\l_fc_rweqy_seq 
+								{1} 
+					}
+
+			\int_set:Nn 
+					\l_fc_rweqz_int 
+					{ 
+						\l_fc_rweqz_tl 
+					}
+			\int_set:Nn 
+					\l_fc_rweqy_int 
+					{ 
+						\l_fc_rweqy_tl 
+					}
+			\int_compare:nNnTF 
+					{ \l_fc_rweqz_int } { #2 } { \l_fc_rweqy_int }
+					{ \sort_return_swapped: }
+					{ \sort_return_same: }
+		}
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfsloadaseq } { o m +m } { % 1=seq name, 2=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			}
+	\seq_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+	\seq_gset_split:cno 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ , } 
+			{ #3 }
+
+%	\seq_show:c 
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfsloadaprop } { o m +m } { % 1=NS, 2=prop name, 3=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop }
+			{ \prop_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			}
+	\prop_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+	\prop_gset_from_keyval:cn 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _prop } 
+			{ #3 }
+
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfssortaseq } { o m m } { %1=seqname, 2=><, asc/desc
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+\ic_funcsortseq:cn { g_fc_rwe \g_fc_namespace_tl #2 _seq } { #3 }
+
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \mfssortaseqnum } { o m m } { %1=seqname, 2=><, asc/desc
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+\ic_funcsortseqnum:cn { g_fc_rwe \g_fc_namespace_tl #2 _seq } { #3 }
+}
+
+
+
+
+
+
+
+
+
+
+\seq_new:N \g_fc_current_seq
+\seq_new:N \g_fc_currentb_seq
+\tl_new:N \g_fc_current_tl
+\tl_new:N \l_fc_currentb_tl
+\seq_new:N \g_fc_fontsn_seq
+\seq_new:N \g_fc_fontln_seq
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Meta
+\NewDocumentCommand \mm { s m } { % 1=run, 2=token liat
+\str_set:Nn \l_tmpa_str { #2 }
+ { \ttfamily\small\str_use:N \l_tmpa_str }
+	\IfBooleanTF { #1 } { \space $\mapsto$ \space #2 } { }
+
+}
+%-------------------- MetaC
+\NewDocumentCommand \mmc { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { { \ttfamily\color{brown} \mm{#1} } }
+\tl_use:N \l_tmpa_tl
+
+}
+
+%-------------------- MetaO
+\NewDocumentCommand \mmo { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { [ \mmi { #1 } ] }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaM
+\NewDocumentCommand \mmm { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { \{ \mmi { #1 } \} }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaI
+\NewDocumentCommand \mmi { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { $\langle$ { \itshape #1 } $\rangle$  }
+\tl_use:N \l_tmpa_tl
+
+}
+
+
+%-------------------- MetaV
+\NewDocumentCommand \mmv { m } { % 1 = text
+\tl_set:Nn \l_tmpa_tl { \textquotedblleft \texttt {  #1 } \textquotedblright  }
+\tl_use:N \l_tmpa_tl
+
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Vars
+\tl_new:N \g_fc_ftext_tl
+\int_new:N \g_fc_glyphcode_int
+\tl_new:N \g_fc_glyphcode_tl
+\int_new:N \g_fc_numdigits_int
+\tl_new:N \g_fc_numdigits_tl
+
+\tl_new:N \g_fc_myblockname_tl    % for lookup
+\tl_new:N \g_fc_myblocksetname_tl % for lookup; will become font switch
+\tl_new:N \g_fc_myfontname_tl
+\tl_new:N \g_fc_prevblocksetname_tl
+%---
+\tl_new:N \g_fc_trtext_tl
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Functions
+
+%------------------
+	\cs_set:Npn \fc_funcprinttrscheme:n #1 {
+% 1=item: string (tr); number (glyphcode)
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+
+
+		\tl_set:Nx \l_tmpa_tl % the tr
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpb_tl % the glyphcode
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+		% print
+%		\space
+		\par\noindent
+		\tl_use:N \l_tmpa_tl
+		\space
+		=
+		\space
+		{ 
+%%				\cs_if_free:cT
+%%					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+%%					{ X
+%%						\exp_args:Nxx
+%%							\newfontfamily
+%%							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+%%							{ \tl_use:N \g_fc_myfontname_tl }
+%%					}
+			\int_set:Nn \l_tmpa_int { \tl_use:N \l_tmpb_tl }
+			\int_compare:nNnTF 
+					{ \l_tmpa_int }  > { 77823 }
+					{ \use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } 
+					\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl
+					}
+					{ \use:c { ns } 
+					\color{red} \Uchar \tl_use:N \l_tmpb_tl
+					}
+					
+%				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+
+%			\large \color{blue} \Uchar \tl_use:N \l_tmpb_tl
+			 }
+%%		,
+
+
+
+
+
+
+
+
+
+%		\ftext{}		
+}
+\newenvironment{myss}{%
+\noindent\Parbox[c]{1.5em}
+\bgroup\small}{\egroup}
+
+\newenvironment{mycolb}{%
+\noindent\Colorbox{blue!20}
+\bgroup}{\egroup}
+
+\newcommand\ehtextcolourspec{blue}
+\newenvironment{ehabtextcolour}{%
+\noindent\adjustbox{color=\ehtextcolourspec,}%\noindent\color{blue}
+\bgroup}{\egroup}
+
+
+\newenvironment{myreflb}{%
+\noindent\Reflectbox
+\bgroup}{\egroup}
+
+\newenvironment{myscaleb}{%
+\noindent\Scalebox{0.6}
+\bgroup}{\egroup}
+
+\newenvironment{myraiseb}{%
+\noindent\Raisebox{0.6ex}
+\bgroup}{\egroup}
+
+\newenvironment{myframeb}{%
+\noindent\Fbox
+\bgroup}{\egroup}
+
+
+\newcommand\ehabtabcolspec{c}
+\newenvironment{ehabtabular}{%
+\noindent\adjustbox{tabular=\ehabtabcolspec}
+\bgroup}{\egroup}
+
+
+\newcommand\ehabstackspec{cc}
+\newenvironment{ehabstack}{%
+\noindent\adjustbox{stack=cc,}%\ehabstackspec}%, margin*=0pt 1ex 0pt 0pt}
+\bgroup}{\egroup}
+
+\newcommand\ehabstackbspec{cb}
+\newenvironment{ehabstackb}{%
+\noindent\adjustbox{stack=cb,}%\ehabstackbspec}%, margin*=0pt 1ex 0pt 0pt}
+\bgroup}{\egroup}
+
+
+
+\newcommand\ehabscalesc{0.8}
+\newenvironment{ehabscale}{%
+\noindent\adjustbox{scale=\ehabscalesc}
+\bgroup}{\egroup}
+
+\newcommand\ehablargersc{1.2}
+\newenvironment{ehablarger}{%
+\noindent\adjustbox{scale=\ehablargersc}
+\bgroup}{\egroup}
+
+\newenvironment{ehabreflect}{%
+\noindent\adjustbox{reflect}
+\bgroup}{\egroup}
+
+
+\newcommand\ehabframebg{blue!5}
+\newenvironment{ehabframe}{%
+\noindent\adjustbox{fbox,bgcolor=\ehabframebg}
+\bgroup}{\egroup}
+
+\newcommand\ehabcframecol{blue}
+\newenvironment{ehabcframe}{%
+\noindent\adjustbox{cframe=\ehabcframecol}
+\bgroup}{\egroup}
+
+\newcommand\ehabrndframecol{red}
+\newcommand\ehabrndframesep{3pt}
+\newcommand\ehabrndframernd{4}
+\newcommand\ehabrndframebg{yellow!21!red!3}
+\newenvironment{ehabrndframe}{%
+\noindent\adjustbox{rndframe={color={\ehabrndframecol}, sep={\ehabrndframesep}}{\ehabrndframernd} ,bgcolor=\ehabrndframebg}
+\bgroup}{\egroup}
+
+\newcommand\ehraiseoptions{}
+\newcommand\ehraisepre{}
+\newcommand\ehraisepost{}
+\newcommand\ehraiseamount{0.8ex}
+\newenvironment{ehabraise}{%
+\noindent\adjustbox{raise=\ehraiseamount,\ehraiseoptions}
+\bgroup\ehraisepre}{\ehraisepost\egroup}
+
+
+%\newenvironment{ehablower}{%
+%\noindent\adjustbox{raise=-0.4ex}
+%\bgroup}{\egroup}
+
+\newcommand\ehloweroptions{}
+\newcommand\ehlowerpre{}
+\newcommand\ehlowerpost{}
+\newcommand\ehloweramount{-0.4ex}
+\newenvironment{ehablower}{%
+\noindent\adjustbox{raise=\ehloweramount,\ehloweroptions}
+\bgroup\ehlowerpre}{\ehlowerpost\egroup}
+
+
+\newenvironment{ehabphantomh}{%
+\noindent\adjustbox{phantom=h}
+\bgroup}{\egroup}
+
+\newenvironment{ehabphantomv}{%
+\noindent\adjustbox{phantom=v}
+\bgroup}{\egroup}
+
+
+\newenvironment{ehdisplay}{%
+\noindent\begin{quotation}\noindent
+}{\end{quotation}}
+
+
+
+\newcommand\ehtranslitfont{\ns\small}
+\newenvironment{ehtranslit}{%manually
+\bgroup
+\ehtranslitfont
+%\usefont{T1}{lmr}{m}{n}
+\strut
+}{\egroup}
+
+
+\newcommand\ehbottomleftoptions{}
+\newcommand\ehbottomleftpre{}
+\newcommand\ehbottomleftpost{}
+\newcommand\ehabblsc{0.72}
+\newcommand\ehabblraise{0.32ex}
+\newcommand\ehabblkern{-0.4ex}
+\newenvironment{ehabbottomleft}{%
+\noindent\adjustbox{scale=\ehabblsc,raise=\ehabblraise,\ehbottomleftoptions}
+\bgroup\ehbottomleftpre}{\ehbottomleftpost\egroup\kern\ehabblkern}
+%\adjustbox{scale=0.5,raise=0.5ex}{ooo}\kern-1.2exX
+
+\newcommand\ehtoprightoptions{}
+\newcommand\ehtoprightpre{}
+\newcommand\ehtoprightpost{}
+\newcommand\ehabtrsc{0.42}
+\newcommand\ehabtrraise{1.2ex}
+\newcommand\ehabtrkern{-0.6ex}
+\newenvironment{ehabtopright}{%
+\noindent\kern\ehabtrkern\adjustbox{scale=\ehabtrsc,raise=\ehabtrraise,\ehtoprightoptions}
+\bgroup\ehtoprightpre}{\ehtoprightpost\egroup}
+
+
+
+\newcommand\bigkern{\kern-0.8em}
+\newcommand\medkern{\kern-0.5em}
+\newcommand\smallkern{\kern-0.2em}
+\newcommand\ehnop{}
+\newcommand\thinvspace{\vspace{0.2em}}
+\newcommand\negthinvspace{\vspace{-0.2em}}
+
+
+\newcommand\ehexclam{!}
+
+
+
+
+%\newcommand\xxa{}
+\newenvironment{ehtransliterate}{%[1]{%auto
+%\def\xxa{#1}
+}{}%{\trbtext[ancient]{egy2tran}{\xxa}}
+
+%%\usepackage{environ}
+%%%\NewEnviron{foo}[1]{\BODY\ #1}
+%%\NewEnviron{ehtransliterate}{\trbtext[ancient]{egy2tran}{\BODY}}
+%\def\openbox#1{\setbox#1=\hbox\bgroup}
+%\def\closebox#1{\egroup\box#1}
+
+\tl_new:N \l_tmpzz_tl
+%\NewDocumentEnvironment { ehtransliterate } { +b } {
+%\tl_set:Nx \l_tmpzz_tl {#1}
+%} { \trbtext[ancient]{egy2tran}{\tl_use:N \l_tmpzz_tl} }
+
+
+
+
+
+\NewDocumentEnvironment { mysstack } { +b } {
+%					        \shortstack[c]
+%					        {#1}
+%\noindent\Makebox
+%\bgroup #1
+%#1
+					        }
+					        { 
+%					        \egroup 
+					        }
+
+
+
+
+
+
+%------------------
+	\cs_set:Npn \fc_functransliterate:n #1 { 
+	% 1=item: from-to
+
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+
+
+		\tl_set:Nx \l_tmpa_tl
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpb_tl
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+%\tl_show:N \l_tmpa_tl
+%\tl_show:N \l_tmpb_tl
+
+%\exp_args:Nxx
+	\tl_greplace_all:Nxx
+			\g_fc_trtext_tl
+			{
+				\tl_use:N \l_tmpa_tl
+			}
+			{
+				\Uchar
+				 \tl_use:N \l_tmpb_tl
+				 
+			}
+	
+%	\tl_show:N
+%			\g_fc_trtext_tl
+
+}
+
+
+
+
+
+
+\tl_new:N \l_tmpcc_tl
+\tl_new:N \l_tmpdd_tl
+%------------------
+	\cs_set:Npn \fc_functransliterateb:n #1 { 
+	% 1=item: from-to
+
+   \tl_set:Nx
+   	\l_tmpa_tl
+   	{
+				#1
+		}
+	\seq_set_split:NnV 
+			\l_tmpa_seq 
+			{ ; } 
+			\l_tmpa_tl
+
+
+		\tl_set:Nx \l_tmpcc_tl
+		{ 
+   		\seq_item:Nn
+				\l_tmpa_seq 
+				{ 1 }
+		 } 
+		 
+		\tl_set:Nx \l_tmpdd_tl
+		{
+   		\seq_item:Nn
+				\l_tmpa_seq 
+				{ 2 }
+		 } 
+
+
+	\tl_greplace_all:Nxx
+			\g_fc_trbtext_tl
+			{
+				\tl_use:N \l_tmpcc_tl
+			}
+			{
+				
+				 \tl_use:N \l_tmpdd_tl
+				 
+			}
+	
+%	\tl_show:N
+%			\g_fc_trtext_tl
+
+}
+
+
+
+
+
+
+\tl_new:N \l_eh_codeA_tl
+\tl_set:Nn \l_eh_codeA_tl { A }
+\tl_new:N \l_tmpĀ_tl
+\tl_gset:Nn \l_tmpĀ_tl { Ā }
+\tl_new:N \l_tmpā_tl
+\tl_gset:Nn \l_tmpā_tl { ā }
+%------------------
+	\cs_set:Npn \fc_funcquadrats:n #1 { 
+	% 1=token
+		\tl_set:Nn \l_tmpa_tl { #1 }
+		\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
+						\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\l_tmpb_tl
+%\tl_show:N \l_tmpa_tl
+%\tl_show:N \l_tmpb_tl
+%%		\str_if_eq:NNTF \l_tmpĀ_tl \l_tmpa_tl { T } { ^^^^^^013000 }
+%		\tl_show:N \l_tmpa_tl
+%		\tl_show:N \l_tmpĀ_tl
+%		\tl_set:NV \l_eh_codeA_tl  \l_tmpa_tl  
+%		\tl_set:NV  \l_tmpa_tl  \l_eh_codeA_tl 
+%%		\tl_show:N \l_tmpa_tl
+%		\tl_set:Nx \l_eh_codeA_tl { \l_tmpa_tl }
+%%\exp_args:Nx
+%		\tl_case:NnF %\str_case_e:nnF 
+%			 \l_tmpa_tl 
+%   set state:
+		\str_case_e:nn
+			 { \l_tmpb_tl }
+%		\tl_case:Nn
+%			  \l_tmpa_tl 
+			{
+%					{ T }  { % process text
+%						\bool_gset_true:N
+%								\g_fc_ehtextmode_bool	
+%								}
+%					{ t }  { % process text finish
+%						\bool_gset_false:N
+%								\g_fc_ehtextmode_bool	
+%								}
+					{ ! } { 
+						\bool_if:NTF
+								\g_fc_ehtextmode_bool	
+								{ 
+					       \endehtranslit
+					       \group_end:
+										\bool_gset_false:N
+									  		\g_fc_ehtextmode_bool	
+					       }
+								{ 
+					       \group_begin:
+					       \ehtranslit
+										\bool_gset_true:N
+									  		\g_fc_ehtextmode_bool	
+					       }
+					   }					
+      }
+%				{} %F case
+
+						\bool_if:NTF
+								\g_fc_ehtextmode_bool	
+								{ 
+										\str_case_e:nnF 
+			 									{ \l_tmpa_tl }
+			 									{
+			 									{!}{}
+%			 										{ ƀ } { ! }
+			 									}
+											{
+										\str_case_e:nnF 
+			 									{ \l_tmpa_tl }
+			 									{
+
+			 										{ ƀ } { ! }
+			 									}
+											{
+											\l_tmpa_tl 
+											}
+											}
+								}
+								
+								{ 
+		\str_case_e:nnF 
+			 { \l_tmpb_tl }
+			{
+			{!}{}
+%					{ ƀ } { ! }
+					{ A }  { 
+						\bool_if:NF
+								\g_fc_ehtextmode_bool	
+								{ 
+					        \group_begin:
+					        \setlength{\tabcolsep}{1pt}
+					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{adjustbox}{tabular=[c]{@{}c@{}}}
+					        \begin{adjustbox}{tabular=[c]{c}}
+					        }
+					       }
+					{ a } { 
+%%										\tex_leavevmode:D
+%					        \c_space_token
+%					        \tex_par:D
+					        \mode_leave_vertical:
+					        \tex_par:D
+					       }
+					{ B } { 
+						\bool_if:NF
+								\g_fc_ehtextmode_bool	
+								{ 
+								       \\
+								       }
+					       }
+					{ b } { 
+%					        \mode_leave_vertical:
+%					        \tex_space:D
+					        \c_space_token
+					       }
+					{ C } { 
+						\bool_if:NF
+								\g_fc_ehtextmode_bool	
+								{ 
+					        \end{adjustbox}
+					        \group_end:
+									}
+					       }
+					{ c } { 
+%					       \color{red} 
+					       }
+					{ D } { 
+										\ehabstack 
+										}
+					{ d } { 
+										\bigkern 
+										}										
+					{ E } { 
+					        \\%[-1.0ex]
+					       }
+					{ e } { 
+										\medkern 
+										}										
+					{ F } { 
+					        \endehabstack
+					       }
+					{ f } { 
+										\smallkern 
+										}										
+					{ G } { 
+					       \ehabscale
+					       }
+					{ g } { 
+					       \endehabscale
+					       }
+					{ H } { 
+					       \ehabreflect
+					       }
+					{ h } { 
+					       \endehabreflect
+					       }
+					{ I } { 
+					       \ehabframe
+					       }
+					{ i } { 
+					       \endehabframe
+					       }
+					{ J } { 
+					       \ehabcframe
+					       }
+					{ j } { 
+					       \endehabcframe
+					       }					
+					{ K } { 
+					       \ehabrndframe
+					       }
+					{ k } { 
+					       \endehabrndframe
+					       }
+					{ L } { 
+					       \ehabraise
+					       }
+					{ l } { 
+					       \endehabraise
+					       }
+					{ M } { 
+					       \ehablower
+					       }
+					{ m } { 
+					       \endehablower
+					       }
+					{ N } { 
+					       \ehabphantomh
+					       }
+					{ n } { 
+					       \endehabphantomh
+					       }
+					{ O } { 
+					       \ehabphantomv
+					       }
+					{ o } { 
+					       \endehabphantomv
+					       }
+					{ Q } { 
+					       \ehdisplay
+					       }
+					{ q } { 
+					       \endehdisplay
+					       }					       
+					{ R } { 
+					       \ehablarger
+					       }
+					{ r } { 
+					       \endehablarger
+					       }					       					       
+%%					{ T } { 
+%%										\bool_gset_true:N
+%%									  		\g_fc_ehtextmode_bool	
+%%										\group_begin:
+%%					       \ehtranslit
+%%					       
+%%					       }
+%					{ t } { 
+%					       \endehtranslit
+%					       \group_end:
+%										\bool_gset_false:N
+%									  		\g_fc_ehtextmode_bool	
+%					       }					
+					{ U } { 
+										\ehabstackb 
+										}
+					{ u } { 
+										\thinvspace 
+										}										
+					{ V } { 
+					        \endehabstackb
+					       }
+					{ v } { 
+										\negthinvspace 
+										}										
+%					{ W } { 
+%					       \ehtransliterate
+%					       					       }
+%					{ w } { 
+%					       \endehtransliterate
+%					       }					
+					 { \l_tmpĀ_tl }  { %Ā ^^^^0100
+					       \ehabbottomleft
+					       					       }
+					 { \l_tmpā_tl }  {  %ā ^^^^0101
+					       \endehabbottomleft
+					       }										       
+					 { Ă }  { %Ă
+					       \ehabtopright
+					       					       }
+					 { ă }  { %ă
+					       \endehabtopright
+					       }										       
+					 { Ą }  {
+					       \ehabtextcolour
+					       }
+					{ ą }  {
+					       \endehabtextcolour
+					       }
+					 { ſ }  { 
+					       \ehnop
+					       }										       					       
+					 { 🀴 }  {  % space placeholder
+					       \l_tmpa_tl % space/catcode
+					       }										       					       
+%						{ 🁤 } { \ehexclam }
+			}
+%			{%T
+%				%
+%			}
+			{%F
+%						\regex_replace_all:nnN
+%						{ 🀴 }
+%						{ \c{c_space_token} }
+%						\l_tmpb_tl
+						
+						\l_tmpa_tl
+			}% end case
+			}% end F bool: in ehtextmode?
+}
+
+
+
+
+%----------------------
+	\cs_set:Npn \fc_funcquadratstl:n #1 { 
+	% 1=token
+		\tl_set:Nn \l_tmpa_tl { #1 }
+%		\tl_set:NV \l_eh_codeA_tl  \l_tmpa_tl  
+%		\tl_set:NV  \l_tmpa_tl  \l_eh_codeA_tl 
+%		\tl_show:N \l_tmpa_tl
+%		\tl_set:Nx \l_eh_codeA_tl { \l_tmpa_tl }
+\exp_args:Nx
+		\tl_case:NnF 
+			{ \tl_use:N \l_tmpa_tl }
+			{
+					{ A }  { 
+					        \group_begin:
+					        \setlength{\tabcolsep}{1pt}
+					        \renewcommand{\arraystretch}{0.6}
+					        \begin{adjustbox}{tabular=[c]{c}}
+%					        \begin{adjustbox}{tabular=[c]{@{}c@{}}}
+					       }
+					{ a } { 
+					        \tex_par:D
+					       }
+					{ B } { 
+					        \\
+					       }
+					{ b } { 
+					        \tex_space:D
+					       }
+					{ C } { 
+%					        \group_begin:
+%					        \setlength{\tabcolsep}{1pt}
+%					        \renewcommand{\arraystretch}{0.6}
+%					        \begin{tabular}[c]{c}
+%%					        #1
+%					        \\
+%%					        #2
+					        \end{adjustbox}
+					        \group_end:
+					       }
+					{ c } { 
+					        
+					       }
+					{ D } { 
+										\ehabstack 
+										}
+					{ d } { 
+										\bigkern 
+										}										
+					{ E } { 
+					        \\%[-1.0ex]
+					       }
+					{ e } { 
+										\medkern 
+										}										
+					{ F } { 
+					        \endehabstack
+					       }
+					{ f } { 
+										\smallkern 
+										}										
+					{ G } { 
+					       \ehabscale
+					       }
+					{ g } { 
+					       \endehabscale
+					       }
+					{ H } { 
+					       \ehabreflect
+					       }
+					{ h } { 
+					       \endehabreflect
+					       }
+					{ I } { 
+					       \ehabframe
+					       }
+					{ i } { 
+					       \endehabframe
+					       }
+					{ J } { 
+					       \ehabcframe
+					       }
+					{ j } { 
+					       \endehabcframe
+					       }					
+					{ K } { 
+					       \ehabrndframe
+					       }
+					{ k } { 
+					       \endehabrndframe
+					       }
+					{ L } { 
+					       \ehabraise
+					       }
+					{ l } { 
+					       \endehabraise
+					       }
+					{ M } { 
+					       \ehablower
+					       }
+					{ m } { 
+					       \endehablower
+					       }
+					{ N } { 
+					       \ehabphantomh
+					       }
+					{ n } { 
+					       \endehabphantomh
+					       }
+					{ O } { 
+					       \ehabphantomv
+					       }
+					{ o } { 
+					       \endehabphantomv
+					       }
+					{ Q } { 
+					       \ehdisplay
+					       }
+					{ q } { 
+					       \endehdisplay
+					       }					       
+					{ R } { 
+					       \ehablarger
+					       }
+					{ r } { 
+					       \endehablarger
+					       }					       					       
+					{ T } { 
+					       \ehtranslit
+					       }
+					{ t } { 
+					       \endehtranslit
+					       }					
+					{ U } { 
+										\ehabstackb 
+										}
+					{ u } { 
+										\thinvspace 
+										}										
+					{ V } { 
+					        \endehabstackb
+					       }
+					{ v } { 
+										\negthinvspace 
+										}										
+%					{ W } { 
+%					       \ehtransliterate
+%					       					       }
+%					{ w } { 
+%					       \endehtransliterate
+%					       }					
+%						{ z } { \ehexclam }
+					 Ā  { \ehabbottomleft
+					       					       }
+					 ā  { 
+					       \endehabbottomleft
+					       }										       
+					 Ă  { 
+					       \ehabtopright
+					       					       }
+					 ă  { 
+					       \endehabtopright
+					       }										       
+					 { Ą }  {
+					       \ehabtextcolour
+					       }
+					{ ą }  {
+					       \endehabtextcolour
+					       }
+					 ſ  { 
+					       \ehnop
+					       }										       					       
+%						{ ƀ } { ! } %{ 🁤 } { \ehexclam }
+			}
+%			{%T
+%				%
+%			}
+			{%F
+				\l_tmpa_tl%
+			}%
+}
+
+
+
+
+
+
+
+%\tl_new:N \l_fc_output_tl
+%------------------
+	\cs_set:Npn \fc_funcappplyfont:n #1 { 
+	% 1=text
+%	\tl_if_single_token:nTF { #1 } {
+			\int_gset:Nn 
+					\g_fc_glyphcode_int
+					{ `#1 }
+
+%			\int_show:N
+%					\g_fc_glyphcode_int
+								
+			\tl_gset:NV 
+					\g_fc_glyphcode_tl
+					\g_fc_glyphcode_int
+
+			\tl_gset:Nx
+					\g_fc_numdigits_tl
+					{ 
+						\tl_count_tokens:V 
+								\g_fc_glyphcode_tl 
+					}
+
+%			\seq_show:c
+%					{ g_fc_rwe 
+%					  list
+%					  \tl_use:N
+%					  		\g_fc_namespace_tl 
+%					  \tl_use:N 
+%					  		\g_fc_numdigits_tl
+%					  digits
+%					   _seq } 
+
+%\exp_args:Nx
+%					  \tl_show:N 
+%					  		\g_fc_glyphcode_tl
+%
+%					  \tl_show:N 
+%					  		\g_fc_numdigits_tl
+
+			\seq_map_function:cN 
+					{ g_fc_rwe 
+					  \tl_use:N
+					  		\g_fc_namespace_tl 
+					  list
+					  \tl_use:N 
+					  		\g_fc_numdigits_tl
+					  digits
+					   _seq } 
+					\fc_funcgetblock:n 
+
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+\int_case:nnF { \g_fc_glyphcode_int }
+{
+	{ `\僜 } { \par }
+	{ 127026 } { \itshape }
+	{ 127027 } { \upshape }
+	{ 127028 } { \c_space_token }
+	{ 127029 } { \c_space_token }
+	{ 127030 } { \bfseries }
+	{ 127031 } { \mdseries }
+	{ 127032 } { \hashtag }
+	{ 127033 } { \\ }
+}
+{ 
+
+	\bool_if:NTF
+		\g_fc_mirror_bool
+		{ 
+			\reflectbox{
+			\symbol{
+					\int_use:N 
+						 \g_fc_glyphcode_int 
+					}
+			}
+		}%T
+		{ 
+%%			\symbol{
+%%%			\int_compare:nNnTF 
+%%%					{ \g_fc_glyphcode_int } { > } { 60000 }
+%%%					{ 
+%%%%						\tl_set:Nx \l_fc_output_tl
+%%%%						{
+%\int_show:N \g_fc_glyphcode_int
+						\Uchar
+									\int_use:N 
+								 \g_fc_glyphcode_int 
+%%%%								 }
+%%%%								 \tl_use:N \l_fc_output_tl
+%%%					 }% end T
+%%%					{ 
+%%%					^^^^0100
+%%%%%%					 ^^^^	\int_to_hex:n	 { \g_fc_glyphcode_int  }
+%%%%%						\tl_set:Nx \l_fc_output_tl
+%%%%%						{
+%%%%%%						 ^^^^	\int_to_hex:n	 { \g_fc_glyphcode_int  }
+%%%%%						\Uchar
+%%%%%									\int_use:N 
+%%%%%								 \g_fc_glyphcode_int 
+%%%%%								 }
+%%%%%								 \tl_show:N \l_fc_output_tl
+%%%%%								 \tl_use:N \l_fc_output_tl
+%%% 					}
+%%%
+%%%%					}
+		}%F
+
+
+	}  
+%			}%end put right
+%}{ F:\use:n #1 }
+ 					
+}
+
+%------------------
+	\cs_set:Npn \fc_funcappplyfontb:n #1 { 
+	% 1=text
+%	\tl_if_single_token:nTF { #1 } {
+			\int_gset:Nn 
+					\g_fc_glyphcode_int
+					{ `#1 }
+			
+			\tl_gset:NV 
+					\g_fc_glyphcode_tl
+					\g_fc_glyphcode_int
+
+			\tl_gset:Nn 
+					\g_fc_numdigits_tl
+					{ 
+						\tl_count_tokens:V 
+								\g_fc_glyphcode_tl 
+					}
+
+%			\seq_show:c
+%					{ g_fc_rwe 
+%					  list
+%					  \tl_use:N
+%					  		\g_fc_namespace_tl 
+%					  \tl_use:N 
+%					  		\g_fc_numdigits_tl
+%					  digits
+%					   _seq } 
+
+			\seq_map_function:cN 
+					{ g_fc_rwe 
+					  \tl_use:N
+					  		\g_fc_namespace_tl 
+					  list
+					  \tl_use:N 
+					  		\g_fc_numdigits_tl
+					  digits
+					   _seq } 
+					\fc_funcgetblock:n 
+
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+\int_case:nnF { \g_fc_glyphcode_int }
+{
+	{ `\僜 } { \par }
+	{ 127026 } { \itshape }
+	{ 127027 } { \upshape }
+	{ 127028 } { \c_space_token }
+	{ 127029 } { \c_space_token }
+	{ 127030 } { \bfseries }
+	{ 127031 } { \mdseries }
+	{ 127032 } { \hashtag }
+	{ 127033 } { \\ }
+}
+{ 
+
+%	\bool_if:NTF
+%		\g_fc_mirror_bool
+%		{ 
+%			\reflectbox{
+%			\symbol{
+%					\int_use:N 
+%						 \g_fc_glyphcode_int 
+%					}
+%			}
+%		}%T
+%		{ 
+%			\symbol{
+%					\int_use:N 
+%						 \g_fc_glyphcode_int 
+%					}
+%		}%F
+%
+
+	}  
+%			}%end put right
+%}{ F:\use:n #1 }
+ 					
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcgetblock:n #1 { 
+	% 1=seq item
+
+
+   \tl_gset:Nx
+   	\g_fc_current_tl
+   	{
+				#1
+		}
+%   \tl_show:N
+%   	\g_fc_current_tl
+
+
+
+	\seq_gset_split:NnV 
+			\g_fc_currentb_seq 
+			{ ; } 
+			\g_fc_current_tl
+%	\seq_show:N
+%			\g_fc_currentb_seq 
+
+
+		\fc_funcgetfontnameb:nn
+		{ 
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 1 }
+		 } 
+		{
+   		\seq_item:Nn
+				\g_fc_currentb_seq 
+				{ 2 }
+		 } 
+
+
+}
+
+
+\tl_new:N \g_fc_fontoptionsa_tl
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funcgetfontnameb:nn #1#2 { 
+	% 1=startcode in block range
+	% 2=finishcode in block range
+	
+	\bool_if:nT
+	{
+\int_compare_p:n { #1  <=  \g_fc_glyphcode_int }
+ &&
+\int_compare_p:n { #2 >= \g_fc_glyphcode_int }	
+	}
+	{
+	
+					\tl_set:Nn 
+							\g_fc_myblockname_tl
+							{
+%					found:
+					   		\seq_item:Nn
+									\g_fc_currentb_seq 
+									{ 3 }
+							}
+
+
+
+
+%					\prop_show:c
+%							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+			\exp_args:Nxx
+					\prop_get:cnN%TF
+							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+							{ \g_fc_myblockname_tl }
+							\g_fc_myblocksetname_tl
+%							{ T }
+%							{ F }
+
+			\exp_args:Nxx
+					\prop_get:cnN
+							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+							{ \g_fc_myblocksetname_tl }
+							\g_fc_myfontname_tl
+
+%\tl_show:N 							\g_fc_myfontname_tl
+
+
+			\exp_args:Nxx
+					\prop_get:cnNTF
+							{ g_fc_rwe \g_fc_namespace_tl blockset2fontoptions _prop }
+							{ \tl_use:N \g_fc_myblocksetname_tl }
+							\g_fc_fontoptionsa_tl
+
+							{
+%							T:
+				\regex_replace_all:nnN
+						{ \; }
+						{ \= }
+						\g_fc_fontoptionsa_tl
+				\regex_replace_all:nnN
+						{ \- }
+						{ \, }
+						\g_fc_fontoptionsa_tl
+							}{
+%							F:
+							\tl_clear:N \g_fc_fontoptionsa_tl
+							}
+
+
+%\tl_show:N\g_fc_namespace_tl\tl_show:N\g_fc_myblocksetname_tl
+
+			\tl_if_eq:NNF
+			\g_fc_prevblocksetname_tl
+			\g_fc_myblocksetname_tl
+			{
+				\cs_if_free:cT
+					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+					{ 
+						\exp_args:Nxx
+							\newfontfamily
+							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+							{ \tl_use:N \g_fc_myfontname_tl }
+							[
+								\tl_use:N \g_fc_fontoptionsa_tl		
+%								NFSSFamily = \tl_use:N \l_fc_rwenamespaceb_tl
+%								, 
+%								\l_fc_rwenamespacec_tl
+							]
+
+					}
+%\tl_gput_right:Nx 
+%					\g_fc_textout_tl
+%					{
+				\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+%}
+				\tl_set_eq:NN
+					\g_fc_prevblocksetname_tl
+					\g_fc_myblocksetname_tl
+
+     		}
+						
+					 } % if glyphcode match found
+
+}
+
+
+
+
+\bool_new:N \g_fc_mirror_bool
+\bool_new:N \g_fc_reversed_bool
+\bool_new:N \g_fc_ehtextmode_bool
+\bool_gset_false:N
+									  		\g_fc_ehtextmode_bool	
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- FTextM (mirrored)
+\NewDocumentCommand \ftextm { s o +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=text
+			\bool_set_true:N
+					\g_fc_mirror_bool
+			\tl_set:Nn 
+					\g_fc_trtext_tl 
+					{ #3 }
+%			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+
+			\bool_set_false:N
+					\g_fc_mirror_bool
+
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRFTextM (mirrored)
+\NewDocumentCommand \trftextm { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\bool_set_true:N
+					\g_fc_mirror_bool
+					
+			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+
+			\bool_set_false:N
+					\g_fc_mirror_bool
+
+}
+
+
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- PrintItemRef
+\NewDocumentCommand \printitemref { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\trtextnop[#2]{#3}{#4}
+			{ \large
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+			}
+			\textsuperscript{{\small #4}}
+			\textsubscript{{\small\scshape #3}}
+}
+
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRFText
+\NewDocumentCommand \trftext { s o m +m } { 
+%% 1=*, reverse (=RTL)
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\trtextnop[#2]{#3}{#4}
+			\IfBooleanTF { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					\ftext*
+					}
+				{ \ftext }
+			[#2]{ \tl_use:N \g_fc_trtext_tl }
+%			\tl_gset:Nx 
+%					\g_fc_trtext_tl
+%					{ #3 }
+%
+%%			\tl_show:N
+%%					\g_fc_trtext_tl
+%					
+%				\IfNoValueTF { #1 } 
+%						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+%						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #1 } }
+%%\tl_show:N \g_fc_namespace_tl
+%						
+%						
+%		\group_begin:				
+%			\exp_args:Nx
+%			\seq_map_function:cN 
+%					{ g_fc_rwe \g_fc_trbnamespace_tl #2 _seq } 
+%					\fc_functransliterate:n
+%		\group_end:
+%
+%			\tl_use:N
+%					\g_fc_trtext_tl
+%
+}
+
+
+
+
+
+
+\tl_new:N \l_fc_uregex_tl
+\tl_new:N \g_fc_namespace_tl
+
+\tl_new:N \g_fc_trbnamespace_tl
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRTextNOP
+\NewDocumentCommand \trtextnop { o m +m } { 
+%% 1=font namespace
+%% 2=translit scheme
+%% 3=text
+			\tl_gset:Nx 
+					\g_fc_trtext_tl
+					{ #3 }
+
+%			\tl_show:N
+%					\g_fc_trtext_tl
+					
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #1 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbnamespace_tl #2 _seq } 
+					\fc_functransliterate:n
+		\group_end:
+
+%			\tl_use:N
+%					\g_fc_trtext_tl
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRText
+\NewDocumentCommand \trtext { s o m +m } { 
+%% 1=*, RTL
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\tl_gset:Nx 
+					\g_fc_trtext_tl
+					{ #4 }
+
+%			\tl_show:N
+%					\g_fc_trtext_tl
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_trbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbnamespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbnamespace_tl #3 _seq } 
+					\fc_functransliterate:n
+		\group_end:
+
+			\tl_use:N
+					\g_fc_trtext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+
+}
+
+
+
+
+\tl_new:N \g_fc_trbtext_tl
+\tl_new:N \g_fc_trbbnamespace_tl
+\bool_new:N \g_fc_breversed_bool
+%****************************************************
+%*
+%****************************************************
+%-------------------- TRbText
+\NewDocumentCommand \trbtext { s o m +m } { 
+%% 1=*, RTL
+%% 2=font namespace
+%% 3=translit scheme
+%% 4=text
+			\tl_gset:Nx 
+					\g_fc_trbtext_tl
+					{ #4 }
+
+%			\tl_show:N
+%					\g_fc_trbtext_tl
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_trbbnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trbbnamespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trbtext_tl 
+					\bool_set_true:N
+						\g_fc_breversed_bool
+					}
+
+						
+		\group_begin:				
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trbbnamespace_tl #3 _seq } 
+					\fc_functransliterateb:n
+		\group_end:
+%\seq_show:c					{ g_fc_rwe \g_fc_trbbnamespace_tl #3 _seq } 
+			\tl_use:N
+					\g_fc_trbtext_tl
+
+%			\tl_show:N
+%					\g_fc_trbtext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+
+}
+
+
+
+
+%%\tl_new:N
+%%					\g_fc_textout_tl
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- FText
+\NewDocumentCommand \ftext { s o +m } { 
+% 1=* RTL arrow, 
+% 2=namespace, 
+% 3=text
+%			\exp_args:NNx
+			\tl_gset:Nx 
+					\g_fc_ftext_tl
+					{ #3 }
+
+
+
+
+
+%%			\tl_clear:N
+%%					\g_fc_ftextout_tl
+%			\tl_show:N
+%					\g_fc_ftext_tl
+
+%%			\exp_args:NNx
+%			\tl_set:Nx 
+%					\l_tmpa_tl
+%					{ \tl_use:N \g_fc_ftext_tl }
+%
+%			\tl_show:N
+%					\l_tmpa_tl
+		
+		
+		
+					
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_ftext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_ftext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_ftext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_ftext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+					\bool_if:NF
+							\g_fc_reversed_bool
+							{ \tl_reverse:N \g_fc_ftext_tl }
+				}						
+						
+		\group_begin:				
+%			\exp_args:NV
+			\tl_map_function:cN 
+					{ g_fc_ftext_tl } 
+					\fc_funcappplyfont:n
+		\group_end:
+		
+			\IfBooleanT { #1 }
+				{ 
+%					\tl_gput_right:Nn
+%						 \g_fc_textout_tl 
+%						 { 
+						 $^\leftarrow$
+%						  }
+			\bool_set_false:N
+					\g_fc_reversed_bool
+					}
+%\tl_show:N
+%					\g_fc_textout_tl		
+%%			\tl_use:N
+%%					\g_fc_textout_tl
+
+}
+
+
+
+
+
+\tl_new:N \g_fc_trnamespace_tl
+%****************************************************
+%*
+%****************************************************
+%-------------------- FTrText
+\NewDocumentCommand \ftrtext { s o o m +m } { 
+% 1=*, RTL
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfont:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+			\IfBooleanT { #1 }
+				{ 
+						 $^\leftarrow$
+				  }
+}
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- mFTrText
+\NewDocumentCommand \mftrtext { s o o m +m } { 
+% 1=*, RTL
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfontb:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+%			\IfBooleanT { #1 }
+%				{ 
+%						 $^\leftarrow$
+%				  }
+%=======================
+
+				\regex_replace_all:nnN
+						{ (.)(verts)(.) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\c{sbh} \1
+							\cE\}
+							\cB\{
+							\c{sbh} \3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(begin)(.)(hor)(.)(end) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{%
+
+							\c{hstack}
+							\cB\{
+							\4
+							\cE\}
+							\cB\{
+							\6
+							\cE\}
+
+							\cE\}%
+						 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(.)(hor)(.) }
+						{ 
+							\c{vstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{%
+
+							\c{hstack}
+							\cB\{
+							\3
+							\cE\}
+							\cB\{
+							\5
+							\cE\}
+
+							\cE\}%
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(centre) }
+						{ 
+							\c{vstackc}
+							\cB\{
+							\1
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+				\regex_replace_all:nnN
+						{ (.)(vert)(.) }
+						{ 
+							\c{sstack}
+							\cB\{
+							\c{sbh} \1
+							\cE\}
+							\cB\{
+							\c{sbh} \3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ (.)(hor)(.) }
+						{ 
+							\c{hstack}
+							\cB\{
+							\1
+							\cE\}
+							\cB\{
+							\3
+							\cE\}
+						 }
+						\g_fc_trtext_tl
+
+
+						
+						\tex_par:D
+						>>
+						\group_begin:
+							\fegyh						
+						\tl_use:N
+						\g_fc_trtext_tl
+						\group_end:
+						<<
+
+}
+
+\newcommand\vstack[2]{
+{\setlength{\tabcolsep}{1pt}\renewcommand{\arraystretch}{0.6}\begin{tabular}[c]{c}#1\\#2\\\end{tabular}}
+}
+\newcommand\hstack[2]{%
+{\setlength{\tabcolsep}{1pt}\begin{tabular}{cc}#1&#2\\\end{tabular}}
+}
+\newcommand\vstackc[1]{
+{\setlength{\tabcolsep}{1pt}\begin{tabular}[c]{c}#1\\[0.8ex]\end{tabular}}
+}
+
+\newcommand\sbh[1]{\scalebox{0.6}[0.6]{#1}}
+
+\newcommand\sstack[2]{
+\shortstack[c]{#1\\#2}
+}
+
+\newcommand\sstacku[2]{
+\raisebox{0.5ex}{\shortstack[c]{#1\\#2}}
+}
+
+
+
+
+\NewDocumentCommand \testtwo { s s m } { 
+    \IfBooleanTF{#2}
+    { true }
+    { false }
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- nFTrText
+\NewDocumentCommand \nftrtext { s s o o m +m } { 
+% 1=*, RTL
+% 2=use TL quadrats
+% 3=font namespace
+% 4=translit namespace
+% 5=translit seq
+% 6=text
+			\tl_gset:Nn 
+					\g_fc_trtext_tl
+					{ #6 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #3 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #4 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #4 } }
+
+				\regex_replace_all:nnN
+						{ excl }
+						{ 🁤 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_ftext_tl
+
+				\regex_replace_all:nnN
+						{ \c{par} }
+						{ 僜 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{itshape} }
+						{ 🀲 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{upshape} }
+						{ 🀳 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c[S](.) }
+						{ 🀴 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{space} }
+						{ 🀵 }
+						\g_fc_trtext_tl
+
+				\regex_replace_all:nnN
+						{ \c{bfseries} }
+						{ 🀶 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{mdseries} }
+						{ 🀷 }
+						\g_fc_trtext_tl
+						
+				\regex_replace_all:nnN
+						{ \c{hashtag} }
+						{ 🀸 }
+						\g_fc_trtext_tl
+						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\g_fc_trtext_tl
+
+
+
+
+%--- translit (tr)
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_trnamespace_tl #5 _seq } 
+					\fc_functransliterate:n
+%%\tl_show:N \g_fc_trtext_tl
+
+
+%--- font changer (f)
+
+%			\tl_show:N
+%					\g_fc_ftext_tl
+					
+%%				\IfNoValueTF { #1 } 
+%%						{ \tl_clear:N \g_fc_namespace_tl } 
+%%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%%%\tl_show:N \g_fc_namespace_tl
+
+%%\exp_args:Nnx
+%		\tl_set:Nn
+%				\g_fc_ftext_tl
+%				{ \g_fc_trtext_tl }
+
+%\tl_show:N \g_fc_ftext_tl
+						
+			\IfBooleanT { #1 }
+				{ 
+			\IfBooleanF { #2 }
+				{ 
+					\tl_reverse:N 
+						\g_fc_trtext_tl 
+					\bool_set_true:N
+						\g_fc_reversed_bool
+					}
+					}
+						
+						
+		\group_begin:				
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \g_fc_trtext_tl }
+					\fc_funcappplyfontb:n
+		\group_end:
+%			\tl_use:N
+%					\g_fc_ftext_tl
+
+%			\IfBooleanT { #1 }
+%				{ 
+%						 $^\leftarrow$
+%				  }
+%=======================
+%\tl_show:N \g_fc_trtext_tl 
+%\tl_use:N \g_fc_trtext_tl 
+    \IfBooleanTF{#2}
+    { 
+%		\tl_show:N \g_fc_trtext_tl
+						\group_begin:
+%							\fegyh						
+%			\exp_args:Nx
+			\tl_map_function:NN 
+					\g_fc_trtext_tl 
+					\fc_funcquadratstl:n
+%						\g_fc_trtext_tl
+						\group_end:
+    }
+    { 
+
+						\group_begin:
+							\fegyh						
+%			\exp_args:Nx
+			\tl_map_function:NN 
+					\g_fc_trtext_tl 
+					\fc_funcquadrats:n
+%						\g_fc_trtext_tl
+						\group_end:
+      }
+						
+%						\tex_par:D
+%						>>
+%						\group_begin:
+%							\fegyh						
+%						\tl_use:N
+%						\g_fc_trtext_tl
+%						\group_end:
+%						<<
+
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Print a transliteration scheme
+\NewDocumentCommand \printtrscheme { s o o m m O{6}} { 
+% 1=*, don't sort
+% 2=font namespace
+% 3=translit namespace
+% 4=translit seq
+% 5=blocksetname, for font
+% 6=number of columns
+
+			\tl_gset:Nn 
+					\g_fc_myblocksetname_tl
+					{ #5 }
+					
+%			\tl_gset:Nn 
+%					\g_fc_myfontname_tl
+%					{ #5 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #2 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #2 } }
+%\tl_show:N \g_fc_namespace_tl
+				\IfNoValueTF { #3 } 
+						{ \tl_clear:N \g_fc_trnamespace_tl } 
+						{ \tl_gset:Nn \g_fc_trnamespace_tl { #3 } }
+
+
+			\exp_args:Nxx
+					\prop_get:cnN
+							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+							{ \g_fc_myblocksetname_tl }
+							\g_fc_myfontname_tl
+
+			\seq_gset_eq:Nc
+					\g_tmpa_seq
+					{ g_fc_rwe \g_fc_trnamespace_tl #4 _seq } 
+		
+		\IfBooleanTF {#1}
+			{ }
+			{			
+			\ic_funcsortseqnumgen:cnn
+					{ g_tmpa_seq } 
+					{ > } % ascending
+					{ 2 } % sort field
+			}
+			
+				\cs_if_free:cT
+					{ ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl }
+					{ %X
+						\exp_args:Nxx
+							\newfontfamily
+							{	\use:c { ffc\g_fc_namespace_tl\g_fc_myblocksetname_tl } }
+							{ \tl_use:N \g_fc_myfontname_tl }
+					}			
+			
+			\begin{multicols}{#6}
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_tmpa_seq } 
+					\fc_funcprinttrscheme:n
+			\end{multicols}
+					
+		{ \tiny
+	~	FS ~ ns ~[ \tl_use:N \g_fc_namespace_tl ]~ 
+		TS ~ ns ~[ \tl_use:N \g_fc_trnamespace_tl ]~ 
+		TS ~ ( #4 ) ~ 
+		bsn ~[ \tl_use:N \g_fc_myblocksetname_tl ]~
+		fn ~[ \tl_use:N \g_fc_myfontname_tl ]~
+		}
+
+
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Display Sampler
+\NewDocumentCommand \sampler { m m } { 
+\int_step_function:nnnN { #1 } { 1 } { #2 } \fc_sampler:n
+}
+
+
+\tl_new:N \l_tmpu_tl
+\tl_new:N \l_tmpv_tl
+\tl_new:N \l_tmpw_tl
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Uchar Method
+\NewDocumentCommand \umethod { m m } { 
+% 1=LHS
+% 2=RHS
+
+
+
+			\tl_set:Nn 
+					\l_tmpa_tl
+					{ #1 }
+
+			\tl_set:Nn 
+					\l_tmpb_tl
+					{ #2 }
+
+			\regex_replace_all:nnN
+					{ U\+ }
+					{ ꀐ }
+					\l_tmpa_tl
+
+			\regex_replace_all:nnN
+					{ ꀐ }
+					{ \c{Uchar}" }
+					\l_tmpa_tl
+					
+			\regex_replace_all:nnN
+					{ U\+ }
+					{ ꀐ }
+					\l_tmpb_tl
+			\regex_replace_all:nnN
+					{ ꀐ }
+					{ \c{Uchar}" }
+					\l_tmpb_tl
+					
+
+			\tl_set:Nx 
+					\l_tmpv_tl 
+					{ \tl_use:N \l_tmpa_tl }
+
+			\tl_set:Nx 
+					\l_tmpw_tl 
+					{ \tl_use:N \l_tmpb_tl }
+
+			\tl_use:N
+					\l_tmpv_tl
+					\space $\mapsto$ ~
+			\tl_use:N
+					\l_tmpw_tl
+
+
+			\tl_set_eq:NN 
+					\l_tmpu_tl
+					\l_tmpv_tl
+
+			\regex_replace_all:xxN
+					{ \tl_use:N \l_tmpa_tl }
+					{ \tl_use:N \l_tmpb_tl }
+					\l_tmpu_tl
+
+			\space : \space
+			\tl_use:N
+					\l_tmpu_tl
+
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- suc
+\NewDocumentCommand \suc { m } { 
+	\int_set:Nn \l_tmpa_int { `#1 }
+	\int_use:N \l_tmpa_int
+	=
+	\int_to_Hex:n { \l_tmpa_int }
+}
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- hashtag
+\NewDocumentCommand \hashtag { } { \# }
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- transliterate
+\NewExpandableDocumentCommand \trxlk {  } { ^^^^0915 }
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%-------------------- Underliner
+\NewExpandableDocumentCommand \underliner { o m } {
+% 1=character to use as marker
+% 2=text
+ 				\IfNoValueTF { #1 } 
+						{ \tl_gset:Nn \g_tmpa_tl { _ } } 
+						{ \tl_gset:Nn \g_tmpa_tl { #1 } }
+
+			\tl_set:Nn \l_tmpa_tl { #2 }
+
+%				\regex_replace_all:nnN
+%						{ \c[S](.) }
+%						{ 🀴 }
+%						\l_tmpa_tl
+%						
+				\tl_set:Nn \l_fc_uregex_tl { \\ }		
+				\regex_replace_all:nnN
+						{ \u { l_fc_uregex_tl } }
+						{ 🀹 }
+						\l_tmpa_tl
+						
+
+
+
+		\group_begin:				
+			\ttfamily
+			\large
+			\begin{quotation}
+%			\center
+			\noindent
+			\exp_args:Nx
+			\str_map_function:nN 
+					{ \l_tmpa_tl }
+					\fc_funcunderline:n
+			\end{quotation}
+		\group_end:				
+
+}
+
+
+
+\ExplSyntaxOff
+
+%------------------------------------------------------------------------------
+
+
+
+
+
+%Data
+
+
+
+
+\newcommand\dma{^^^^092e}
+\newcommand\lsq{^^^^2018}
+\newcommand\rsq{^^^^2019}
+
+
+
+
+%===============================================================
+
+%Data - Noto
+
+\mfsloadaseq[noto]{list2digits}{
+30;99;Basic Latin
+}
+\mfsloadaseq[noto]{list3digits}{
+100;127;Basic Latin
+,128;255;Latin-1 Supplement
+,256;383;Latin Extended-A
+,384;591;Latin Extended-B
+,592;687;IPA Extensions
+,688;767;Spacing Modifier Letters
+,768;879;Combining Diacritical Marks
+,880;999;Greek and Coptic
+}
+\mfsloadaseq[noto]{list4digits}{
+1000;1023;Greek and Coptic
+,1024;1279;Cyrillic
+,1280;1327;Cyrillic Supplement
+,1328;1423;Armenian
+,1424;1535;Hebrew
+,1536;1791;Arabic
+,1792;1871;Syriac
+,1872;1919;Arabic Supplement
+,1920;1983;Thaana
+,1984;2047;NKo
+,2048;2111;Samaritan
+,2112;2143;Mandaic
+,2144;2159;Syriac Supplement
+,2160;2207;Arabic Extended-B
+,2208;2303;Arabic Extended-A
+,2304;2431;Devanagari
+,2432;2559;Bengali
+,2560;2687;Gurmukhi
+,2688;2815;Gujarati
+,2816;2943;Oriya
+,2944;3071;Tamil
+,3072;3199;Telugu
+,3200;3327;Kannada
+,3328;3455;Malayalam
+,3456;3583;Sinhala
+,3584;3711;Thai
+,3712;3839;Lao
+,3840;4095;Tibetan
+,4096;4255;Myanmar
+,4256;4351;Georgian
+,4352;4607;Hangul Jamo
+,4608;4991;Ethiopic
+,4992;5023;Ethiopic Supplement
+,5024;5119;Cherokee
+,5120;5759;Unified Canadian Aboriginal Syllabics
+,5760;5791;Ogham
+,5792;5887;Runic
+,5888;5919;Tagalog
+,5920;5951;Hanunoo
+,5952;5983;Buhid
+,5984;6015;Tagbanwa
+,6016;6143;Khmer
+,6144;6319;Mongolian
+,6320;6399;Unified Canadian Aboriginal Syllabics Extended
+,6400;6479;Limbu
+,6480;6527;Tai Le
+,6528;6623;New Tai Lue
+,6624;6655;Khmer Symbols
+,6656;6687;Buginese
+,6688;6831;Tai Tham
+,6832;6911;Combining Diacritical Marks Extended
+,6912;7039;Balinese
+,7040;7103;Sundanese
+,7104;7167;Batak
+,7168;7247;Lepcha
+,7248;7295;Ol Chiki
+,7296;7311;Cyrillic Extended-C
+,7312;7359;Georgian Extended
+,7360;7375;Sundanese Supplement
+,7376;7423;Vedic Extensions
+,7424;7551;Phonetic Extensions
+,7552;7615;Phonetic Extensions Supplement
+,7616;7679;Combining Diacritical Marks Supplement
+,7680;7935;Latin Extended Additional
+,7936;8191;Greek Extended
+,8192;8303;General Punctuation
+,8304;8351;Superscripts and Subscripts
+}
+\mfsloadaseq[noto]{list5digits}{
+11264;11359;Glagolitic
+,11360;11391;Latin Extended-C
+,11392;11519;Coptic
+,11520;11567;Georgian Supplement
+,11568;11647;Tifinagh
+,11648;11743;Ethiopic Extended
+,11744;11775;Cyrillic Extended-A
+,11776;11903;Supplemental Punctuation
+,40960;42127;Yi Syllables
+,42128;42191;Yi Radicals
+,42192;42239;Lisu
+,42240;42559;Vai
+,42560;42655;Cyrillic Extended-B
+,42656;42751;Bamum
+,42784;43007;Latin Extended-D
+,43008;43055;Syloti Nagri
+,43056;43071;Common Indic Number Forms
+,43072;43135;Phags-pa
+,43136;43231;Saurashtra
+,43232;43263;Devanagari Extended
+,43264;43311;Kayah Li
+,43312;43359;Rejang
+,43360;43391;Hangul Jamo Extended-A
+,43392;43487;Javanese
+,43488;43519;Myanmar Extended-B
+,43520;43615;Cham
+,43616;43647;Myanmar Extended-A
+,43648;43743;Tai Viet
+,43744;43775;Meetei Mayek Extensions
+,43776;43823;Ethiopic Extended-A
+,43824;43887;Latin Extended-E
+,43888;43967;Cherokee Supplement
+,43968;44031;Meetei Mayek
+,44032;55215;Hangul Syllables
+,55216;55295;Hangul Jamo Extended-B
+,64336;65023;Arabic Presentation Forms-A
+,65136;65279;Arabic Presentation Forms-B
+,65536;65663;Linear B Syllabary
+,65664;65791;Linear B Ideograms
+,65792;65855;Aegean Numbers
+,65856;65935;Ancient Greek Numbers
+,65936;65999;Ancient Symbols
+,66000;66047;Phaistos Disc
+,66176;66207;Lycian
+,66208;66271;Carian
+,66272;66303;Coptic Epact Numbers
+,66304;66351;Old Italic
+,66352;66383;Gothic
+,66384;66431;Old Permic
+,66432;66463;Ugaritic
+,66464;66527;Old Persian
+,66560;66639;Deseret
+,66640;66687;Shavian
+,66688;66735;Osmanya
+,66736;66815;Osage
+,66816;66863;Elbasan
+,66864;66927;Caucasian Albanian
+,66928;67007;Vithkuqi
+,67072;67455;Linear A
+,67456;67519;Latin Extended-F
+,67584;67647;Cypriot Syllabary
+,67648;67679;Imperial Aramaic
+,67680;67711;Palmyrene
+,67712;67759;Nabataean
+,67808;67839;Hatran
+,67840;67871;Phoenician
+,67872;67903;Lydian
+,67968;67999;Meroitic Hieroglyphs
+,68000;68095;Meroitic Cursive
+,68096;68191;Kharoshthi
+,68192;68223;Old South Arabian
+,68224;68255;Old North Arabian
+,68288;68351;Manichaean
+,68352;68415;Avestan
+,68416;68447;Inscriptional Parthian
+,68448;68479;Inscriptional Pahlavi
+,68480;68527;Psalter Pahlavi
+,68608;68687;Old Turkic
+,68736;68863;Old Hungarian
+,68864;68927;Hanifi Rohingya
+,69216;69247;Rumi Numeral Symbols
+,69248;69311;Yezidi
+,69376;69423;Old Sogdian
+,69424;69487;Sogdian
+,69488;69551;Old Uyghur
+,69552;69599;Chorasmian
+,69600;69631;Elymaic
+,69632;69759;Brahmi
+,69760;69839;Kaithi
+,69840;69887;Sora Sompeng
+,69888;69967;Chakma
+,69968;70015;Mahajani
+,70016;70111;Sharada
+,70112;70143;Sinhala Archaic Numbers
+,70144;70223;Khojki
+,70272;70319;Multani
+,70320;70399;Khudawadi
+,70400;70527;Grantha
+,70656;70783;Newa
+,70784;70879;Tirhuta
+,71040;71167;Siddham
+,71168;71263;Modi
+,71264;71295;Mongolian Supplement
+,71296;71375;Takri
+,71424;71503;Ahom
+,71680;71759;Dogra
+,71840;71935;Warang Citi
+,71936;72031;Dives Akuru
+,72096;72191;Nandinagari
+,72192;72271;Zanabazar Square
+,72272;72367;Soyombo
+,72368;72383;Unified Canadian Aboriginal Syllabics Extended-A
+,72384;72447;Pau Cin Hau
+,72704;72815;Bhaiksuki
+,72816;72895;Marchen
+,72960;73055;Masaram Gondi
+,73056;73135;Gunjala Gondi
+,73440;73471;Makasar
+,73648;73663;Lisu Supplement
+,73664;73727;Tamil Supplement
+,73728;74751;Cuneiform
+,74752;74879;Cuneiform Numbers and Punctuation
+,74880;75087;Early Dynastic Cuneiform
+,77712;77823;Cypro-Minoan
+,77824;78895;Egyptian Hieroglyphs
+,78896;78911;Egyptian Hieroglyph Format Controls
+,82944;83583;Anatolian Hieroglyphs
+,92160;92735;Bamum Supplement
+,92736;92783;Mro
+,92784;92879;Tangsa
+,92880;92927;Bassa Vah
+,92928;93071;Pahawh Hmong
+,93760;93855;Medefaidrin
+,93952;94111;Miao
+,94176;94207;Ideographic Symbols and Punctuation
+,94208;99999;Tangut
+}
+\mfsloadaseq[noto]{list6digits}{
+100000;100351;Tangut
+,100352;101119;Tangut Components
+,101120;101631;Khitan Small Script
+,101632;101759;Tangut Supplement
+
+
+
+
+,110960;111359;Nushu
+,113664;113823;Duployan
+
+
+
+
+
+
+,119552;119647;Tai Xuan Jing Symbols
+
+
+
+,122624;122879;Latin Extended-G
+,122880;122927;Glagolitic Supplement
+,123136;123215;Nyiakeng Puachue Hmong
+,123536;123583;Toto
+,123584;123647;Wancho
+,124896;124927;Ethiopic Extended-B
+,124928;125151;Mende Kikakui
+,125184;125279;Adlam
+
+
+,126464;126719;Arabic Mathematical Alphabetic Symbols
+
+}
+
+
+\mfsloadaprop[noto]{block2blockset}{
+Basic Latin=latin
+,Latin-1 Supplement=latin
+,Latin Extended-A=latin
+,Latin Extended-B=latin
+,IPA Extensions=latin
+,Spacing Modifier Letters=latin
+,Combining Diacritical Marks=latin
+,Greek and Coptic=greek
+,Cyrillic=cyrillic
+,Cyrillic Supplement=cyrillic
+,Armenian=armenian
+,Hebrew=hebrew
+,Arabic=arabic
+,Syriac=syriac
+,Arabic Supplement=arabic
+,Thaana=thaana
+,NKo=nko
+,Samaritan=samaritan
+,Mandaic=mandaic
+,Syriac Supplement=syriac
+,Arabic Extended-B=arabic
+,Arabic Extended-A=arabic
+,Devanagari=devanagari
+,Bengali=bengali
+,Gurmukhi=gurmukhi
+,Gujarati=gujarati
+,Oriya=oriya
+,Tamil=tamil
+,Telugu=telugu
+,Kannada=kannada
+,Malayalam=malayalam
+,Sinhala=sinhala
+,Thai=thai
+,Lao=lao
+,Tibetan=tibetan
+,Myanmar=myanmar
+,Georgian=georgian
+,Hangul Jamo=hangul
+,Ethiopic=ethiopic
+,Ethiopic Supplement=ethiopic
+,Cherokee=cherokee
+,Unified Canadian Aboriginal Syllabics=canadian
+,Ogham=ogham
+,Runic=runic
+,Tagalog=tagalog
+,Hanunoo=hanunoo
+,Buhid=buhid
+,Tagbanwa=tagbanwa
+,Khmer=khmer
+,Mongolian=mongolian
+,Unified Canadian Aboriginal Syllabics Extended=canadian
+,Limbu=limbu
+,Tai Le=taile
+,New Tai Lue=newtailue
+,Khmer Symbols=khmer
+,Buginese=buginese
+,Tai Tham=taitham
+,Combining Diacritical Marks Extended=latin
+,Balinese=balinese
+,Sundanese=sundanese
+,Batak=batak
+,Lepcha=lepcha
+,Ol Chiki=olchiki
+,Cyrillic Extended-C=cyrillic
+,Georgian Extended=georgian
+,Sundanese Supplement=sundanese
+,Vedic Extensions=vedic
+,Phonetic Extensions=latin
+,Phonetic Extensions Supplement=latin
+,Combining Diacritical Marks Supplement=latin
+,Latin Extended Additional=latin
+,Greek Extended=greek
+,General Punctuation=latin
+,Superscripts and Subscripts=latin
+,Glagolitic=glagolitic
+,Latin Extended-C=latin
+,Coptic=coptic
+,Georgian Supplement=georgian
+,Tifinagh=tifinagh
+,Ethiopic Extended=ethiopic
+,Cyrillic Extended-A=cyrillic
+,Supplemental Punctuation=latin
+,Yi Syllables=yi
+,Yi Radicals=yi
+,Lisu=lisu
+,Vai=vai
+,Cyrillic Extended-B=cyrillic
+,Bamum=bamum
+,Latin Extended-D=latin
+,Syloti Nagri=sylotinagri
+,Common Indic Number Forms=common
+,Phags-pa=phags-pa
+,Saurashtra=saurashtra
+,Devanagari Extended=devanagari
+,Kayah Li=kayahli
+,Rejang=rejang
+,Hangul Jamo Extended-A=hangul
+,Javanese=javanese
+,Myanmar Extended-B=myanmar
+,Cham=cham
+,Myanmar Extended-A=myanmar
+,Tai Viet=taiviet
+,Meetei Mayek Extensions=meeteimayek
+,Ethiopic Extended-A=ethiopic
+,Latin Extended-E=latin
+,Cherokee Supplement=cherokee
+,Meetei Mayek=meeteimayek
+,Hangul Syllables=hangul
+,Hangul Jamo Extended-B=hangul
+,Arabic Presentation Forms-A=arabic
+,Arabic Presentation Forms-B=arabic
+,Linear B Syllabary=linearb
+,Linear B Ideograms=linearb
+,Aegean Numbers=aegeannumbers
+,Ancient Greek Numbers=ancientgreeknumbers
+,Ancient Symbols=ancientsymbols
+,Phaistos Disc=phaistosdisc
+,Lycian=lycian
+,Carian=carian
+,Coptic Epact Numbers=coptic
+,Old Italic=olditalic
+,Gothic=gothic
+,Old Permic=oldpermic
+,Ugaritic=ugaritic
+,Old Persian=oldpersian
+,Deseret=deseret
+,Shavian=shavian
+,Osmanya=osmanya
+,Osage=osage
+,Elbasan=elbasan
+,Caucasian Albanian=caucasianalbanian
+,Vithkuqi=vithkuqi
+,Linear A=lineara
+,Latin Extended-F=latin
+,Cypriot Syllabary=cypriotsyllabary
+,Imperial Aramaic=imperialaramaic
+,Palmyrene=palmyrene
+,Nabataean=nabataean
+,Hatran=hatran
+,Phoenician=phoenician
+,Lydian=lydian
+,Meroitic Hieroglyphs=meroitic
+,Meroitic Cursive=meroitic
+,Kharoshthi=kharoshthi
+,Old South Arabian=oldsoutharabian
+,Old North Arabian=oldnortharabian
+,Manichaean=manichaean
+,Avestan=avestan
+,Inscriptional Parthian=inscriptionalparthian
+,Inscriptional Pahlavi=inscriptionalpahlavi
+,Psalter Pahlavi=psalterpahlavi
+,Old Turkic=oldturkic
+,Old Hungarian=oldhungarian
+,Hanifi Rohingya=hanifirohingya
+,Rumi Numeral Symbols=rumi
+,Yezidi=yezidi
+,Old Sogdian=oldsogdian
+,Sogdian=sogdian
+,Old Uyghur=olduyghur
+,Chorasmian=chorasmian
+,Elymaic=elymaic
+,Brahmi=brahmi
+,Kaithi=kaithi
+,Sora Sompeng=sorasompeng
+,Chakma=chakma
+,Mahajani=mahajani
+,Sharada=sharada
+,Sinhala Archaic Numbers=sinhala
+,Khojki=khojki
+,Multani=multani
+,Khudawadi=khudawadi
+,Grantha=grantha
+,Newa=newa
+,Tirhuta=tirhuta
+,Siddham=siddham
+,Modi=modi
+,Mongolian Supplement=mongolian
+,Takri=takri
+,Ahom=ahom
+,Dogra=dogra
+,Warang Citi=warangciti
+,Dives Akuru=divesakuru
+,Nandinagari=nandinagari
+,Zanabazar Square=zanabazar
+,Soyombo=soyombo
+,Unified Canadian Aboriginal Syllabics Extended-A=canadian
+,Pau Cin Hau=paucinhau
+,Bhaiksuki=bhaiksuki
+,Marchen=marchen
+,Masaram Gondi=masaramgondi
+,Gunjala Gondi=gunjalagondi
+,Makasar=makasar
+,Lisu Supplement=lisu
+,Tamil Supplement=tamil
+,Cuneiform=cuneiform
+,Cuneiform Numbers and Punctuation=cuneiform
+,Early Dynastic Cuneiform=earlydynasticcuneiform
+,Cypro-Minoan=cypro-minoan
+,Egyptian Hieroglyphs=egyptianhieroglyphs
+,Egyptian Hieroglyph Format Controls=egyptianhieroglyphs
+,Anatolian Hieroglyphs=anatolianhieroglyphs
+,Bamum Supplement=bamum
+,Mro=mro
+,Tangsa=tangsa
+,Bassa Vah=bassavah
+,Pahawh Hmong=pahawhhmong
+,Medefaidrin=medefaidrin
+,Miao=miao
+,Ideographic Symbols and Punctuation=ideographic
+,Tangut=tangut
+,Tangut Components=tangut
+,Khitan Small Script=khitan
+,Tangut Supplement=tangut
+,Nushu=nushu
+,Duployan=duployan
+,Tai Xuan Jing Symbols=taixuanjingsymbols
+,Latin Extended-G=latin
+,Glagolitic Supplement=glagolitic
+,Nyiakeng Puachue Hmong=nyiakengpuachuehmong
+,Toto=toto
+,Wancho=wancho
+,Ethiopic Extended-B=ethiopic
+,Mende Kikakui=mendekikakui
+,Adlam=adlam
+,Arabic Mathematical Alphabetic Symbols=arabic
+}
+
+\mfsloadaprop[noto]{blockset2font}{
+latin=Noto Serif
+,greek=Noto Serif
+,cyrillic=Noto Serif
+%,bamum=Noto Sans Bamum
+%,batak=Noto Sans Batak
+,adlam=NotoSansAdlam
+,anatolianhieroglyphs=NotoSansAnatolianHieroglyphs
+,arabic=NotoSansArabic
+,armenian=NotoSansArmenian
+,avestan=NotoSansAvestan
+,balinese=NotoSansBalinese
+,bamum=NotoSansBamum
+,batak=NotoSansBatak
+,bengali=NotoSansBengali
+,brahmi=NotoSansBrahmi
+,buginese=NotoSansBuginese
+,buhid=NotoSansBuhid
+,canadianaboriginal=NotoSansCanadianAboriginal
+,carian=NotoSansCarian
+,chakma=NotoSansChakma
+,cham=NotoSansCham
+,cherokee=NotoSansCherokee
+,coptic=NotoSansCoptic
+,cuneiform=NotoSansCuneiform
+,cypriot=NotoSansCypriot
+,deseret=NotoSansDeseret
+,devanagari=NotoSansDevanagari
+,egyptianhieroglyphs=NotoSansEgyptianHieroglyphs
+,elymaic=NotoSansElymaic
+,ethiopic=NotoSansEthiopic
+,georgian=NotoSansGeorgian
+,glagolitic=NotoSansGlagolitic
+,gothic=NotoSansGothic
+,grantha=NotoSansGrantha
+,gujarati=NotoSansGujarati
+,gurmukhi=NotoSansGurmukhi
+,hanunoo=NotoSansHanunoo
+,hatran=NotoSansHatran
+,hebrew=NotoSansHebrew
+,imperialaramaic=NotoSansImperialAramaic
+,inscriptionalpahlavi=NotoSansInscriptionalPahlavi
+,inscriptionalparthian=NotoSansInscriptionalParthian
+,javanese=NotoSansJavanese
+,kaithi=NotoSansKaithi
+,kannada=NotoSansKannada
+,kayahli=NotoSansKayahLi
+,kharoshthi=NotoSansKharoshthi
+,khmer=NotoSansKhmer
+,khudawadi=NotoSansKhudawadi
+,lao=NotoSansLao
+,lepcha=NotoSansLepcha
+,limbu=NotoSansLimbu
+,lineara=NotoSansLinearA
+,linearb=NotoSansLinearB
+,lisu=NotoSansLisu
+,lycian=NotoSansLycian
+,lydian=NotoSansLydian
+,malayalam=NotoSansMalayalam
+,mandaic=NotoSansMandaic
+,meeteimayek=NotoSansMeeteiMayek
+,miao=NotoSansMiao
+,modi=NotoSansModi
+,mongolian=NotoSansMongolian
+,multani=NotoSansMultani
+,myanmar=NotoSansMyanmar
+,newtailue=NotoSansNewTaiLue
+,nko=NotoSansNKo
+,nushu=NotoSansNushu
+,ogham=NotoSansOgham
+,olchiki=NotoSansOlChiki
+,olditalic=NotoSansOldItalic
+,oldpersian=NotoSansOldPersian
+,oldsogdian=NotoSansOldSogdian
+,oldsoutharabian=NotoSansOldSouthArabian
+,oldturkic=NotoSansOldTurkic
+,oriya=NotoSansOriya
+,osage=NotoSansOsage
+,osmanya=NotoSansOsmanya
+,paucinhau=NotoSansPauCinHau
+,phagspa=NotoSansPhagsPa
+,phoenician=NotoSansPhoenician
+,psalterpahlavi=NotoSansPsalterPahlavi
+,rejang=NotoSansRejang
+,runic=NotoSansRunic
+,samaritan=NotoSansSamaritan
+,saurashtra=NotoSansSaurashtra
+,sharada=NotoSansSharada
+,siddham=NotoSansSiddham
+,sinhala=NotoSansSinhala
+,sogdian=NotoSansSogdian
+,soyombo=NotoSansSoyombo
+,sundanese=NotoSansSundanese
+,sylotinagri=NotoSansSylotiNagri
+,tagalog=NotoSansTagalog
+,tagbanwa=NotoSansTagbanwa
+,taile=NotoSansTaiLe
+,taitham=NotoSansTaiTham
+,taiviet=NotoSansTaiViet
+,takri=NotoSansTakri
+,tamil=NotoSansTamil
+,telugu=NotoSansTelugu
+,thaana=NotoSansThaana
+,thai=NotoSansThai
+,tibetan=NotoSansTibetan
+,tifinagh=NotoSansTifinagh
+,ugaritic=NotoSansUgaritic
+,vai=NotoSansVai
+,wancho=NotoSansWancho
+,warangciti=NotoSansWarangCiti
+,yi=NotoSansYi
+}
+
+%\mfsloadaprop[ancient]{blockset2fontoptions}{
+%}
+
+
+
+
+%
+\newcommand\descitem[3]{%
+\bigskip\noindent\begin{tabular}{cl}
+\begin{tabular}[t]{c}
+\fbox{%
+\begin{minipage}[][][c]{4em}
+\begin{center}
+\nftrtext[ancienteh][ancient]{egytran}{#1}
+\end{center}
+\end{minipage}
+}
+\\
+\ttfamily
+#2
+\end{tabular}
+& 
+\begin{minipage}{0.6\textwidth}
+#3
+\end{minipage}
+ \\
+\end{tabular}
+}
+
+
+
+
+
+%===============================================================
+\begin{document}
+Automatic switching of fonts in scripts supported by Noto fonts.
+
+
+\ftext[noto]{ꚢꚲꛂ  abc αβγδ 123 ᯀᯁᯂᯃᯄ  ꚢꚲꛂ 123
+ ꚠꚡꚢꚣ  ꀀꀁꀂꀃꀔꀤꀵꁅꁖ
+}
+
+Sampler
+
+\sampler{40960}{41000}
+
+\sampler{77824}{77900}
+
+\sampler{43648}{43694}
+
+
+\end{document}
