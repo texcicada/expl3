@@ -7,7 +7,7 @@
 \usepackage{realboxes}
 \pagecolor{brown!5}
 \usepackage{adjustbox}
-\usepackage{pgfcalendar}
+%\usepackage{pgfcalendar}
 
 
 
@@ -105,6 +105,129 @@
 			\l_fc_rwenamespaceb_tl
 	\tl_new:N 
 			\l_fc_rwenamespacec_tl
+
+\tl_new:N \l_fc_lritem_tl
+\tl_new:N \l_fc_lritemstart_tl
+\tl_new:N \l_fc_lritemfinish_tl
+\tl_new:N \l_fc_lritemblock_tl
+\tl_new:N \l_fc_lritemblockset_tl
+\tl_new:N \l_fc_lritemfontname_tl
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Npn \fc_funclistresource:n #1 {
+			\tl_set:Nx 
+					\l_fc_lritem_tl 
+					{ 
+					  #1
+%						\seq_item:Nn 
+%								\l_fc_rweqz_seq 
+%								{1} 
+					}
+
+%%		\tl_use:N 
+%%				\l_fc_lritem_tl
+%%				
+				
+%---
+				\seq_set_split:NnV
+					\l_tmpa_seq  
+					{ ; } 
+				 \l_fc_lritem_tl 
+								
+			\tl_set:Nx 
+					\l_fc_lritemstart_tl 
+					{ 
+						\seq_item:Nn 
+								\l_tmpa_seq 
+								{ 1 } 
+					}
+								
+			\tl_set:Nx 
+					\l_fc_lritemfinish_tl 
+					{ 
+						\seq_item:Nn 
+								\l_tmpa_seq 
+								{ 2 } 
+					}
+								
+			\tl_set:Nx 
+					\l_fc_lritemblock_tl 
+					{ 
+						\seq_item:Nn 
+								\l_tmpa_seq 
+								{ 3 } 
+					}
+					
+					
+%x					
+\tex_par:D
+\noindent
+:
+\tex_space:D
+
+			\tl_use:N
+					\l_fc_lritemstart_tl 
+/				
+			\tl_use:N
+					\l_fc_lritemfinish_tl 
+/				
+			\tl_use:N
+					\l_fc_lritemblock_tl 
+%//				
+\dotfill
+
+%		\prop_if_in:cnTF 
+%							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+%							{ \l_fc_lritemblock_tl }
+%					{
+					
+			\exp_args:Nxx
+					\prop_get:cnNTF
+							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
+							{ \l_fc_lritemblock_tl }
+							\l_fc_lritemblockset_tl
+							{ % T blockset
+			\exp_args:Nxx
+					\prop_get:cnNTF
+							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
+							{ \l_fc_lritemblockset_tl }
+							\l_fc_lritemfontname_tl
+							{ % T fontname
+							 }% end T fontname
+							{ % F fontname
+									 \tl_set:Nn \l_fc_lritemfontname_tl { n/a } 
+							 }% end F fontname							
+							 }% end T blockset
+							{ \tl_set:Nn \l_fc_lritemblockset_tl { n/a } }
+
+
+%					}
+%					{
+%						\tl_set:Nn \l_fc_lritemblockset_tl { -none- }
+%						}
+						
+						
+[ 			\tl_use:N 
+								\l_fc_lritemblockset_tl       ] ~
+>>			\tl_use:N
+								\l_fc_lritemfontname_tl				<<
+
+%
+%			\tl_show:N
+%					\l_fc_lritemstart_tl 
+%			\tl_show:N
+%					\l_fc_lritemblock_tl 
+%			\tl_show:N
+%					\l_fc_lritemblockset_tl 
+%			\tl_show:N
+%					\l_fc_lritemfontname_tl 
+
+
+
+
+}
 
 
 
@@ -1349,7 +1472,7 @@
 
 
 
-
+\bool_new:N \g_fc_foundblock_bool
 %\tl_new:N \l_fc_output_tl
 %------------------
 	\cs_set:Npn \fc_funcappplyfont:n #1 { 
@@ -1389,6 +1512,8 @@
 %
 %					  \tl_show:N 
 %					  		\g_fc_numdigits_tl
+
+\bool_gset_false:N \g_fc_foundblock_bool
 
 			\seq_map_function:cN 
 					{ g_fc_rwe 
@@ -1555,6 +1680,9 @@
 	\cs_set:Npn \fc_funcgetblock:n #1 { 
 	% 1=seq item
 
+\bool_if:NF
+		\g_fc_foundblock_bool
+		{% block not found yet
 
    \tl_gset:Nx
    	\g_fc_current_tl
@@ -1586,6 +1714,7 @@
 				{ 2 }
 		 } 
 
+		}% end block not found yet
 
 }
 
@@ -1611,7 +1740,8 @@
 \int_compare_p:n { #2 >= \g_fc_glyphcode_int }	
 	}
 	{
-	
+			\bool_gset_true:N \g_fc_foundblock_bool
+			
 					\tl_set:Nn 
 							\g_fc_myblockname_tl
 							{
@@ -1627,21 +1757,20 @@
 %					\prop_show:c
 %							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
 			\exp_args:Nxx
-					\prop_get:cnN%TF
+					\prop_get:cnNTF
 							{ g_fc_rwe \g_fc_namespace_tl block2blockset _prop }
 							{ \g_fc_myblockname_tl }
 							\g_fc_myblocksetname_tl
-%							{ T }
-%							{ F }
-
+							{ %T myblocksetname
+							%---
 			\exp_args:Nxx
-					\prop_get:cnN
+					\prop_get:cnNTF
 							{ g_fc_rwe \g_fc_namespace_tl blockset2font _prop }
 							{ \g_fc_myblocksetname_tl }
 							\g_fc_myfontname_tl
-
-%\tl_show:N 							\g_fc_myfontname_tl
-
+							{ } %T fn
+							{ \tl_gset:Nn \g_fc_myfontname_tl {NotoSerif} } %F fn: default font
+							%---
 
 			\exp_args:Nxx
 					\prop_get:cnNTF
@@ -1663,9 +1792,7 @@
 %							F:
 							\tl_clear:N \g_fc_fontoptionsa_tl
 							}
-
-
-%\tl_show:N\g_fc_namespace_tl\tl_show:N\g_fc_myblocksetname_tl
+						%---
 
 			\tl_if_eq:NNF
 			\g_fc_prevblocksetname_tl
@@ -1696,6 +1823,20 @@
 					\g_fc_myblocksetname_tl
 
      		}
+							
+							
+							
+							 }%end T myblocksetname
+							{ %F 
+							\tl_gclear:N \g_fc_myblocksetname_tl
+							}
+
+
+%\tl_show:N 							\g_fc_myfontname_tl
+
+
+%\tl_show:N\g_fc_namespace_tl\tl_show:N\g_fc_myblocksetname_tl
+
 						
 					 } % if glyphcode match found
 
@@ -2683,6 +2824,31 @@
 %****************************************************
 %*
 %****************************************************
+%-------------------- List resources
+\NewDocumentCommand \listresource { o m } { 
+
+			\tl_gset:Nn 
+					\g_fc_list_tl
+					{ #2 }
+%\tl_show:N \g_fc_trtext_tl
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+			\exp_args:Nx
+			\seq_map_function:cN 
+					{ g_fc_rwe \g_fc_namespace_tl \g_fc_list_tl _seq } 
+					\fc_funclistresource:n
+
+
+}
+
+
+
+%****************************************************
+%*
+%****************************************************
 %-------------------- Print a transliteration scheme
 \NewDocumentCommand \printtrscheme { s o o m m O{6}} { 
 % 1=*, don't sort
@@ -3165,22 +3331,9 @@
 ,100352;101119;Tangut Components
 ,101120;101631;Khitan Small Script
 ,101632;101759;Tangut Supplement
-
-
-
-
 ,110960;111359;Nushu
 ,113664;113823;Duployan
-
-
-
-
-
-
 ,119552;119647;Tai Xuan Jing Symbols
-
-
-
 ,122624;122879;Latin Extended-G
 ,122880;122927;Glagolitic Supplement
 ,123136;123215;Nyiakeng Puachue Hmong
@@ -3189,10 +3342,7 @@
 ,124896;124927;Ethiopic Extended-B
 ,124928;125151;Mende Kikakui
 ,125184;125279;Adlam
-
-
 ,126464;126719;Arabic Mathematical Alphabetic Symbols
-
 }
 
 
@@ -3579,13 +3729,42 @@ Automatic switching of fonts in scripts supported by Noto fonts.
  ꚠꚡꚢꚣ  ꀀꀁꀂꀃꀔꀤꀵꁅꁖ
 }
 
-Sampler
-
+%Sampler
+%
 \sampler{40960}{41000}
 
 \sampler{77824}{77900}
 
-\sampler{43648}{43694}
+%\sampler{43648}{43694}
 
+%%\sampler{92000}{92000}
+%%
+%%
+Bamum 
+\sampler{92160}{92260}
+
+Mro
+\sampler
+{92736}{92736}
+
+\paragraph{2 digits}
+
+\listresource[noto]{list2digits}
+
+\paragraph{3 digits}
+
+\listresource[noto]{list3digits}
+
+\paragraph{4 digits}
+
+\listresource[noto]{list4digits}
+
+\paragraph{5 digits}
+
+\listresource[noto]{list5digits}
+
+\paragraph{6 digits}
+
+\listresource[noto]{list6digits}
 
 \end{document}
