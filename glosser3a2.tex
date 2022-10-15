@@ -1,0 +1,1370 @@
+\documentclass{article}
+%\usepackage{xcolor}
+\usepackage{xcolor,luacolor,lua-ul}
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+\setmonofont{Noto Sans Mono}
+%\usepackage{xparse}
+%-------------------------------------------------------------
+\include{incl-glosser3a2.tex}
+\usepackage{tikz} % before gb4e
+\usepackage{gb4e}
+%\usepackage{linguex,cgloss4e} %linguex after \include: list-definition
+%\noautomath
+
+
+%\usepackage{enumitem}
+\usepackage{etoolbox} % patch
+%\usepackage{tabularx}
+%\usepackage{calc} % widthof						
+\usepackage{lipsum}
+
+
+
+%================
+
+
+
+
+
+
+
+\begin{document}
+
+%
+%\mfsloadaseql[gloss]{ex1}{*/}{%
+%gef hundinum matinn
+%*/    gje hunden maten
+%*/    give {the dog} {the food}
+%*/    gib {dem Hunde} {das Essen}
+%}
+%
+%\squiggle
+%
+	\mfssetpreformat{}
+
+%\begin{exe}
+%    \ex
+%\mfsloadaseql[gloss]{ex2}{*/}{%
+%Auto uderzył dziecko. 
+%*/        car.nom/acc hit.3sg child.acc/nom
+%glt        `The car hit the child.' 
+%*/        car.acc hit.3sg child.nom 
+%glt        `The child hit the car.' 
+%}
+%\end{exe}
+
+
+%\begin{exe}
+%\ex
+%\glinlines*{%
+%  :space;x
+%glt   Somebody has arrived late.
+%*/    :llaphash;Ich bin schon da
+%*/    I am already there
+%glt   `I am here already.'}
+%\end{exe}
+
+\para{The \texttt{\textbackslash glinlines} macro}
+The \glcmdb{glinlines} macro provides for an unlimited number of word-for-word interlinear text/gloss lines, and an unlimited number of free-form text lines for translations, notes, etc.
+
+The macro can be used inside the linguistic example environment (\verb|exe|) of the \verb|gb4e| package, standing in place of the \glcmd{gl...} commands in some cases.
+
+\begin{verbatim}
+\begin{exe}
+\ex
+\gll Wenn jemand in die Wüste zieht ... \\
+If someone in the desert draws and lives ... \\
+\trans `if one retreats to the desert and ... '
+\end{exe}
+\end{verbatim}
+
+produces:
+
+\begin{exe}
+\ex
+\gll Wenn jemand in die Wüste zieht und ... \\
+If someone in the desert draws and lives ... \\
+\trans `if one retreats to the desert and ... '
+\end{exe}
+
+
+The \glcmdb{glinlines} equivalent is:
+
+\begin{verbatim}
+\begin{exe}
+\ex
+\glinlines{%
+       Wenn jemand in die Wüste zieht und ... 
+*/     If someone in the desert draws and  ... 
+glt    `If one retreats to the desert and ... '
+\end{exe}
+\end{verbatim}
+
+and produces:
+
+\begin{exe}
+\ex
+\glinlines{%
+       Wenn jemand in die Wüste zieht und ... 
+*/     If someone in the desert draws and  ... 
+glt    `If one retreats to the desert and ... '
+}
+\end{exe}
+
+The number of words in the text/gloss lines currently must be equal.
+
+Lines are delineated with \verb|*/| (arbitrarily chosen, can be set to some other string).
+
+Words are split out by spaces. ``they-have'' is one word, ``they have'' is two words. Braces, which have a special meaning to \TeX, can be used to group words, in effect shielding everything they contain from being seen: ``\{they have\}'' counts as one word. Because braces are eventually stripped out before printing, their presence affects the working of any attach-commands that \glcmdb{glinlines} might use.
+
+Free-form text as a translation (or any other matter) is introduced with \verb|glt| (likewise arbitrary) as the default marker.
+
+Multiple glosses are possible:
+
+
+\begin{exe}
+    \ex
+\glinlines{%
+Auto uderzył dziecko. 
+*/        car.nom hit.3sg child.acc
+glt        `The car hit the child.' % use * version of command
+*/        car.acc hit.3sg child.nom 
+glt        `The car hit the child.' / `The child hit the car.' 
+}
+\end{exe}
+
+Each text/gloss line (the word-for-word lines, WFW), can have one or more free-form text lines (FFT) attached.
+
+The unstarred version of the macro, \glcmdb{glinlines}, will print the FFT line(s) attached to the last WFW line. The starred version, \glcmdb{glinlines*}, will print all FFT lines.
+
+\begin{exe}
+    \ex
+\glinlines*{%
+Auto uderzył dziecko. 
+*/        car.nom hit.3sg child.acc
+glt        `The car hit the child.' 
+*/        car.acc hit.3sg child.nom 
+glt        `The child hit the car.' 
+}
+\end{exe}
+
+
+
+The WFW lines can hold anything, not just glossing, as long as the number of words (\glie ungrouped spaces) matches.
+
+The FFT lines likewise can contain anything, not just translations.
+
+
+\begin{exe}
+    \ex
+\glinlines{%
+gef hundinum matinn
+*/    gje hunden maten
+*/    give {the dog} {the food}
+*/    gib {dem Hunde} {das Essen}
+glt    One of the daily chores.
+}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/156066/align-glosses-in-more-than-one-language-with-gb4e}
+
+
+\squiggle
+
+
+
+The \glcmdb{glsetfirstlineformat} command will apply its contents to every word on the first line, \gleg	font, font size, font colour.
+
+To keep the spaces pristine as word-boundary markers, commands to be applied inside a line are marked with a colon (:) and suffixed to a word, \gleg \glmeta{ugrt:writing} becomes \glmeta{ugrt}\glcmd{writing}, which typesets as ``ugrt\writing''.
+
+\glsetfirstlineformat{\fug\large\color{blue}}
+\begin{exe}
+    \ex
+\glinlines{%
+𐎜𐎂𐎗𐎚 𐎖
+*/  ugrt:writing q
+*/  ʾUgarītu:speech q
+*/  Ugarit q
+glt  An ancient city in the east Mediterranean.
+glt  Also known as Ras Shamra (``head fennel'' = Cape Fennel), arabic::selectlanguage;
+
+ رأس شمرة 
+
+%english::selectlanguage; . % Arabic: رأس شمرة, literally "Cape Fennel")
+}
+\end{exe}
+\glsetfirstlineformat{}
+
+
+\squiggle
+
+\para{New line} Post-pend a plus sign (+) to the word prior to where the new line should occur, \gleg ``Mink.+'':
+
+
+\begin{exe}
+        \ex
+\glinlines{%
+ thu-mi-t-əm =kʼwa Mink.+  chichiya7-u-s =kʼwa Mink te= c'estaya.
+*/        go.ril.ctr.pass =.quot Mink grandmother.pst.3poss =.quot Mink .det= knothole
+glt        `Mink went towards it. The knothole was Mink's grandmother.'%
+%glt \ttfamily Mink+
+         }  
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/306764/breaking-line-in-gb4e}
+
+
+Switching over to italic blue for the first line.
+
+Notice the emphasized e, subscript i, \emphe\subi, inside an italic environment.
+
+
+\glsetfirstlineformat{\itshape\color{blue}}
+
+%\hangindent=1em \hangafter=-1 \noindent
+%%\newcommand{myindentedpar}[1][21.3pt]{\begin{list}{}{\leftmargin=#1 \itemindent=-\leftmargin}\item[]}
+%% {\end{list}}
+%%\newlength\listindent
+%%\setlength\listindent{20pt}
+
+\begin{exe}%[label={},itemindent=-2em,leftmargin=2em]%[leftmargin=3em,itemindent=2em]
+%%\parshape 2 0cm 0.75\linewidth \listindent \dimexpr\linewidth-\listindent\relax
+%\leftmargin=42pt\itemindent=-21pt%\leftmargin
+        \ex 
+\quad\glinlines{%
+{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} :emphe:subi er  ngak 
+*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+glt `My mother asked me what the teacher gave me a book and Toki sold me'
+         }  
+\end{exe}
+To do: outdent:
+
+\surl{https://tex.stackexchange.com/questions/115591/how-can-i-indent-the-second-line-of-a-linguistic-gloss-with-gb4e-sty/115607#115607}
+
+
+%%\begin{exe}\setlength{\listparindent}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%     
+%%
+%%
+%%
+%%
+%%%\setlength{\listparindent}{3.5em}
+%%\begin{exe}\setlength{\itemindent}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%\begin{exe}\setlength{\itemindent}{-3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%     
+%%\begin{exe}\setlength{\leftmargin}{3.5em}
+%%        \ex 
+%%\glinlines{%
+%%{leftmargin3-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%\setlength{\leftmargin}{3.5em}
+%%\begin{exe}
+%%	\setlength{\itemindent}{0pt}
+%%        \ex 
+%%\glinlines{%
+%%{leftmargin3-itemindentneg-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%
+%%
+%%
+%%
+%%
+%%\begin{exe}\setlength{\parindent}{3em}
+%%        \ex 
+%%\glinlines{%
+%%{ parindent3-a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+%%
+%%
+%%
+%%
+%%
+%%
+%%\begin{exe}\setlength{\leftmargin}{3.5em}
+%%\setlength{\itemindent}{-0.5\leftmargin}
+%%        \ex 
+%%\glinlines{%
+%%{a delak }  {a uleker} er ngak el kmo ng-ngerai {a sensei}   {a milskak}  {a buk} me   {a Toki} {a ulterur} emph-e-i er  ngak 
+%%*/ mother-my   asked P  me L Comp   CL-what teacher     gave    book and  Toki  sold {} P me 
+%%glt `My mother asked me what the teacher gave me a book and Toki sold me'
+%%         }  
+%%\end{exe}
+
+
+
+
+
+\para{Prepend commands} To prepend a command to a word, mark the command's finish with a semicolon (;), \gleg \glmeta{:llapstar;`The} becomes \glcmd{llapstar}\glmeta{`The} which becomes ``*`The''. (The \glcmdb{llap} command is used here to overprint the * to the left, so that the text aligns vertically.)
+
+\begin{exe}
+\ex
+\glinlines{%
+bites dog cat
+*/  verb dd  cc
+glt   `The dog bites the cat.'
+glt   :llapstar;`The cat bites the dog.'
+}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/306564/left-edge-vertical-alignment-in-gb4e}
+
+\para{Dot Prefix} Words (\glie made up of letters A-Z, a-z, and digits 0-9) beginning with a dot are treated as parts of speech and their formatting is governed by the \glcmdb{mfssetposformat} command, \gleg ``.1sg'' becomes ``{\scshape\bfseries\sffamily .1sg}''.
+
+\mfssetposformat{\scshape\bfseries\sffamily}
+\begin{exe}
+    \ex 
+    \glinlines{%
+    kma t'-əlčqu-(ɣ)in 
+*/ .1sg  .1sg.sub-see-.2sg.obj
+glt `I saw you.' (S1:71)
+		}
+%    \ex \gll q-\textschwa{l}\v{c}qu-{\textbeta}um kma\\
+%    {\sc 2.irr-}see-{\sc 1sg.obj} {\sc 1sg}\\
+%    \glt `Look (at) me.' (S1:75)
+%
+%    \ex \gll kma t-k'o{\textbeltl}-ki\v{c}en \\
+%    {\sc 1sg} {\sc 1sg.subj-}come-{\sc 1sg.subj} \\
+%    \glt `I came/arrived.' (S3:13)
+
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/184860/gb4e-leaves-extra-space-before-translation/184862#184862}
+
+
+\para{Patching the example number format}
+
+{
+\makeatletter
+\patchcmd\@exe
+  {(\thexnumi)}
+  {\thexnumi.}
+  {}{}
+\makeatother
+\begin{exe}
+    \ex
+    \glinlines{%
+        Dies ist ein Beispiel
+*/    This is an example
+glt    ( ) $\mapsto$. : \textbackslash usepackage\{gb4e\}
+\textbackslash usepackage\{etoolbox\}
+\textbackslash makeatletter
+\textbackslash patchcmd\textbackslash \@ exe
+  \{(\textbackslash thexnumi)\}
+  \{\textbackslash thexnumi.\}
+  \{\}\{\}
+\textbackslash makeatother
+}
+\end{exe}
+}
+
+
+%\setcounter{exx}{0}
+
+\para{Global settings}
+
+The \glcmdb{mfssetposformat} formatting continues to apply from one example to the next, like a global switch.
+
+
+\begin{exe}
+\ex
+    \glinlines{%
+Saja mem-bawa surat itu kepada Ali.
+*/     I .cause-bring letter the to Ali.
+glt    I brought the letter to Ali.
+}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/337817/using-gb4e-inside-of-enumerate-environment/338093#338093}
+
+
+\para{Attaching commands} Use \glmeta{:commandA;na:commandB } to achieve \glcmd{commandA}\glmeta{na}\glcmd{commandB}
+
+\gleg upright brackets: \glmeta{:uplb;na:uprb } $\mapsto$ \uplb na\uprb.
+
+
+\begin{exe}
+\ex
+    \glinlines{%
+        nyumba i-na-on-ek-a :uplb;na:uprb wa-tu
+*/     house(9) 9-.prs-see-.neut-.fv (.com) 2-person
+glt    intended: `(A/the) house is seen by people.'
+}
+\ex
+  \glinlines{%
+        a-li-sem-a kwamba :uplqq;na-m-ju-a:uprqq;
+*/     1-.pst-speak-.fv .comp .1sg.prs-1-know-.fv
+glt `He said, ``I know him.'''
+}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/308454/gb4e-overwrite-italics-in-first-line}
+
+
+%\usepackage{tabularx}
+%\usepackage{calc}
+%\newcommand{\longexampleandlanguage}[2]{
+%\begin{tabularx}{\linewidth}[t]{@{}X@{}p{\widthof{(#2)}}@{}}
+%\begin{minipage}[t]{\linewidth-1em}
+%#1
+%\end{minipage} & (#2)\\
+%\end{tabularx}}
+%
+
+%https://tex.stackexchange.com/questions/600695/limiting-space-used-by-gb4e-and-adding-language-information-to-the-right
+%
+%
+
+%edited Nov 9, 2021 at 20:17
+%answered Jun 11, 2021 at 13:34
+%user avatar
+%Stefan Müller
+%6,52733 gold badges2424 silver badges60
+
+%\newcommand{\longexampleandlanguage}[2]{
+%\begin{minipage}[t]{\linewidth-3em-\widthof{(#2)}}
+%#1
+%\end{minipage} 
+%\hfill
+%\begin{minipage}[t]{\widthof{(#2)}}
+% (#2)
+%\end{minipage}
+%}
+
+\para{Adding information to the right} is done with \glcmd{glinlinesnote}\{\glmeta{gloss example}\}\{\glmeta{note}\}.
+
+\begin{verbatim}
+\begin{exe}
+\ex
+    \glinlinesnote{%
+      Das ist ein deutsches Beispiel.
+*/   this is a   German    example
+     }{German}
+\end{exe}
+\end{verbatim}
+
+produces
+
+\begin{exe}
+\ex
+    \glinlinesnote{%
+      Das ist ein deutsches Beispiel.
+*/   this is a   German    example
+     }{German}
+\end{exe}
+
+
+A longer sentence:
+
+\begin{exe}
+\ex
+  \glinlines{%
+Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.
+*/  this is  one   of-these very long   sentences that it in the a b German    language gives
+}
+\end{exe}
+
+
+\begin{exe}
+\ex
+\glinlinesnote{%
+Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.
+*/ this is  one   of-these very long   sentences that it in the a b German    language gives
+glt This item has a language note.
+}{German}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/600695/limiting-space-used-by-gb4e-and-adding-language-information-to-the-right}
+
+
+
+\para{Extended commentary} The example can be almost all free-form text (\glie \glmeta{glt}-tagged material):
+
+\begin{exe}
+\ex
+\glinlines{%
+        On the honeydew melon:footnotemark;
+glt     The honeydew:space;melon::ttikz; is one of the two main cultivar types in Cucumis melo Inodorus Group. It is characterized by the smooth rind and lack of musky odor. 
+%glt Το πεπόνι χάνεϊντιου, γνωστό και ως μελοπέπονο, είναι φρούτο της ποικιλίας muskmelon ή Cucumis melo της οικογένειας των κολοκυνθοειδών. Η ομάδα αυτή των Inodorus περιλαμβάνει το συγκεκριμένο πεπόνι αλλά και άλλα ανάμεικτα είδη πεπονιού και κολοκύθας. 
+glt :par;:smallskip;El melón:space;verde::ttikz;, melón blanco, casaba, melón rocío de miel o melón tuna es un fruto de la familia del melónCucumis melo (Cucumis melo) que se cultiva en general para el consumo gastronómico. La fruta es similar al melón anaranjado o cantalupo, pero tiene un sabor más dulce, contiene más agua y posee un color verde pálido o claro en su interior.
+glt :par;:smallskip;Le melon honeydew, ou melon miel, est un melon du groupe de cultivars de l'espèce Cucumis melo (famille des Cucurbitaceae). Le groupe Inodorus inclut le melon honeydew, le melon musqué, le melon d'hiver et d'autres hybrides du melon.
+glt :par;:smallskip;Il melone verde è un gruppo di colture appartenente al gruppo Inodorus della specie dei Cucumis melo.
+
+Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno, casaba e crenshaw. 
+%glt   ハネデューメロン（英: honeydew melon）は、白色系の果皮で橙色の果肉（赤肉）、淡い緑色の果肉（青肉）、白い果肉（白肉）の3種類があるノーネットメロン。
+%
+%日本では、「ハネジューメロン」「ハネージュメロン」「ハニジューメロン」「ハニーデューメロン」「ハニージューメロン」「ハニージュメロン」等とも呼ばれ、一般的な海外のメロンでもある。 
+%glt  Hunajameloni (Cucumis melo Hunajameloni-ryhmä) on yksi melonin lajikeryhmä.[1] Hunajameloni on yleensä noin 15–22 cm pitkä ja hieman soikea. Sen paino vaihtelee 1,8–3,6 kg:n välillä. Hedelmän liha on vaaleanvihreätä ja sileän kuoren väri vaihtelee vihreästä keltaiseen.[2] Hunajamelonin liha on mehukasta ja makeaa ja hedelmää nautitaan usein jälkiruokana. Hedelmiä myydään ympäri maailmaa. 
+%glt :par;:smallskip;Melon madu minangka salah sawijining rong jinis kultivar utama ing Grup Codumis melo Inodorus. [1] Ditondoi kanthi kulit alus lan ora duwe ambu ora enak. Jinis utama liyane ing Grup Inodorus yaiku melon casaba kulit. 
+}
+\end{exe}
+\footnotetext{Text from various Wikipedias.}
+
+This example also illustrates the use of custom markdown commands and their attachment as postfixes, acting on the word they are attached to: \glmeta{honeydew melon} becomes \glmeta{honeydew:space;melon}, to be seen as one `word', to which the \glcmd{ttikz} command (an overlaid green bounding box with red text) is applied as the pattern \glmeta{word::command;} and the pattern is converted to \glcmd{command	}\{\glmeta{word}\} by a regular expression. The pattern \glmeta{:command;} is converted to \glcmd{command}.
+
+\glmeta{honeydew::ttikz;} produces:
+
+\begin{exe}
+\ex
+\glinlines{%
+     The honeydew::ttikz; melon
+*/   .art .prod.met.attr .fruit
+}
+\end{exe}
+
+
+
+\mfskeepdotposoff
+\begin{exe}
+\ex
+\glinlines{%
+ Naoya-wa Mari-ga Nani::bffbox;-o Non-da ka Yumi-ni it-ta no::textbf;? 
+ */     Naoya-.Top Mari-.Nom what-.Acc drink-.Past Q Yumi-.Dat it-.Past Q?  
+ glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
+}
+\end{exe}
+%https://tex.stackexchange.com/questions/425424/boxed-text-and-underline-within-the-gb4e-environment
+
+
+Word-numbering can be switched on with  \glcmd{mfsnumberedwordson}.
+
+\renewcommand\bffcolor{yellow!50}
+\mfsnumberedwordson
+\begin{exe}
+\ex
+\glinlines{%
+ Naoya-wa Mari-ga Nani::bffcolorbox;-o Non-da ka Yumi-ni it-ta no::bffcolorbox;? 
+ */     Naoya-.Top Mari-.Nom what-.Acc drink-.Past Q Yumi-.Dat it-.Past Q?  
+ glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
+}
+\end{exe}
+\mfsnumberedwordsoff
+\mfskeepdotposon
+
+
+%\begin{exe}
+%
+%\ex[]{\gll Naoya-wa Mari-ga \UL\framebox{\textbf{Nani}}-o Non-da ka Yumi-ni it-ta \textbf{no}\LU? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.' } 
+%\gluline
+%
+%
+%
+%\ex[]{\gll Naoya-wa Mari-ga \UL\textbf{Nani}-o Non-da ka Yumi-ni it-ta \textbf{no}\LU? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.'  
+%}
+%\gluline
+%
+%
+%\end{exe}
+%\begin{minipage}{.5\linewidth}
+%\begin{exe}
+%\ex[]{\gll Naoya-wa Mari-ga \UL\framebox{\textbf{Nani}}-o Non-da ka\LU{} \tkzmk{3}Yumi-ni it-ta \textbf{no}\tkzmk{4}? \\
+%      Naoya-\textsc{Top} Mari-\textsc{Nom} what-\textsc{Acc} drink-\textsc{Past} Q Yumi-\textsc{Dat} it-\textsc{Past} Q?  \\
+%      \trans `(Lit.) For which $x$, $x$ a thing, Naoya said to Yumi whether Mari drink $x$.' } 
+%\gluline
+%\tkzuline{3}{4}
+%\end{exe}
+%\end{minipage}
+
+
+
+Word-stacks (which are \glmeta{vbox}es) can be formatted with \glcmd{mfsformattedvboxon}.\footnote{A hard-coded \texttt{\textbackslash colorbox\{blue!12\}} is applied.} 
+\mfsformattedvboxon
+\begin{exe}
+\ex
+\glinlines{%
+   οὐ θέλω δὲ ὑμᾶς ἀγνοεῖν, ἀδελφοί, ὅτι πολλάκις προεθέμην ἐλθεῖν
+*/  ou thelō de humas agnoein adelphoi hoti polakis proethemēn elthein
+*/  not want.1Sg but you.Acc.Pl be-ignorant.Pres.Inf brothers.Voc that often planned.1Sg come.Aor.Inf
+glt  But I don't want you to be unaware, brothers, that many times I planned to come. 
+glt   :space;:hfill;(Rom 1.13):space;
+ }
+\end{exe}
+\mfsformattedvboxoff
+
+
+\begin{exe}
+\ex
+\glinlines{%
+        w-for-w line 1 
+glt   Line 1, Trans A
+glt   Line 1, Trans B
+glt   Line 1, Trans C
+*/     w-for-w line 2   
+glt   Line 2, Trans A
+glt   Line 2, Trans B
+glt   Line 2, Trans C
+*/     w-for-w line 3 
+glt   Line 3, Trans A
+glt   Line 3, Trans B
+glt   Line 3, Trans C
+*/     w-for-w line 4 
+glt   Line 4, Trans A
+glt   Line 4, Trans B
+glt   Line 4, Trans C
+}
+\end{exe}
+
+
+\begin{exe}
+\ex
+\glinlines*{%
+        w-for-w line 1 
+glt   Line 1, Trans A
+glt   Line 1, Trans B
+glt   Line 1, Trans C
+*/     w-for-w line 2   
+glt   Line 2, Trans A
+glt   Line 2, Trans B
+glt   Line 2, Trans C
+*/     w-for-w line 3 
+glt   Line 3, Trans A
+glt   Line 3, Trans B
+glt   Line 3, Trans C
+*/     w-for-w line 4 
+glt   Line 4, Trans A
+glt   Line 4, Trans B
+glt   Line 4, Trans C
+}
+\end{exe}
+
+\para{option key preamble=}
+%\mfsformattedvboxon
+\begin{exe}
+\ex%
+\glinlines[preamble={Somebody has arrived late.}]{%
+       :llaphash;Ich bin schon da
+*/    I am already there
+glt   `I am here already.'}
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/308008/gb4e-phantom-spacing}
+
+
+
+
+
+\begin{exe}
+\ex
+\glinlines{%
+       [This] is an example which displays properly.
+       }
+%\ex[*]
+%\glinlines{%
+%       [This] is an example which displays properly.
+%       }
+\end{exe}
+
+
+
+
+\begin{exe}
+\ex
+\glinlines{%
+       [This] a is an example which displays properly.
+       }
+\ex[*]{}
+\glinlines{%
+       [This] b is an example which displays properly.
+       }
+\ex
+\glinlines{%
+       :llapstar;[This] c is an example which displays properly.
+       }
+\end{exe}
+
+\surl{https://tex.stackexchange.com/questions/590883/how-to-use-gb4e-to-produce-glossed-example-with-bracket}
+
+
+
+Text, see footnote\footnote{\glinlines{%
+This is a footnoted example.
+*/ dA V iA Adj N
+       }}
+
+
+\begin{exe}
+\ex
+\glinlines{%
+Text:footnotemark;, text, text.
+*/ Text:footnotemark;, text, text.
+*/ Text:footnotemark;, text, text.
+glt Text is here:footnotemark;, text, text.
+}
+\end{exe}
+\footnotetext[2]{A footnote.}
+\footnotetext[3]{A footnote.}
+\footnotetext[4]{A footnote.}
+\footnotetext{A footnote: \surl{https://tex.stackexchange.com/questions/334636/using-gb4e-to-insert-footnote-in-gll-line}}
+
+
+%%\begin{exe}
+%%  \ex
+%%  \begin{xlist}
+%%    \ex[??/*]           {Which \ldots}
+%%    \ex[\phantom{??/}*] {Which \ldots}
+%%    \ex[*]              {Which \ldots}
+%%  \end{xlist}
+%%\end{exe}
+%%%https://tex.stackexchange.com/questions/282740/gb4e-tabbing-problem
+
+
+
+\NewDocumentCommand\definekey{mm}
+ {
+  \keys_define:nn { #1 }
+   {
+    #2 .tl_set:c = { l_#1_#2_tl },
+   }
+ }
+%%\begin{equation}
+%%xxx \label{key3} yyy
+%%\end{equation}
+%%xxx \ref{key3} xxx
+
+
+
+%%\begin{exe}
+%%\ex
+%%\glinlines{%
+%%:marktext;{بَبَب}
+%%%ب¶اللون{¶أحمر}َ¶اللون{¶أخضر}ب¶اللون{¶أزرق}ب
+%%       }
+%%\end{exe}
+%%
+
+
+
+
+
+
+\newpage
+%\begin{figure}
+\begin{exe}
+\ex%~[lingstyle=EarlyBabbish,exno=1]  
+\glinlines{%
+luizcid dun-  ua-  glud-  gan giumima 
+*/ ART PFX PFX V SFX N 
+*/ ATEL-  NPST-  be.old-  ACT-  VST.PTCP woman 
+*/ A::tikzmark;{there was a} C::tikzmark;{being old} D::tikzmark;  {}  {woman who} woman::phantom;B::tikzmark;
+}
+\end{exe}
+%\caption{Example of figure}
+%\end{figure}
+      \tikzbrace{C}{D}{Something else}
+      \tikzbrace[25]{A}{B}{Ergative subject of muiddrin}
+      \overunderbrace[60]{A}{B}{Over text}{Under text}
+
+
+\vspace{8em}
+\surl{https://tex.stackexchange.com/questions/355934/horizontal-curly-braces-in-expex-glossing-example}
+
+xxx
+
+\para{Right-to-Left} See the example (uses polyglossia).
+
+\subpara{Even height and depth} with a zero width \textbackslash vrule.
+           
+\para{Right-to-Left}
+\begin{Arabic}
+\glsetfirstlineformat{\selectlanguage{arabic}\Large\color{blue}{\vrule height 28pt depth 16pt width 0.2pt}}
+\glsetsecondlineformat{\selectlanguage{greek}}
+\glsetthirdlineformat{\selectlanguage{brazil}}
+\glsetfourthlineformat{\selectlanguage{english}}
+\glsetfifthlineformat{\selectlanguage{english}\ttfamily}
+\glsetsixthlineformat{\selectlanguage{english}\itshape}
+\mfsformattedvboxon
+%\mfsnumberedwordson
+\begin{exe}
+\ex  \quad\quad\quad
+\glinlines{%
+
+ هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما {سيلهي القارئ} {عن الترك}
+
+*/ {εν τω} έτει τω-δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη {το πνεύμα αυτού} και {ο ύπνος αυτού} {εγένετο απ 'αυτού}
+*/ No ano-segundo {do reinado} {de Nabucodonosor} sonhou Nabucodonsor {um sonho,} e desconcertou-se {o espirito dele,} e o {sono dele} {se lhe fugiu.}
+*/ english::selectlanguage; x x x x x x x x x x x x y
+*/  hunak haqiqat muthabatat mundh zaman tawil wahi 'ana almuhtawaa almaqru' lisafhat ma {silahi alqari} {ean alturk}
+*/ there reality installed ago time long which that content read for-page what-will {distract the-reader} {about the-turk/leaving}
+glt english::selectlanguage; `There is a long-established fact that the readable content of a page will distract the reader from leaving.'
+}
+\end{exe}
+\end{Arabic}
+\glsetthirdlineformat{}
+\mfsformattedvboxoff
+
+\surl{https://tex.stackexchange.com/questions/317589/arabic-russian-interlinear-text/317703#317703}
+
+
+
+\para{Reset line formats} with \glcmd{glresetlineformats}.
+
+\glresetlineformats
+\begin{exe}
+\ex  
+\glinlines{%
+x y z
+*/ a b c
+*/ a b c
+*/ a b c
+*/ a b c
+*/ a b c
+}
+\end{exe}
+
+\para{Subscripts and Superscripts} with \glcmdb{glsub} and \glcmdb{glsuper}.
+
+
+\begin{exe}
+\ex  
+\glinlines{%
+       x:suba; y:subalpha; z::glsub!b;
+*/    a::glsuper!x; b::glsuper!y; c::glsuper!z;
+*/    a::glsub!1; b::glsub!2; c::glsub!3;
+*/    ::glsub!1;a ::glsub!2;b ::glsub!3;c
+*/    ::glsuper!x;a ::glsuper!y;b ::glsuper!z;c
+*/    a b e::glsub!i;
+}
+\end{exe}
+
+
+\para{Single-item Sequence as Input Line}
+\mfsloadaseql{cat}{.}{The cat sat on the mat.}
+\begin{exe}
+\ex  
+\glinlines{%
+       \mfsuseaseql{cat}{.}
+*/    \mfsuseaseql{cat}{!}
+*/    \mfsuseaseql{cat}{?}
+*/    \mfsuseaseql{cat}{??}
+}
+\end{exe}
+
+%----------------------
+\para{Sequence item as Input Line}
+
+\mfsloadaseql{dog}{*/}{%
+The cat sat on the mat.
+*/ The quick brown fox jumps over.
+*/ Many Volcanoes Erupt Mulberry Jam Sandwiches.
+}
+
+
+\begin{exe}
+\ex  
+\glinlines{%
+       \mfsuseaseqli{dog}{3}
+*/    \mfsuseaseqli{dog}{1}
+*/    \mfsuseaseqli{dog}{2}
+}
+\end{exe}
+
+\mfsloadaprop{cat}{%
+The=1
+,cat=2
+,sat=3
+,on=4
+,the=5
+,mat=6
+,mat.=7
+}
+\mfsgetapropkv{cat}{the}
+
+%\mfsuseaprop{cat}
+%The property list \g_fc_rwecat_prop contains the pairs (without outer braces):
+%>  {The}  =>  {1}
+%>  {cat}  =>  {2}
+%>  {sat}  =>  {3}
+%>  {on}  =>  {4}
+%>  {the}  =>  {5}
+%>  {mat}  =>  {6}.
+
+%----------------------
+\para{Attaching a command to every word on a line}
+
+\begin{exe}
+\ex  
+\glinlines[addca=pkvcat]{%
+%\glinlines{%
+          The cat sat on the mat. {}
+*/       The::pkvcat; cat::pkvcat; sat::pkvcat; on::pkvcat; the::pkvcat; mat::pkvcat;. {pkvcat added manually}
+*/    The cat sat on the mat. {}
+%glt  \newcommand\pkvcat[1]{\mfsgetapropkv{cat}{#1}}
+}
+\end{exe}
+
+
+
+%
+%ενG1722 In τωG3588 the έτειG2094 year τωG3588 δευτέρωG1208 second τηςG3588 of the βασιλείαςG932 kingdom Ναβουχοδονόσορ of Nebuchadnezzar, ενυπνιάσθηG1797 dreamed Ναβουχοδονόσορ Nebuchadnezzar ενύπνιονG1798 a dream, καιG2532 and εξέστηG1839 was startled τοG3588 πνεύμα αυτούG4151 his spirit, καιG2532 and οG3588 ύπνος αυτούG5258 his sleep εγένετοG1096 went απ΄G575 from αυτούG1473 him.
+%
+%\surl{http://biblia-online.pl/Biblia/Septuaginta/Ksiega-Daniela/2/1}
+%\mfsloadaseql{dog}{*/}{%
+
+\mfsloadaseql{nab}{*/}{%
+εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+}
+
+\mfsloadaprop{strong}{%
+εν=G1722
+,τω=G3588
+,έτει=G2094
+%,τω=G3588 
+,δευτέρω=G1208
+,της=G3588
+,βασιλείας=G932
+,Ναβουχοδονόσορ=*
+,ενυπνιάσθη=G1797
+%,Ναβουχοδονόσορ=*
+,ενύπνιον=G1798
+,και=G2532
+,εξέστη=G1839
+,το=G3588 
+,πνεύμα=G4151 
+,αυτού=G1473
+%,και=G2532
+,ο=G3588 
+,ύπνος=G5258
+%,αυτού=G1473
+,εγένετο=G1096
+,απ΄=G575
+%,αυτού=G1473
+,test=Y9999
+}
+
+\mfsloadaprop{nabeng}{%
+εν=in 
+,τω=the 
+,έτει=year 
+%,τω=G3588 
+,δευτέρω=second 
+,της=of-the 
+,βασιλείας=reign
+,Ναβουχοδονόσορ=Nebuchadnezzar 
+,ενυπνιάσθη=dreamed 
+%,Ναβουχοδονόσορ
+% Nebuchadnezzar 
+,ενύπνιον=a-dream
+,και=and 
+,εξέστη=was-startled 
+,το=the
+,πνεύμα=spirit
+,αυτού=his
+%,και=G2532
+% and 
+,ο=the
+,ύπνος=sleep
+%,αυτού=G5258
+% his sleep 
+,εγένετο=went 
+,απ΄=from 
+%,αυτού=G1473
+% him.
+,test=X9999
+}
+
+%----------------------
+\para{Doing lookups}
+
+\glsetfirstlineformat{\footnotesize\ttfamily}
+\glsetsecondlineformat{\selectlanguage{greek}\color{blue}{\vrule height 12pt depth 6pt width 0pt}}
+\glsetthirdlineformat{\small}
+\mfsformattedvboxon
+
+\begin{exe}
+\ex  \mnote{addca=\\ addcc=}
+\glinlines[addca=pkvstrong,addcc=pkvnabeng]{%
+%     test ύπνος το πνεύμα
+% */ bΝαβουχοδονόσορ ύπνος x x
+% */ cΝαβουχοδονόσορ x x x
+%       \mfsuseaseql{nab}{.}
+%*/    \mfsuseaseql{nab}{.}
+%*/    \mfsuseaseql{nab}{.}
+    εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+    */     εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+    */    εν τω έτει τω δευτέρω της βασιλείας Ναβουχοδονόσορ ενυπνιάσθη Ναβουχοδονόσορ ενύπνιον και εξέστη το πνεύμα αυτού και ο ύπνος αυτού εγένετο απ΄ αυτού
+}
+\end{exe}
+\mfsformattedvboxoff
+\glresetlineformats
+
+%\mfsgetapropkv{strong}{ύπνος}
+%
+%\pkvstrong{ύπνος}
+
+
+%----------------------
+\para{Attaching commands to specific words}
+
+\begin{exe}
+\ex \mnote{addc\fbox{b}=\\ addc\fbox{a}w=\\ addc\fbox{c}w=\\ addcxa=} 
+\glinlines[addcaw=2;doemph,
+addcb=pkvcat,
+addccw=6;doemph,
+addcxa=3;1;doemph,
+linenumsa=true,
+]{%
+%\glinlines{%
+          The cat sat on the mat. 
+*/       The cat sat on the mat. 
+*/    The cat sat on the mat. 
+}
+\end{exe}
+
+
+%----------------------
+\para{An inline lookup}
+
+``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
+
+
+
+
+%----------------------
+\para{Attaching multiple commands to one word}
+
+\begin{exe}
+\ex  \mnote{addcxa=\\ addc\fbox{a}w=\\ addcxb=}
+%      \nnote{Multiple commands}
+\glinlines[
+addcxa=1;1;textit,
+addcaw=1;textbf,
+addcxb=1;1;underWavy,
+addcxc=1;7;textit,
+linenumsa=true,
+]{%
+          The cat sat on the mat. e::glsub!i;
+}
+\end{exe}
+
+
+
+%%\begin{exe}
+%%\ex 
+%%\glinlines{%
+%%\mfsuseaseql{dog}{*/}
+%%}
+%%\end{exe}
+
+
+\begin{exe}
+\ex  
+\glinlines{%
+          The cat sat on the mat. e::glsub!i;
+}
+\end{exe}
+
+%\mfsformattedvboxon
+
+%\begin{exe}
+%%\mfsformattedvboxon
+%\ex  
+%\glinlines{%
+%          The cat sat on the mat. e::glsub!i;
+%}
+%\end{exe}
+
+
+%\begin{exe}
+%\ex  
+%\glinlines{%
+%          The cat sat on the mat. e::glsub!i;
+%}
+%\end{exe}
+
+\para{Highlighting a Wordstack}
+
+\begin{exe}
+\ex  \mnote{addwsa=}
+\glinlines[addwsa=2;textredit]{%
+     The cat sat on the mat. 
+*/    The cat sat on the mat. 
+*/                 The cat sat on the mat. 
+*/                              The cat sat on the mat. 
+}
+\end{exe}
+
+
+
+%\begin{exe}
+%\ex \glll
+%    我           \clt {没有}              \clf {问题} \\
+%    \pinyin{wo3} \clt \pinyin{mei2 you3} \clf \pinyin{wen4 ti2} \\
+%    I            \clt {don't have}       \clf questions \\
+%\end{exe}
+
+\glsetfirstlineformat{\cjk}
+\begin{exe}
+\ex 
+\glinlines[addwsa=2;textred,
+addcb=xpppinyin,
+linenumsa=true,
+]{%
+    我 没 有 问 题 
+*/  我 没 有 问 题 
+%    */  wo3 mei2 you3  wen4 ti2 
+%    */      wǒ             méi yǒu               wèn tí
+    */    I             no have        ask question
+    glt  `I don't have questions.'
+    glt [Line (b) does a lookup of the xpinyin-database.def. * = first of multiple readings.]
+}
+\end{exe}
+
+
+\normalsize
+\para{Standalone commands}
+\subpara{Note}  \glcmdb{glnote}
+
+\lipsum[1][1-4]
+
+
+\begin{exe}
+\ex  \glnote{
+\gll Das ist ein deutsches Beispiel.\\
+     this is a   German    example\\
+     }{German}
+\end{exe}
+
+\lipsum[1][1-4]
+
+
+\ea
+ \glnote{
+    \gll Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.\\
+         this is  one   of.these very long   sentences that it in the a b German    language gives\\
+			}{German}
+\z
+
+\lipsum[1][1-4]
+
+\squiggle
+
+\subpara{Parallel}  \glcmdb{gltwoex}
+
+\lipsum[1][1-4]
+
+\begin{exe}
+\gltwoex[0.35][0.60]{
+\ex
+\gll Das ist ein deutsches Beispiel.\\
+     this is a   German    example\\
+}
+{
+\ex
+    \gll Das  ist einer dieser   sehr langen Sätze,    die  es in der a b deutschen Sprache gibt.\\
+         this is  one   of.these very long   sentences that it in the a b German    language gives\\
+}
+\end{exe}
+
+\lipsum[1][1-4]
+
+\begin{exe}
+\gltwoex{
+\ex
+\gll The quick brown fox jumps over the lazy dog.\\ 
+       DA ADJ1 ADJ2 N V PREP DA ADJ1 N\\
+}
+{
+\ex
+    \gll The cat sat on the mat.\\ 
+          DA N V PREP DA N\\
+}
+\end{exe}
+
+\squiggle
+
+{\cjk 我诸葛 亮} $\mapsto$ \xpppinyin{我诸葛 亮}
+
+{\cjk 我诸葛 亮} $\mapsto$ \xpppinyin*{我诸葛 亮}
+
+
+\xppname{诸葛 亮}, ...
+
+%  mpya - for a character setting ``a''
+%  = - set it to
+%  2 - character position in the argument
+%  ; - delimiter
+%  2 - pinyin position in the comma list
+\xppname[mpya=2;2]{诸葛 亮}, ...
+
+\bigskip
+\xpppinyin*{𪀩𪘬𩞀}
+
+\tick 3:2:3 \xppname[mpya=2;2,
+mpyb=3;3,
+mpyc=1;3,
+]{𪀩𪘬 𩞀}
+
+\tick 1:1:2 \xppname[mpya=3;2,
+mpyb=1;1,
+mpyc=2;1,
+]{𪀩𪘬 𩞀}
+
+\tick 2:3:- \xppname[mpya={},
+mpyb=1;2,
+mpyc=2;3,
+]{𪀩𪘬 𩞀}
+
+\tick -:-:- \xppname[%mpya={},
+mpyb={},
+mpyc={},
+]{𪀩𪘬 𩞀}
+
+\tick -:-:2 \xppname[mpya=3;2]{𪀩𪘬 𩞀}
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+\tick 1:1:2 \xppname[mpya=3;2,
+mpyb=1;1,
+mpyc=2;1,
+]{𪀩𪘬 𩞀}
+
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+\tick -:-:2 \xppname[mpya=3;2]{𪀩𪘬 𩞀}
+
+
+\tick -:-:- \xppname{𪀩𪘬 𩞀}
+
+
+
+\squiggle
+
+
+\newcommand\doglmeta[1]{\glmeta{\textbackslash#1} $\mapsto$ \csname #1\endcsname\par
+}
+\newcommand\doglmetai[1]{\glmeta{\textbackslash#1\{zzz\}} $\mapsto$ \csname #1\endcsname{zzz}\par}
+
+\para{Meta Commands}
+xxx
+
+%\newcommand*{\tkzmk}[1]{\tikz[remember picture,overlay] \node (#1) {};}
+%\newcommand*{\tkzuline}[2]{\tikz[overlay,remember picture]{ \draw (#1.south) -- (#2.south);}}
+%\newcommand*{\UL}{\tkzmk{1}}
+%\newcommand*{\LU}{\tkzmk{2}}
+%\newcommand*{\gluline}{\tkzuline{1}{2}}
+
+%\newcommand\backoneline{\\[-\baselineskip]}
+%\newcommand\backonelineb{\vskip{-\baselineskip}}
+
+%\newcommand\hindent[1]{\hangindent=#1}
+%\newcommand\ttikz[1]{\tikz[remember picture,baseline={([yshift=-.25em]current bounding box.center)}] \node[fill=green!60,opacity=0.72,inner sep=0pt,text=red!80!blue] (#1) {#1\vphantom{Ag}};}
+%%,baseline={text.base}
+%%baseline={(0,0)}
+%%baseline={([yshift=-.25em]current bounding box.center)}
+
+%%\newcommand\textdirltl{\textdir LTL}
+%%\newcommand\slgk{\selectlanguage[variant=ancient]{greek}}
+
+
+\doglmeta{speech}
+\doglmeta{writing}
+\doglmeta{uplb}
+\doglmeta{uprb}
+\doglmeta{uplq}
+\doglmeta{uprq}
+\doglmeta{uplqq}
+\doglmeta{uprqq}
+\doglmeta{emphe}
+\doglmeta{suba}
+\doglmeta{subi}
+\doglmeta{emphx}
+
+\doglmetai{bffbox}
+\doglmetai{bffcolorbox}
+\doglmetai{llaphash}
+\doglmetai{llapstar}
+\doglmetai{glcmd}
+\doglmetai{glcmdb}
+\doglmetai{glmeta}
+\doglmetai{glsub}
+\doglmetai{glsuper}
+\doglmetai{subalpha}
+%\doglmetai{pkvcat}
+%\doglmetai{pkvstrong}
+%\doglmetai{pkvnabeng}
+\doglmetai{pkvtest}
+\doglmetai{doemph}
+%\doglmetai{para}
+%\doglmetai{subpara}
+
+%\newunderlinetype\beginUnderWavy[\number\dimexpr1ex]{\cleaders\hbox{%
+%\setlength\unitlength{.3ex}%
+%\begin{picture}(4,0)(0,1)
+%\thicklines
+%\color{red}%
+%\qbezier(0,0)(1,1)(2,0)
+%\qbezier(2,0)(3,-1)(4,0)
+%\end{picture}%
+%}}
+%\newcommand\underWavy[1]{{\beginUnderWavy#1}}
+%
+%\definecolor{dg}{rgb}{0,.392,0} %DarkGreen
+%\definecolor{dm}{rgb}{.545,0,.545}  %DarkMagenta
+%\newcommand\mnote[1]{\leavevmode\reversemarginpar\marginpar{\raggedright\ttfamily\color{dg}
+%#1}}
+%\newcommand\nnote[1]{\leavevmode\normalmarginpar\marginpar{\raggedright\sffamily\color{dm}
+%#1}}
+%
+%\newcommand\textred[1]{\textcolor{red}{#1}}
+%\newcommand\textredit[1]{\textcolor{red}{\textit{#1}}}
+%%\newcommand\xp[1]}{\xpinyin*{#1}}
+%\newcommand\gleg{e.g.,\space}
+%\newcommand\glie{i.e.,\space}
+%
+%%squiggle
+%\newcommand\squiggle{%
+%\begin{center}
+%{\usefont{U}{lasy}{m}{n}\char58\char58\char58\char58\char58\char58\char58\char58\char58}
+%\end{center}
+%}
+
+
+\end{document}
+
+
+
+https://tex.stackexchange.com/questions/647186/linguistic-example-with-alternative-gloss-and-translation/647414#647414
+
+

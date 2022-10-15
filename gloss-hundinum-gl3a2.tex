@@ -1,0 +1,86 @@
+\documentclass[a5paper,12pt]{article}
+\usepackage{geometry}%
+\geometry{headsep=3mm,includehead,margin=10mm,nofoot}%
+\usepackage{blindtext}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+%\usepackage{xparse}
+
+%-------------------------------------------------------------
+\include{incl-glosser3a2.tex}
+\usepackage{tikz} % before gb4e
+%\usepackage{gb4e}
+\usepackage{linguex,cgloss4e} %linguex after \include: list-definition
+%\noautomath
+
+
+
+\begin{document}
+
+
+%\begin{exe}
+%    \ex
+%\glinlines{% end-of-line counts as an extra space
+%       gef hundinum matinn
+%*/    gje hunden maten
+%*/    give {the dog} {the food}
+%*/    gib {dem Hunde} {das Essen}
+%}
+%\end{exe}
+%
+%
+%\begin{exe}
+%    \ex
+%\glinlines{% end-of-line counts as an extra space
+%       gef hundinum matinn
+%*/    give.tense hound.case meat.case
+%*/    gje hunden maten
+%*/    give {the dog} {the food}
+%*/    .vrb {.art .noun} {.art .noun}
+%*/    .cmd .subj .obj
+%*/    gib {dem Hunde} {das Essen}
+%glt    One of the daily chores.
+%glt    Multiple translation/note lines.
+%glt    Formal literal colloquial idiom
+%glt    A note
+%}
+%\end{exe}
+%
+%
+%\mfssetposformat{\scshape\bfseries\sffamily}
+%\begin{exe}
+%    \ex 
+%    \glinlines{%
+%    kma t'-əlčqu-(ɣ)in 
+%*/ .1sg  .1sg.sub-see-.2sg.obj
+%glt `I saw you.' (S1:71)
+%        }
+%\end{exe}
+
+\blindtext{}
+
+\ex. Meaningless example from Language (original)
+\gll Kono kuruma-wa takai  takai-koto-wa takai-desu-ka?\\ 
+This car-\textsc{top} expensive expensive-\textsc{nmlz}-\textsc{cont} expensive-\textsc{pred}.\textsc{polite}-Q\\
+`Is this car expensive?'
+
+
+
+\mfssetposformat{\scshape}
+\glsetfirstlineformat{\color{blue}}
+
+%\hangindent=-1in
+%\setlength{\rightmargin}{1in}
+\ex. %[rightmargin=1in] 
+\glinlines[preamble={Random example from Language (\textbackslash glinlines) x x x x x x x x x x x x x x x x x x }]{%
+    Kono kuruma- wa takai  takai- koto- wa takai- desu- ka?
+*/ This car- .top expensive expensive- .nmlz- .cont expensive- .pred.polite- Q
+glt :itshape;`This car, is it expensive?'
+}
+
+xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx 
+
+
+\end{document}
