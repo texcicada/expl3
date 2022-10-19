@@ -19,6 +19,7 @@
 %\usepackage{tabularx}
 %\usepackage{calc} % widthof						
 \usepackage{lipsum}
+\usepackage{multicol}
 
 
 
@@ -26,7 +27,7 @@
 
 
 
-
+\newcommand\dogl[1]{\par\noindent\glmeta{#1} $\mapsto$ \glinlines{#1}}
 
 
 
@@ -332,6 +333,7 @@ To do: outdent:
 
 
 
+%++++++++++++++++++++++++++++++++++++++++
 \para{Prepend commands} To prepend a command to a word, mark the command's finish with a semicolon (;), \gleg \glmeta{:llapstar;`The} becomes \glcmd{llapstar}\glmeta{`The} which becomes ``*`The''. (The \glcmdb{llap} command is used here to overprint the * to the left, so that the text aligns vertically.)
 
 \begin{exe}
@@ -346,7 +348,10 @@ glt   :llapstar;`The cat bites the dog.'
 
 \surl{https://tex.stackexchange.com/questions/306564/left-edge-vertical-alignment-in-gb4e}
 
-\para{Dot Prefix} Words (\glie made up of letters A-Z, a-z, and digits 0-9) beginning with a dot are treated as parts of speech and their formatting is governed by the \glcmdb{mfssetposformat} command, \gleg ``.1sg'' becomes ``{\scshape\bfseries\sffamily .1sg}''.
+
+
+%++++++++++++++++++++++++++++++++++++++++
+\para{Dot Prefix} Words (\glie made up of letters A-Z, a-z, and digits 0-9) beginning with a dot are treated as parts of speech and their formatting is governed by the \glcmdb{mfssetposformat} command, \gleg with \glmeta{\textbackslash mfssetposformat\{ \textbackslash  scshape \textbackslash bfseries \textbackslash sffamily\}}, ``.1sg'' becomes ``{\scshape\bfseries\sffamily .1sg}''.
 
 \mfssetposformat{\scshape\bfseries\sffamily}
 \begin{exe}
@@ -368,7 +373,7 @@ glt `I saw you.' (S1:71)
 
 \surl{https://tex.stackexchange.com/questions/184860/gb4e-leaves-extra-space-before-translation/184862#184862}
 
-
+%++++++++++++++++++++++++++++++++++++++++
 \para{Patching the example number format}
 
 {
@@ -398,6 +403,8 @@ glt    ( ) $\mapsto$. : \textbackslash usepackage\{gb4e\}
 
 %\setcounter{exx}{0}
 
+
+%++++++++++++++++++++++++++++++++++++++++
 \para{Global settings}
 
 The \glcmdb{mfssetposformat} formatting continues to apply from one example to the next, like a global switch.
@@ -415,6 +422,8 @@ glt    I brought the letter to Ali.
 \surl{https://tex.stackexchange.com/questions/337817/using-gb4e-inside-of-enumerate-environment/338093#338093}
 
 
+
+%++++++++++++++++++++++++++++++++++++++++
 \para{Attaching commands} Use \glmeta{:commandA;na:commandB } to achieve \glcmd{commandA}\glmeta{na}\glcmd{commandB}
 
 \gleg upright brackets: \glmeta{:uplb;na:uprb } $\mapsto$ \uplb na\uprb.
@@ -468,6 +477,9 @@ glt `He said, ``I know him.'''
 %\end{minipage}
 %}
 
+
+
+%++++++++++++++++++++++++++++++++++++++++
 \para{Adding information to the right} is done with \glcmd{glinlinesnote}\{\glmeta{gloss example}\}\{\glmeta{note}\}.
 
 \begin{verbatim}
@@ -515,6 +527,7 @@ glt This item has a language note.
 
 
 
+%++++++++++++++++++++++++++++++++++++++++
 \para{Extended commentary} The example can be almost all free-form text (\glie \glmeta{glt}-tagged material):
 
 \begin{exe}
@@ -563,7 +576,10 @@ This example also illustrates the use of custom markdown commands and their atta
 %https://tex.stackexchange.com/questions/425424/boxed-text-and-underline-within-the-gb4e-environment
 
 
-Word-numbering can be switched on with  \glcmd{mfsnumberedwordson}.
+
+
+%++++++++++++++++++++++++++++++++++++++++
+\para{Word-numbering} can be switched on with  \glcmd{mfsnumberedwordson}.
 
 \renewcommand\bffcolor{yellow!50}
 \mfsnumberedwordson
@@ -608,7 +624,9 @@ Word-numbering can be switched on with  \glcmd{mfsnumberedwordson}.
 
 
 
-Word-stacks (which are \glmeta{vbox}es) can be formatted with \glcmd{mfsformattedvboxon}.\footnote{A hard-coded \texttt{\textbackslash colorbox\{blue!12\}} is applied.} 
+%++++++++++++++++++++++++++++++++++++++++
+\para{Word-stacks}, which are \glmeta{vbox}es, can be formatted with \glcmd{mfsformattedvboxon}.
+ 
 \mfsformattedvboxon
 \begin{exe}
 \ex
@@ -620,9 +638,24 @@ glt  But I don't want you to be unaware, brothers, that many times I planned to 
 glt   :space;:hfill;(Rom 1.13):space;
  }
 \end{exe}
+
+
+The default style is  \texttt{\textbackslash colorbox\{blue!12\}}. It can be changed by setting the \glmeta{[wordstackstyle = ...,]} option, \gleg \glmeta{[wordstackstyle = \{\textbackslash fcolorbox\{blue\}\{red!12\}\},]} produces:
+\begin{exe}
+\ex
+\glinlines[wordstackstyle = {\fcolorbox{blue}{red!12}},]{%
+   οὐ θέλω δὲ ὑμᾶς ἀγνοεῖν
+*/  ou thelō de humas agnoein
+*/  not want.1Sg but you.Acc.Pl be-ignorant.Pres.Inf 
+ }
+\end{exe}
+
+
 \mfsformattedvboxoff
 
 
+
+%++++++++++++++++++++++++++++++++++++++++
 \begin{exe}
 \ex
 \glinlines{%
@@ -668,6 +701,9 @@ glt   Line 4, Trans C
 }
 \end{exe}
 
+
+
+%++++++++++++++++++++++++++++++++++++++++
 \para{option key preamble=}
 %\mfsformattedvboxon
 \begin{exe}
@@ -683,33 +719,37 @@ glt   `I am here already.'}
 
 
 
+%++++++++++++++++++++++++++++++++++++++++
 
-\begin{exe}
-\ex
-\glinlines{%
-       [This] is an example which displays properly.
-       }
-%\ex[*]
-%\glinlines{%
-%       [This] is an example which displays properly.
-%       }
-\end{exe}
+%%\begin{exe}
+%%\ex
+%%\glinlines{%
+%%       [This] is an example which displays properly.
+%%       }
+%%%\ex[*]
+%%%\glinlines{%
+%%%       [This] is an example which displays properly.
+%%%       }
+%%\end{exe}
 
 
-
+%++++++++++++++++++++++++++++++++++++++++
+In plain code, square brackets on the first word is an issue, since an \glcmd{item[...]} will set the item dotpoint to whatever ``...'' is, but is not an issue with \glcmd{glinlines}.
 
 \begin{exe}
 \ex
 \glinlines{%
        [This] a is an example which displays properly.
+       glt No special treatment, uses [This]::glmeta;
        }
-\ex[*]{}
-\glinlines{%
-       [This] b is an example which displays properly.
+\ex[*]{}\glinlines{%
+       [This] b is an example which displays properly (not).
+       glt uses :textbackslash;ex[*]::glmeta;
        }
 \ex
 \glinlines{%
        :llapstar;[This] c is an example which displays properly.
+       glt uses llapstar::glmeta;
        }
 \end{exe}
 
@@ -732,9 +772,9 @@ Text:footnotemark;, text, text.
 glt Text is here:footnotemark;, text, text.
 }
 \end{exe}
-\footnotetext[2]{A footnote.}
 \footnotetext[3]{A footnote.}
 \footnotetext[4]{A footnote.}
+\footnotetext[5]{A footnote.}
 \footnotetext{A footnote: \surl{https://tex.stackexchange.com/questions/334636/using-gb4e-to-insert-footnote-in-gll-line}}
 
 
@@ -867,8 +907,33 @@ x y z
 }
 \end{exe}
 
+\setlength\columnseprule{0.4pt}
+
+\begin{multicols}{2}
+\dogl{x:suba;} 
+\dogl{y:subalpha;}
+\dogl{z::glsub!b;}
+\dogl{a::glsuper!x;}
+\dogl{b::glsuper!y;}
+\dogl{c::glsuper!z;}
+\dogl{a::glsub!1;}
+\dogl{b::glsub!2;}
+\dogl{c::glsub!3;}
+\dogl{::glsub!1;a}
+\dogl{::glsub!2;b}
+\dogl{::glsub!3;c}
+\dogl{::glsuper!x;a}
+\dogl{::glsuper!y;b}
+\dogl{::glsuper!z;c}
+\dogl{e::glsub!i;}
+\end{multicols}
+
+
+
 
 \para{Single-item Sequence as Input Line}
+An item that will be used multiple times can be stored once and retrieved multiple times.
+
 \mfsloadaseql{cat}{.}{The cat sat on the mat.}
 \begin{exe}
 \ex  
@@ -880,8 +945,33 @@ x y z
 }
 \end{exe}
 
+The command \glcmd{mfsloadaseql} takes four parameters:
+[ namespace (optional) ]
+\{ sequence name \}
+\{ separator \}
+\{ (multiline) data \}
+so that
+\glcmd{mfsloadaseql}
+\{ cat \} \{.\} \{ The cat sat on the mat. \}
+loads \glmeta{The cat sat on the mat}.
+And the command 
+\glcmd{mfsuseaseql}
+\{ sequence name \}
+\{ output delimiter \}
+retrieves it.
+
+\begin{verbatim}
+\glinlines{%
+       \mfsuseaseql{cat}{.}
+*/    \mfsuseaseql{cat}{!}
+*/    \mfsuseaseql{cat}{?}
+*/    \mfsuseaseql{cat}{??}
+}
+\end{verbatim}
+
+
 %----------------------
-\para{Sequence item as Input Line}
+\para{Sequence item as Input Line} Multiple items can be stored as records in a sequence and then retrieved from that sequence by record number. For examples, sentences in a narrative.
 
 \mfsloadaseql{dog}{*/}{%
 The cat sat on the mat.
@@ -899,6 +989,31 @@ The cat sat on the mat.
 }
 \end{exe}
 
+Storing:
+
+\begin{verbatim}
+\mfsloadaseql{dog}{*/}{%
+The cat sat on the mat.
+*/ The quick brown fox jumps over.
+*/ Many Volcanoes Erupt Mulberry Jam Sandwiches.
+}
+\end{verbatim}
+
+Retrieving:
+
+\begin{verbatim}
+\glinlines{%
+       \mfsuseaseqli{dog}{3}
+*/    \mfsuseaseqli{dog}{1}
+*/    \mfsuseaseqli{dog}{2}
+}
+\end{verbatim}
+
+
+\para{Using a lookup table} A property list can store (case sensitive) \glmeta{key} = \glmeta{value} pairs as records, and \glmeta{value}can be retrieved with \glcmd{mfsgetapropkv} \{ propertylist name \} \{ key \}.
+
+
+
 \mfsloadaprop{cat}{%
 The=1
 ,cat=2
@@ -908,7 +1023,29 @@ The=1
 ,mat=6
 ,mat.=7
 }
+
+
+Storing:
+
+\begin{verbatim}
+\mfsloadaprop{cat}{%
+The=1
+,cat=2
+,sat=3
+,on=4
+,the=5
+,mat=6
+,mat.=7
+}
+\end{verbatim}
+
+Retrieving the value attached to key \glmeta{the} = \mfsgetapropkv{cat}{the}.
+
+\begin{verbatim}
 \mfsgetapropkv{cat}{the}
+\end{verbatim}
+
+
 
 %\mfsuseaprop{cat}
 %The property list \g_fc_rwecat_prop contains the pairs (without outer braces):
@@ -920,15 +1057,16 @@ The=1
 %>  {mat}  =>  {6}.
 
 %----------------------
-\para{Attaching a command to every word on a line}
+\para{Auto-attaching a command to every word on a line} The option [ addca = pkvcat ] will postfix the example custom command \glcmd{pkvcat} to every word on line \glmeta{a} (the first line). The first three lines (a--c) have this built-in addc- ability.
+
 
 \begin{exe}
 \ex  
 \glinlines[addca=pkvcat]{%
 %\glinlines{%
-          The cat sat on the mat. {}
-*/       The::pkvcat; cat::pkvcat; sat::pkvcat; on::pkvcat; the::pkvcat; mat::pkvcat;. {pkvcat added manually}
-*/    The cat sat on the mat. {}
+          The cat sat on the mat. {pkvcat auto-added}
+*/       The::pkvcat; cat::pkvcat; sat::pkvcat; on::pkvcat; the::pkvcat; mat::pkvcat;. {pkvcat added manually (note the dot)}
+*/    The cat sat on the mat. {source text}
 %glt  \newcommand\pkvcat[1]{\mfsgetapropkv{cat}{#1}}
 }
 \end{exe}
