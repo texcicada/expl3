@@ -1170,6 +1170,23 @@ Retrieving the value attached to key \glmeta{the} = \mfsgetapropkv{cat}{the}.
 %
 %\pkvstrong{ύπνος}
 
+The gloss contains the same Greek, three times.
+
+The first line is doing a lookup of the \glmeta{strong} property list which contains (unique) entries of the sort \glmeta{εν=G1722}, word to Strong Concordance number: \glmeta{[addca=pkvstrong]}, which uses \glcmd{mfsgetapropkv}.
+
+The second line is the Greek text left as-is.
+
+The third line is doing a lookup of the \glmeta{nabeng} property list which contains (unique) entries of the sort \glmeta{εν=in}, word to English translation: \glmeta{[addcc=pkvnabeng]}, which uses \glcmd{mfsgetapropkv}.
+
+General formating is:
+
+\begin{verbatim}
+\glsetfirstlineformat{\footnotesize\ttfamily}
+\glsetsecondlineformat{\selectlanguage{greek}\color{blue}{%
+\vrule height 12pt depth 6pt width 0pt}}
+\glsetthirdlineformat{\small}
+\mfsformattedvboxon
+\end{verbatim}
 
 %----------------------
 \para{Attaching commands to specific words}
@@ -1188,6 +1205,18 @@ linenumsa=true,
 */    The cat sat on the mat. 
 }
 \end{exe}
+
+The option \glmeta{addcaw=2;doemph,} is applying the command \glmeta{doemph} to word 2 of line (a).
+
+The option \glmeta{addcb=pkvcat,} is applying the command \glmeta{pkvcat} to every word  of line (b).
+
+The option \glmeta{addccw=6;doemph,} is applying the command \glmeta{doemph} to word 6 of line (c).
+
+The option \glmeta{addcxa=3;1;doemph,} is applying the command \glmeta{doemph} to word 1 of line (c).
+
+The option \glmeta{linenumsa=true,} displays the (first six) line numbers as lower case alphabetic.
+
+
 
 
 %----------------------
