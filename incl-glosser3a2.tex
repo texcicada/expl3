@@ -559,6 +559,9 @@ mpyc={},} m }
 preamble .tl_set:N = \g_gloss_preamble_tl,
 preamble .initial:n = {},
 preamble .default:n = {},
+linesep .tl_set:N = \g__gloss_linesep_tl,
+linesep .initial:n = {},
+linesep .default:n = {},
 wordstackstyle .tl_set:N = \g_gloss_wordstackstyle_tl,
 wordstackstyle .initial:n = \colorbox{blue!12},
 wordstackstyle .default:n = \colorbox{blue!12},
@@ -581,6 +584,8 @@ addcxd .tl_set:c = { l_gloss_clinexwxd_tl },
 addcxe .tl_set:c = { l_gloss_clinexwxe_tl },
 addcxf .tl_set:c = { l_gloss_clinexwxf_tl },
 linenumsa .bool_set:N = \g__gloss_numberthelinesa_bool,
+linenumsa .initial:n = false,
+linenumsa .default:n = false,
 addwsa .tl_set:c = { l_gloss_wordstacka_tl },
 %addca .tl_set:N = l_gloss_cline1_tl ,
 %%addca .initial:n = {\tl_gclear:c { l_gloss_cline1_tl } },
@@ -1952,7 +1957,20 @@ addwsa .tl_set:c = { l_gloss_wordstacka_tl },
 %   		\l_tmpa_tl
 %   		{ #3 }
 %   \exp_args:Nnnnx
-		\glinlinesbase[gloss]{ex2a}{*/}{ #3 }
+%%		\tl_show:N
+%%			\g__gloss_linesep_tl
+		\tl_if_empty:NTF
+			\g__gloss_linesep_tl
+			{
+			\glinlinesbase[gloss]{ex2a}{*/}{ #3 }
+			}%T
+			{
+%			\exp_args:Nnnx
+%			\glinlinesbase[gloss]{ex2a}{*/}{ #3 }
+%		\tl_show:N
+%			\g__gloss_linesep_tl
+			\glinlinesbase[gloss]{ex2a}{\g__gloss_linesep_tl}{ #3 }
+			}%F
 %    	  \endgroup
 
 }

@@ -1224,6 +1224,35 @@ The option \glmeta{linenumsa=true,} displays the (first six) line numbers as low
 
 ``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
 
+Done with:
+
+\begin{verbatim}
+``Cat'' is word
+{\glinlines[addcaw=1;pkvcat]{cat}}
+in the lookup.
+\end{verbatim}
+
+Here is an example, 
+\glinlines{%
+ Naoya-wa Mari-ga 
+ */     Naoya-.Top Mari-.Nom
+ },
+of some inline glossing.
+
+
+
+
+%----------------------
+\para{Separator string} The \glcmd{glinlines} assumes that the line separator markup is \glmeta{*/}. The underlying macro \glcmd{glinlinesbase} takes the separator string as a parameter, so that\\
+ \glcmd{glinlinesbase}[gloss]\{sep\}\{xx\}\{AtextxxBtext\}\\ 
+ produces \glinlinesbase[gloss]{sep}{xx}{AtextxxBtext}.
+The \glmeta{linesep} option passes the line separator through, so that\\
+\{ \glcmd{glinlines}[linesep=yy]\{CtextyyDtext\} \}\\ 
+ produces {\glinlines[linesep=yy]{CtextyyDtext}}.
+
+
+
+
 
 
 
@@ -1239,6 +1268,8 @@ addcaw=1;textbf,
 addcxb=1;1;underWavy,
 addcxc=1;7;textit,
 linenumsa=true,
+linesep,
+preamble,
 ]{%
           The cat sat on the mat. e::glsub!i;
 }
@@ -1283,7 +1314,9 @@ linenumsa=true,
 
 \begin{exe}
 \ex  \mnote{addwsa=}
-\glinlines[addwsa=2;textredit]{%
+\glinlines[addwsa=2;textredit,
+linesep,
+preamble,]{%
      The cat sat on the mat. 
 */    The cat sat on the mat. 
 */                 The cat sat on the mat. 
