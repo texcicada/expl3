@@ -1268,13 +1268,20 @@ addcaw=1;textbf,
 addcxb=1;1;underWavy,
 addcxc=1;7;textit,
 linenumsa=true,
-linesep,
-preamble,
 ]{%
           The cat sat on the mat. e::glsub!i;
 }
 \end{exe}
 
+
+\glmeta{addcaw=1;textbf,} makes the first word (1) on the first line (a) bold (textbf). There are 3 line-based options like this:
+\glmeta{addcaw}, \glmeta{addcbw}, \glmeta{addccw}, for the first, second and third lines respectively.
+
+\glmeta{addcxa=1;1;textit,}, line;word;command format, makes the first word (1) on the first line (1) italic (textit). There are 6 options like this: addcx[a-f]. They can refer to any line, including the same one.
+
+\glmeta{addcxb=1;1;underWavy,}, the first word of the first line is underlined with a wavy line.
+
+\glmeta{addcxc=1;7;textit,} makes the seventh word (7) on the first line (1) italic (textit).
 
 
 %%\begin{exe}
@@ -1310,13 +1317,12 @@ preamble,
 %}
 %\end{exe}
 
-\para{Highlighting a Wordstack}
+\para{Highlighting a Wordstack} A wordstack can be styled with \glmeta{addwsa=}. For example, \glmeta{addwsa=2;textredit}\footnote{Defined as \texttt{\textbackslash newcommand\textbackslash textredit[1]\{\textbackslash textcolor\{red\}\{\textbackslash textit\{\#1\}\}\}}.} makes the second wordstack red italic.
 
 \begin{exe}
 \ex  \mnote{addwsa=}
 \glinlines[addwsa=2;textredit,
-linesep,
-preamble,]{%
+]{%
      The cat sat on the mat. 
 */    The cat sat on the mat. 
 */                 The cat sat on the mat. 
