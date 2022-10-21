@@ -1317,10 +1317,10 @@ linenumsa=true,
 %}
 %\end{exe}
 
-\para{Highlighting a Wordstack} A wordstack can be styled with \glmeta{addwsa=}. For example, \glmeta{addwsa=2;textredit}\footnote{Defined as \texttt{\textbackslash newcommand\textbackslash textredit[1]\{\textbackslash textcolor\{red\}\{\textbackslash textit\{\#1\}\}\}}.} makes the second wordstack red italic.
+\para{Highlighting a Wordstack} A wordstack can be styled with \glmeta{addwsa=}. For example, \glmeta{addwsa=2;textredit}\footnote{Defined as \texttt{\textbackslash newcommand\textbackslash textredit[1]\{\textbackslash textcolor\{red\}\{\textbackslash textit\{\#1\}\}\}}.} makes the second wordstack red italic. Up to three wordstacks and be highlighted (addws[a-c]).
 
 \begin{exe}
-\ex  \mnote{addwsa=}
+		\ex  \mnote{addwsa=}
 \glinlines[addwsa=2;textredit,
 ]{%
      The cat sat on the mat. 
@@ -1339,10 +1339,11 @@ linenumsa=true,
 %    I            \clt {don't have}       \clf questions \\
 %\end{exe}
 
-\glsetfirstlineformat{\cjk}
+
 \begin{exe}
-\ex 
+\ex  \glsetfirstlineformat{\cjk\Large}
 \glinlines[addwsa=2;textred,
+addwsb=4;textbluebf,
 addcb=xpppinyin,
 linenumsa=true,
 ]{%

@@ -179,6 +179,7 @@
 
 \newcommand\textred[1]{\textcolor{red}{#1}}
 \newcommand\textredit[1]{\textcolor{red}{\textit{#1}}}
+\newcommand\textbluebf[1]{\textcolor{blue}{\textbf{#1}}}
 %\newcommand\xp[1]}{\xpinyin*{#1}}
 \newcommand\gleg{e.g.,\space}
 \newcommand\glie{i.e.,\space}
@@ -587,6 +588,8 @@ linenumsa .bool_set:N = \g__gloss_numberthelinesa_bool,
 linenumsa .initial:n = false,
 linenumsa .default:n = false,
 addwsa .tl_set:c = { l_gloss_wordstacka_tl },
+addwsb .tl_set:c = { l_gloss_wordstackb_tl },
+addwsc .tl_set:c = { l_gloss_wordstackc_tl },
 %addca .tl_set:N = l_gloss_cline1_tl ,
 %%addca .initial:n = {\tl_gclear:c { l_gloss_cline1_tl } },
 %unknown .initial:n = {},
@@ -945,7 +948,8 @@ addwsa .tl_set:c = { l_gloss_wordstacka_tl },
 				\l_tmpc_tl
 												}}% end line3w
 			}% end has value
-%---
+%------------------
+%--- workstack-a
 % wordstack has ?priority, so comes ?last
 		\tl_if_empty:cF { l_gloss_wordstacka_tl }
 		{  
@@ -965,6 +969,54 @@ addwsa .tl_set:c = { l_gloss_wordstacka_tl },
 				\l_tmpc_tl
 												}% end word X
 			}% end has value
+%------------------
+%--- workstack-b
+% wordstack has ?priority, so comes ?last
+		\tl_if_empty:cF { l_gloss_wordstackb_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator
+			{ \tl_use:c { l_gloss_wordstackb_tl } }
+			
+					\int_compare:nNnT
+{ \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } }
+								  {
+%		\tl_show:c { l_gloss_cline1_tl }
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 2 } }		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{\l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}% end word X
+			}% end has value
+%------------------
+%--- workstack-c
+% wordstack has ?priority, so comes ?last
+		\tl_if_empty:cF { l_gloss_wordstackc_tl }
+		{  
+			\exp_args:Nnnx
+	\seq_gset_split:Nnn 
+		\l_tmpa_seq
+			{ ; } % separator
+			{ \tl_use:c { l_gloss_wordstackc_tl } }
+			
+					\int_compare:nNnT
+{ \g__gloss_wordloop_int } = { \seq_item:Nn \l_tmpa_seq { 1 } }
+								  {
+%		\tl_show:c { l_gloss_cline1_tl }
+\tl_set:Nx \l_tmpe_tl { \seq_item:Nn \l_tmpa_seq { 2 } }		\regex_replace_all:nnN
+				{ (\S+) }
+				{ \c{\u{\l_tmpe_tl}} \cB\{ \0 \cE\} }
+				\l_tmpc_tl
+												}% end word X
+			}% end has value
+%---
+
+
+%---
+
+
 %---
 
 
