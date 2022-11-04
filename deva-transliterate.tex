@@ -55,6 +55,66 @@
 \tl_new:N \l_mytranslit_tl
 
 
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------
+	\cs_set:Nn \ic_funcvowelsveltdeva: {
+	\regex_replace_all:nnN
+				{ (\S)(aa) }
+				{ \1 a \c{Uchar} 2366 \c{tex_relax:D} }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ (\S)(e) }
+				{ \1 a \c{Uchar} 2375 \c{tex_relax:D} }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ (\S)(i) }
+				{ \1 a \c{Uchar} 2367 \c{tex_relax:D} }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ (\S)(o) }
+				{ \1 a \c{Uchar} 2379 \c{tex_relax:D} }
+				\l_mytranslit_tl
+
+}
+
+
+%------------------
+	\cs_set:Nn \ic_funcvowelsveltiast: {
+	\regex_replace_all:nnN
+				{ (aa) }
+				{ ā }
+				\l_mytranslit_tl
+	\regex_replace_all:nnN
+				{ (ii) }
+				{ ī }
+				\l_mytranslit_tl
+	\regex_replace_all:nnN
+				{ (uu) }
+				{ ū }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ \.h }
+				{ ḥ  }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ \.m }
+				{ ṃ  }
+				\l_mytranslit_tl
+\regex_replace_all:nnN
+				{ \.n }
+				{ ṅ }
+				\l_mytranslit_tl
+
+}
+
+
+
+
+
 %****************************************************
 %*
 %****************************************************
@@ -110,6 +170,10 @@
 
 
 
+
+
+\tl_new:N \l_mytranslookup_tl
+
 %****************************************************
 %*
 %****************************************************
@@ -124,6 +188,18 @@
 %					\seq_show:c
 %							 { l_trtmpa_seq }
 							
+		\tl_set:Nx							
+				\l_mytranslookup_tl
+				  {
+						\seq_item:Nn
+						   \l_trtmpa_seq 
+								{ \l_trns_fielda_tl } % field number in record (first of pair)
+								}				
+				
+		\tl_if_empty:NF
+			\l_mytranslookup_tl
+			{ 
+						% if there is somthing to look up:	
 					\tl_replace_all:Nxx  
 							\l_mytranslit_tl 
 							{ 
@@ -159,7 +235,7 @@
 %					\group_end:		
 %					
 %					\tex_par:D
-
+				} % end lookup
 	}
 
 
@@ -485,6 +561,9 @@ fieldc .default:n = { },
 formatc .tl_set:c = { l_trns_formatc_tl },
 formatc .initial:n = { },
 formatc .default:n = { },
+showoriginal .bool_set:c = { l_trns_showoriginal_bool },
+showoriginal .initial:n = {false},
+showoriginal .default:n = {false},
 }
 
 
@@ -518,27 +597,65 @@ formatc .default:n = { },
 
 }
 
+\tl_new:N \l_mytranslitorig_tl
+\regex_const:Nn \c_consonantaa_regex { ([rm]{1})(aa) }
 
+\tl_new:N \l_trns_fielddeva_tl
+\tl_new:N \l_trns_fieldvelt_tl
+\tl_new:N \l_trns_fieldiast_tl
+\tl_set:Nn \l_trns_fielddeva_tl {2}
+\tl_set:Nn \l_trns_fieldvelt_tl {7}
+\tl_set:Nn \l_trns_fieldiast_tl {8}
 %****************************************************
 %*
 %****************************************************
 %--------------------
-\NewDocumentCommand { \translit } { o m O{} +m } { 
+\NewDocumentCommand { \translitx } { o m O{} +m } { 
 %1=namespace
 %2=seqname 
 %3=keys
 %4=data
 
 		\tl_set:Nx \l_mytranslit_tl { #4 }
+
+
  
       \IfNoValueF{#3}
     {
     	\keys_set:nn { trnsllist } { #3 } 
     	}
-
+		\bool_if:NT
+				\l_trns_showoriginal_bool  %  key
+				{
+				  \tl_set_eq:NN
+				  			\l_mytranslitorig_tl
+				  			\l_mytranslit_tl
+				}
+				
+				
 				\IfNoValueTF { #1 } 
 						{ \tl_clear:N \g_fc_namespace_tl } 
 						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+% pre-process vowels
+%\ic_funcvowels2:
+\tl_case:Nn   \l_trns_fielda_tl
+{
+	\l_trns_fieldvelt_tl { 
+					\tl_case:Nn   \l_trns_fieldb_tl
+					{
+							\l_trns_fielddeva_tl { \ic_funcvowelsveltdeva: }
+							\l_trns_fieldiast_tl { \ic_funcvowelsveltiast: }
+						} 
+	   }
+} 
+
+
+% -----
+
+
+
 
 
 		\tl_if_empty:cTF
@@ -569,9 +686,111 @@ formatc .default:n = { },
 			}
 
 
+		\bool_if:NT
+				\l_trns_showoriginal_bool
+				{
+						\group_begin:
+			    \l_trns_formata_tl
+				  \tl_use:N
+				  			\l_mytranslitorig_tl
+				  	\group_end:		
+				  	{\usefont{T1}{lmr}{m}{it}\tex_space:D (original)}
+		  			\tex_par:D
+				}
+
 		{
-		\fdevb
-		\tl_use:N \l_mytranslit_tl
+		  \group_begin:
+					\l_trns_formatb_tl
+					\tl_use:N \l_mytranslit_tl
+				\group_end:
+		}
+}
+
+
+%****************************************************
+%*
+%****************************************************
+%--------------------
+\NewDocumentCommand { \translit } { o m O{} +m } { 
+%1=namespace
+%2=seqname 
+%3=keys
+%4=data
+
+		\tl_set:Nx \l_mytranslit_tl { #4 }
+
+
+ 
+      \IfNoValueF{#3}
+    {
+    	\keys_set:nn { trnsllist } { #3 } 
+    	}
+		\bool_if:NT
+				\l_trns_showoriginal_bool  %  key
+				{
+				  \tl_set_eq:NN
+				  			\l_mytranslitorig_tl
+				  			\l_mytranslit_tl
+				}
+				
+				
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+% pre-process vowels
+%				\regex_replace_all:NnN
+%				\u{c_consonant_regex}
+%				{ /1 ा }
+%				\l_mytranslit_tl
+
+% -----
+
+		\tl_if_empty:cTF
+			{ l_trns_placeholder_tl } % 34633
+			{
+		\seq_map_function:cN
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+					\ic_functranslitseq:n 
+			}
+			{
+				%A:
+		\seq_map_function:cN
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+					\ic_functranslitseqa:n 
+					
+					\tl_set_eq:NN \l_mytranslitph_tl \l_mytranslit_tl				 
+%			\tl_show:N \l_mytranslitph_tl
+					
+					
+				%B:
+		\seq_map_function:cN
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+					\ic_functranslitseqb:n 
+%			\tl_show:N \l_mytranslitph_tl
+					
+					\tl_set_eq:NN \l_mytranslit_tl \l_mytranslitph_tl				 
+	
+			}
+
+
+		\bool_if:NT
+				\l_trns_showoriginal_bool
+				{
+						\group_begin:
+			    \l_trns_formata_tl
+				  \tl_use:N
+				  			\l_mytranslitorig_tl
+				  	\group_end:		
+				  	{\usefont{T1}{lmr}{m}{it}\tex_space:D (original)}
+		  			\tex_par:D
+				}
+
+		{
+		  \group_begin:
+					\l_trns_formatb_tl
+					\tl_use:N \l_mytranslit_tl
+				\group_end:
 		}
 }
 
@@ -603,9 +822,9 @@ formatc .default:n = { },
 
 \mfsloadaseq[x]{devatranslit}{%
 //;ऀ;U+0900 ऀ DEVANAGARI SIGN INVERTED CANDRABINDU ;1;2304;x0001;;
-,/;ँ;U+0901 ँ DEVANAGARI SIGN CANDRABINDU ;2;2305;x0002;;˜ 
-,.m;ं;U+0902 ं DEVANAGARI SIGN ANUSVARA ;3;2306;x0003;;ṃ 
-,.h;ः;U+0903 ः DEVANAGARI SIGN VISARGA ;4;2307;x0004;;ḥ 
+,/;ँ;U+0901 ँ DEVANAGARI SIGN CANDRABINDU ;2;2305;x0002;;x 
+,.m;ं;U+0902 ं DEVANAGARI SIGN ANUSVARA ;3;2306;x0003;.m;ṃ 
+,.h;ः;U+0903 ः DEVANAGARI SIGN VISARGA ;4;2307;x0004;.h;ḥ 
 ,a=;ऄ;U+0904 ऄ DEVANAGARI LETTER SHORT A ;5;2308;x0005;;
 ,a-;अ;U+0905 अ DEVANAGARI LETTER A ;6;2309;x0006;a;a 
 ,aa-;आ;U+0906 आ DEVANAGARI LETTER AA ;7;2310;x0007;aa;ā 
@@ -632,7 +851,7 @@ formatc .default:n = { },
 ,cha;छ;U+091B छ DEVANAGARI LETTER CHA ;28;2331;x0028;cha;ch
 ,ja;ज;U+091C ज DEVANAGARI LETTER JA ;29;2332;x0029;ja;j
 ,jha;झ;U+091D झ DEVANAGARI LETTER JHA ;30;2333;x0030;jha;jh
-,\~na;ञ;U+091E ञ DEVANAGARI LETTER NYA ;31;2334;x0031;~na;ñ
+,\~na;ञ;U+091E ञ DEVANAGARI LETTER NYA ;31;2334;x0031;\~na;ñ
 ,.ta;ट;U+091F ट DEVANAGARI LETTER TTA ;32;2335;x0032;.ta;ṭ
 ,.tha;ठ;U+0920 ठ DEVANAGARI LETTER TTHA ;33;2336;x0033;.tha;ṭh
 ,.da;ड;U+0921 ड DEVANAGARI LETTER DDA ;34;2337;x0034;.da;ḍ
@@ -778,14 +997,18 @@ formatb=\fdevb\Large,
 ]
 \end{multicols}
 
-\translit[x]{devatranslit}{data a-baiicaii..  kauula bananasa sa\&kauula }
+\translit[x]{devatranslit}[
+formata=\usefont{T1}{lmtt}{m}{n},
+formatb=\fdevb,
+]
+{data a-baiicaii..  kauula bananasa sa\&kauula }
 
 .dha is set up as 
 \translit[x]{devatranslit}[
 fielda=1,
 formata=\usefont{T1}{lmtt}{m}{n},
 fieldb=3,
-formatb=\usefont{T1}{lmtt}{m}{n}\small,
+formatb=\fdevb,%\usefont{T1}{lmtt}{m}{n}\small,
 placeholder=4,
 ]{.dha}
 and maps to
@@ -805,7 +1028,7 @@ xascii2unicode
 fielda=1,
 formata=\usefont{T1}{lmtt}{m}{n},
 fieldb=3,
-formatb=\usefont{T1}{lmtt}{m}{n}\small,
+%formatb=\fdevb\small,
 ]
 
 
@@ -881,6 +1104,42 @@ fieldc=2,
 formatc=\fdevb,
 ]
 \end{multicols}
+
+
+
+
+
+
+
+\newpage
+\translit[x]{devatranslit}[
+fielda=2,
+formata=\fdevb,
+fieldb=8,
+formatb=\fipa,
+]{
+रामो राजमणि सदा विजयते रामं रमेशं भजे
+}
+
+\translitx[x]{devatranslit}[
+fielda=7,
+formata=\fipa,
+fieldb=2,
+formatb=\fdevb,
+showoriginal=true,
+]{
+raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+}
+
+\translitx[x]{devatranslit}[
+fielda=7,
+formata=\fipa,
+fieldb=8,
+formatb=\fipa,
+showoriginal=false,
+]{
+raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+}
 
 
 
