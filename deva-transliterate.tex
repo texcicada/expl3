@@ -60,8 +60,72 @@
 %****************************************************
 %*
 %****************************************************
-%------------------
-	\cs_set:Nn \ic_funcvowelsveltdeva: {
+%------------------12
+	\cs_set:Nn \ic_funcvowelsxasciidevapost: {
+	\regex_replace_all:nnN
+				{ a }
+				{  }
+				\l_mytranslit_tl
+}
+
+%****************************************************
+%*
+%****************************************************
+%------------------21
+	\cs_set:Nn \ic_funcvowelsdevaxasciipre: {
+	\regex_replace_all:nnN
+				{ ([क-ह]) }
+				{ 
+					\1
+					X
+%					\c{textcolor}\cB\{red\cE\}\cB\{ X \cE\} 
+				 }
+				\l_mytranslit_tl
+}
+
+%------------------21
+	\cs_set:Nn \ic_funcvowelsdevaxasciipost: {
+	% no end vowel
+	\regex_replace_all:nnN
+				{ (X)(\s) }
+				{ 
+					\2
+				 }
+				\l_mytranslit_tl
+%\tl_show:N \l_mytranslit_tl
+  % halant
+	\regex_replace_all:nnN
+				{ (X\c{&}) }
+				{ 
+					
+				 }
+				\l_mytranslit_tl
+  % before non-inherent vowel
+	\regex_replace_all:nnN
+				{ (X)([aeiou]) }
+				{ 
+					\2
+				 }
+				\l_mytranslit_tl
+  % is inherent vowel
+	\regex_replace_all:nnN
+				{ (X) }
+				{ 
+					a
+				 }
+				\l_mytranslit_tl
+}
+
+
+
+
+
+
+%****************************************************
+%*
+%****************************************************
+%------------------72
+	\cs_set:Nn \ic_funcvowelsveltdevapre: {
 	\regex_replace_all:nnN
 				{ (\S)(aa) }
 				{ \1 a \c{Uchar} 2366 \c{tex_relax:D} }
@@ -82,37 +146,66 @@
 }
 
 
-%------------------
-	\cs_set:Nn \ic_funcvowelsveltiast: {
+%------------------78
+	\cs_set:Nn \ic_funcvowelsveltiastmid: {
+
 	\regex_replace_all:nnN
-				{ (aa) }
-				{ ā }
-				\l_mytranslit_tl
-	\regex_replace_all:nnN
-				{ (ii) }
-				{ ī }
-				\l_mytranslit_tl
-	\regex_replace_all:nnN
-				{ (uu) }
-				{ ū }
-				\l_mytranslit_tl
-\regex_replace_all:nnN
-				{ \.h }
-				{ ḥ  }
-				\l_mytranslit_tl
-\regex_replace_all:nnN
-				{ \.m }
-				{ ṃ  }
-				\l_mytranslit_tl
-\regex_replace_all:nnN
-				{ \.n }
-				{ ṅ }
-				\l_mytranslit_tl
+				{ ([蝟-螃])([^蝐-蝞螈-螫]) }
+				{ \1 a }
+				\l_mytranslitph_tl
+
+
+
+%	\regex_replace_all:nnN
+%				{ (aa) }
+%				{ ā }
+%				\l_mytranslit_tl
+
+%	\regex_replace_all:nnN
+%				{ (aa) }
+%				{ ā }
+%				\l_mytranslit_tl
+%		\regex_replace_all:nnN
+%					{ (ii) }
+%					{ ī }
+%					\l_mytranslit_tl
+%		\regex_replace_all:nnN
+%					{ (uu) }
+%					{ ū }
+%					\l_mytranslit_tl
+%	\regex_replace_all:nnN
+%					{ \.h }
+%					{ ḥ  }
+%					\l_mytranslit_tl
+%	\regex_replace_all:nnN
+%					{ \.m }
+%					{ ṃ  }
+%					\l_mytranslit_tl
+%	\regex_replace_all:nnN
+%					{ \.n }
+%					{ ṅ }
+%					\l_mytranslit_tl
 
 }
 
 
-
+%------------------28
+	\cs_set:Nn \ic_funcvowelsdevaiastpost: {
+	\regex_replace_all:nnN
+				{ ([hlmnrtv]{1})(/) }
+				{ \1 x\2 }
+				\l_mytranslit_tl
+	\regex_replace_all:nnN
+				{ ([hlmnrtv]{1})([^(ā|i|/{3})]{1}) }
+				{ \1 a }
+				\l_mytranslit_tl
+%				([^t]+|(t([^e]|$)|te([^s]|$)|tes([^t]|$)))+
+%^((?!hede).)*$
+%%%	\regex_replace_all:nnN
+%%%				{ ([hlmnt])(/{3}) }
+%%%				{ \1 }
+%%%				\l_mytranslit_tl
+}
 
 
 %****************************************************
@@ -259,6 +352,19 @@
 							{ #1 }
 %					\seq_show:c
 %							 { l_trtmpa_seq }
+
+		\tl_set:Nx							
+				\l_mytranslookup_tl
+				  {
+						\seq_item:Nn
+						   \l_trtmpa_seq 
+								{ \l_trns_fielda_tl } % field number in record (first of pair)
+								}				
+				
+		\tl_if_empty:NF
+			\l_mytranslookup_tl
+			{ 
+						% if there is somthing to look up:	
 							
 					\int_set:Nn 
 							\l_tmpa_int 
@@ -268,7 +374,9 @@
 						   \l_trtmpa_seq 
 						   { \l_trns_placeholder_tl }
 							}
-														
+
+
+%\int_show:N \l_tmpa_int														
 					\tl_replace_all:Nxx  
 							\l_mytranslit_tl 
 							{ 
@@ -284,6 +392,8 @@
 %***								{ \l_trns_fieldb_tl }% field number in record (second of pair)
 							 } 
 %			\tl_show:N \l_mytranslit_tl
+
+		} % end lookup
 							 
 	}
 
@@ -600,9 +710,11 @@ showoriginal .default:n = {false},
 \tl_new:N \l_mytranslitorig_tl
 \regex_const:Nn \c_consonantaa_regex { ([rm]{1})(aa) }
 
+\tl_new:N \l_trns_fieldxascii_tl
 \tl_new:N \l_trns_fielddeva_tl
 \tl_new:N \l_trns_fieldvelt_tl
 \tl_new:N \l_trns_fieldiast_tl
+\tl_set:Nn \l_trns_fieldxascii_tl {1}
 \tl_set:Nn \l_trns_fielddeva_tl {2}
 \tl_set:Nn \l_trns_fieldvelt_tl {7}
 \tl_set:Nn \l_trns_fieldiast_tl {8}
@@ -642,15 +754,26 @@ showoriginal .default:n = {false},
 %\ic_funcvowels2:
 \tl_case:Nn   \l_trns_fielda_tl
 {
+%  % 2 ---
+	\l_trns_fielddeva_tl { 
+					\tl_case:Nn   \l_trns_fieldb_tl
+					{
+							\l_trns_fieldxascii_tl { \ic_funcvowelsdevaxasciipre: }
+%							\l_trns_fieldvelt_tl { \ic_funcvowelsdevavelt: }
+%							\l_trns_fieldiast_tl { \ic_funcvowelsdevaiast: }
+						} 
+	   }
+  % 7 ---
 	\l_trns_fieldvelt_tl { 
 					\tl_case:Nn   \l_trns_fieldb_tl
 					{
-							\l_trns_fielddeva_tl { \ic_funcvowelsveltdeva: }
-							\l_trns_fieldiast_tl { \ic_funcvowelsveltiast: }
+							\l_trns_fielddeva_tl { \ic_funcvowelsveltdevapre: }
+%							\l_trns_fieldiast_tl { \ic_funcvowelsveltiast: }
 						} 
 	   }
 } 
 
+%			\tl_show:N \l_mytranslit_tl
 
 % -----
 
@@ -674,12 +797,47 @@ showoriginal .default:n = {false},
 					\tl_set_eq:NN \l_mytranslitph_tl \l_mytranslit_tl				 
 %			\tl_show:N \l_mytranslitph_tl
 					
+% mid-process vowels
+\tl_case:Nn   \l_trns_fielda_tl
+{
+%  % 2 ---
+%	\l_trns_fielddeva_tl { 
+%					\tl_case:Nn   \l_trns_fieldb_tl
+%					{
+%%							\l_trns_fieldvelt_tl { \ic_funcvowelsdevavelt: }
+%							\l_trns_fieldiast_tl { \ic_funcvowelsdevaiast: }
+%						} 
+%	   }
+  % 7 ---
+	\l_trns_fieldvelt_tl { 
+					\tl_case:Nn   \l_trns_fieldb_tl
+					{
+%							\l_trns_fielddeva_tl { \ic_funcvowelsveltdeva: }
+							\l_trns_fieldiast_tl { \ic_funcvowelsveltiastmid: }
+						} 
+	   }
+} 
+					
+					
+
+
+
+
+
 					
 				%B:
 		\seq_map_function:cN
 					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
 					\ic_functranslitseqb:n 
 %			\tl_show:N \l_mytranslitph_tl
+	
+%		\regex_replace_all:nnN
+%				{ ; }
+%				{  }
+%				\l_mytranslitph_tl
+%
+%		\tl_show:N \l_mytranslitph_tl
+		
 					
 					\tl_set_eq:NN \l_mytranslit_tl \l_mytranslitph_tl				 
 	
@@ -697,6 +855,34 @@ showoriginal .default:n = {false},
 				  	{\usefont{T1}{lmr}{m}{it}\tex_space:D (original)}
 		  			\tex_par:D
 				}
+
+
+
+
+
+% post-process vowels
+\tl_case:Nn   \l_trns_fielda_tl
+{
+  % 1 --
+  \l_trns_fieldxascii_tl { 
+					\tl_case:Nn   \l_trns_fieldb_tl
+					{
+							\l_trns_fielddeva_tl { \ic_funcvowelsxasciidevapost: }
+						} 
+	   }
+  
+  % 2 ---
+	\l_trns_fielddeva_tl { 
+					\tl_case:Nn   \l_trns_fieldb_tl
+					{
+							\l_trns_fieldxascii_tl { \ic_funcvowelsdevaxasciipost: }
+							\l_trns_fieldiast_tl { \ic_funcvowelsdevaiastpost: }
+						} 
+	   }
+
+}
+
+
 
 		{
 		  \group_begin:
@@ -822,7 +1008,7 @@ showoriginal .default:n = {false},
 
 \mfsloadaseq[x]{devatranslit}{%
 //;ऀ;U+0900 ऀ DEVANAGARI SIGN INVERTED CANDRABINDU ;1;2304;x0001;;
-,/;ँ;U+0901 ँ DEVANAGARI SIGN CANDRABINDU ;2;2305;x0002;;x 
+,/;ँ;U+0901 ँ DEVANAGARI SIGN CANDRABINDU ;2;2305;x0002;;˜ 
 ,.m;ं;U+0902 ं DEVANAGARI SIGN ANUSVARA ;3;2306;x0003;.m;ṃ 
 ,.h;ः;U+0903 ः DEVANAGARI SIGN VISARGA ;4;2307;x0004;.h;ḥ 
 ,a=;ऄ;U+0904 ऄ DEVANAGARI LETTER SHORT A ;5;2308;x0005;;
@@ -842,52 +1028,52 @@ showoriginal .default:n = {false},
 ,o=;ऒ;U+0912 ऒ DEVANAGARI LETTER SHORT O ;19;2322;x0019;;
 ,o-;ओ;U+0913 ओ DEVANAGARI LETTER O ;20;2323;x0020;o;o 
 ,au-;औ;U+0914 औ DEVANAGARI LETTER AU ;21;2324;x0021;au;au 
-,ka;क;U+0915 क DEVANAGARI LETTER KA ;22;2325;x0022;ka;k
-,kha;ख;U+0916 ख DEVANAGARI LETTER KHA ;23;2326;x0023;kha;kh
-,ga;ग;U+0917 ग DEVANAGARI LETTER GA ;24;2327;x0024;ga;g
-,gha;घ;U+0918 घ DEVANAGARI LETTER GHA ;25;2328;x0025;gha;gh
-,"na;ङ;U+0919 ङ DEVANAGARI LETTER NGA ;26;2329;x0026;"na;ṅ
-,ca;च;U+091A च DEVANAGARI LETTER CA ;27;2330;x0027;ca;c
-,cha;छ;U+091B छ DEVANAGARI LETTER CHA ;28;2331;x0028;cha;ch
-,ja;ज;U+091C ज DEVANAGARI LETTER JA ;29;2332;x0029;ja;j
-,jha;झ;U+091D झ DEVANAGARI LETTER JHA ;30;2333;x0030;jha;jh
-,\~na;ञ;U+091E ञ DEVANAGARI LETTER NYA ;31;2334;x0031;\~na;ñ
-,.ta;ट;U+091F ट DEVANAGARI LETTER TTA ;32;2335;x0032;.ta;ṭ
-,.tha;ठ;U+0920 ठ DEVANAGARI LETTER TTHA ;33;2336;x0033;.tha;ṭh
-,.da;ड;U+0921 ड DEVANAGARI LETTER DDA ;34;2337;x0034;.da;ḍ
-,.dha;ढ;U+0922 ढ DEVANAGARI LETTER DDHA ;35;2338;x0035;.dha;ḍh
-,.na;ण;U+0923 ण DEVANAGARI LETTER NNA ;36;2339;x0036;.na;ṇ
-,ta;त;U+0924 त DEVANAGARI LETTER TA ;37;2340;x0037;ta;t
-,tha;थ;U+0925 थ DEVANAGARI LETTER THA ;38;2341;x0038;tha;th
-,da;द;U+0926 द DEVANAGARI LETTER DA ;39;2342;x0039;da;d
-,dha;ध;U+0927 ध DEVANAGARI LETTER DHA ;40;2343;x0040;dha;dh
-,na;न;U+0928 न DEVANAGARI LETTER NA ;41;2344;x0041;na;n
+,k;क;U+0915 क DEVANAGARI LETTER KA ;22;2325;x0022;k;k
+,kh;ख;U+0916 ख DEVANAGARI LETTER KHA ;23;2326;x0023;kh;kh
+,g;ग;U+0917 ग DEVANAGARI LETTER GA ;24;2327;x0024;g;g
+,gh;घ;U+0918 घ DEVANAGARI LETTER GHA ;25;2328;x0025;gh;gh
+,"n;ङ;U+0919 ङ DEVANAGARI LETTER NGA ;26;2329;x0026;"n;ṅ
+,c;च;U+091A च DEVANAGARI LETTER CA ;27;2330;x0027;c;c
+,ch;छ;U+091B छ DEVANAGARI LETTER CHA ;28;2331;x0028;ch;ch
+,j;ज;U+091C ज DEVANAGARI LETTER JA ;29;2332;x0029;j;j
+,jh;झ;U+091D झ DEVANAGARI LETTER JHA ;30;2333;x0030;jh;jh
+,\~na;ञ;U+091E ञ DEVANAGARI LETTER NYA ;31;2334;x0031;~n;ñ
+,.t;ट;U+091F ट DEVANAGARI LETTER TTA ;32;2335;x0032;.t;ṭ
+,.th;ठ;U+0920 ठ DEVANAGARI LETTER TTHA ;33;2336;x0033;.th;ṭh
+,.d;ड;U+0921 ड DEVANAGARI LETTER DDA ;34;2337;x0034;.d;ḍ
+,.dh;ढ;U+0922 ढ DEVANAGARI LETTER DDHA ;35;2338;x0035;.dh;ḍh
+,.n;ण;U+0923 ण DEVANAGARI LETTER NNA ;36;2339;x0036;.n;ṇ
+,t;त;U+0924 त DEVANAGARI LETTER TA ;37;2340;x0037;t;t
+,th;थ;U+0925 थ DEVANAGARI LETTER THA ;38;2341;x0038;th;th
+,d;द;U+0926 द DEVANAGARI LETTER DA ;39;2342;x0039;d;d
+,dh;ध;U+0927 ध DEVANAGARI LETTER DHA ;40;2343;x0040;dh;dh
+,n;न;U+0928 न DEVANAGARI LETTER NA ;41;2344;x0041;n;n
 ,.nna;ऩ;U+0929 ऩ DEVANAGARI LETTER NNNA ;42;2345;x0042;;
-,pa;प;U+092A प DEVANAGARI LETTER PA ;43;2346;x0043;pa;p
-,pha;फ;U+092B फ DEVANAGARI LETTER PHA ;44;2347;x0044;pha;ph
-,ba;ब;U+092C ब DEVANAGARI LETTER BA ;45;2348;x0045;ba;b
-,bha;भ;U+092D भ DEVANAGARI LETTER BHA ;46;2349;x0046;bha;bh
-,ma;म;U+092E म DEVANAGARI LETTER MA ;47;2350;x0047;ma;m
-,ya;य;U+092F य DEVANAGARI LETTER YA ;48;2351;x0048;ya;y
-,ra;र;U+0930 र DEVANAGARI LETTER RA ;49;2352;x0049;ra;r
+,p;प;U+092A प DEVANAGARI LETTER PA ;43;2346;x0043;p;p
+,ph;फ;U+092B फ DEVANAGARI LETTER PHA ;44;2347;x0044;ph;ph
+,b;ब;U+092C ब DEVANAGARI LETTER BA ;45;2348;x0045;b;b
+,bh;भ;U+092D भ DEVANAGARI LETTER BHA ;46;2349;x0046;bh;bh
+,m;म;U+092E म DEVANAGARI LETTER MA ;47;2350;x0047;m;m
+,y;य;U+092F य DEVANAGARI LETTER YA ;48;2351;x0048;y;y
+,r;र;U+0930 र DEVANAGARI LETTER RA ;49;2352;x0049;r;r
 ,rra;ऱ;U+0931 ऱ DEVANAGARI LETTER RRA ;50;2353;x0050;;
-,la;ल;U+0932 ल DEVANAGARI LETTER LA ;51;2354;x0051;la;l
+,l;ल;U+0932 ल DEVANAGARI LETTER LA ;51;2354;x0051;l;l
 ,.L;ळ;U+0933 ळ DEVANAGARI LETTER LLA ;52;2355;x0052;;
 ,.LL;ऴ;U+0934 ऴ DEVANAGARI LETTER LLLA ;53;2356;x0053;;
-,va;व;U+0935 व DEVANAGARI LETTER VA ;54;2357;x0054;va;v
-,"sa;श;U+0936 श DEVANAGARI LETTER SHA ;55;2358;x0055;"sa;ś
-,.sa;ष;U+0937 ष DEVANAGARI LETTER SSA ;56;2359;x0056;.sa;ṣ
-,sa;स;U+0938 स DEVANAGARI LETTER SA ;57;2360;x0057;sa;s
-,ha;ह;U+0939 ह DEVANAGARI LETTER HA ;58;2361;x0058;ha;h
+,v;व;U+0935 व DEVANAGARI LETTER VA ;54;2357;x0054;v;v
+,"s;श;U+0936 श DEVANAGARI LETTER SHA ;55;2358;x0055;"s;ś
+,.s;ष;U+0937 ष DEVANAGARI LETTER SSA ;56;2359;x0056;.s;ṣ
+,s;स;U+0938 स DEVANAGARI LETTER SA ;57;2360;x0057;s;s
+,h;ह;U+0939 ह DEVANAGARI LETTER HA ;58;2361;x0058;h;h
 ,oe;ऺ;U+093A ऺ DEVANAGARI VOWEL SIGN OE ;59;2362;x0059;;
 ,ooe;ऻ;U+093B ऻ DEVANAGARI VOWEL SIGN OOE ;60;2363;x0060;;
 ,N;़;U+093C ़ DEVANAGARI SIGN NUKTA ;61;2364;x0061;;
 ,.a;ऽ;U+093D ऽ DEVANAGARI SIGN AVAGRAHA ;62;2365;x0062;;' 
-,aa;ा;U+093E ा DEVANAGARI VOWEL SIGN AA ;63;2366;x0063;;
-,i;ि;U+093F ि DEVANAGARI VOWEL SIGN I ;64;2367;x0064;;
-,ii;ी;U+0940 ी DEVANAGARI VOWEL SIGN II ;65;2368;x0065;;
-,u;ु;U+0941 ु DEVANAGARI VOWEL SIGN U ;66;2369;x0066;;
-,uu;ू;U+0942 ू DEVANAGARI VOWEL SIGN UU ;67;2370;x0067;;
+,aa;ा;U+093E ा DEVANAGARI VOWEL SIGN AA ;63;2366;x0063;;ā 
+,i;ि;U+093F ि DEVANAGARI VOWEL SIGN I ;64;2367;x0064;;i 
+,ii;ी;U+0940 ी DEVANAGARI VOWEL SIGN II ;65;2368;x0065;;ī 
+,u;ु;U+0941 ु DEVANAGARI VOWEL SIGN U ;66;2369;x0066;;u 
+,uu;ू;U+0942 ू DEVANAGARI VOWEL SIGN UU ;67;2370;x0067;;ū 
 ,.r;ृ;U+0943 ृ DEVANAGARI VOWEL SIGN VOCALIC R ;68;2371;x0068;;
 ,.l;ॄ;U+0944 ॄ DEVANAGARI VOWEL SIGN VOCALIC RR ;69;2372;x0069;;
 ,\~e;ॅ;U+0945 ॅ DEVANAGARI VOWEL SIGN CANDRA E ;70;2373;x0070;;
@@ -898,7 +1084,7 @@ showoriginal .default:n = {false},
 ,o=;ॊ;U+094A ॊ DEVANAGARI VOWEL SIGN SHORT O ;75;2378;x0075;;
 ,o;ो;U+094B ो DEVANAGARI VOWEL SIGN O ;76;2379;x0076;;
 ,au;ौ;U+094C ौ DEVANAGARI VOWEL SIGN AU ;77;2380;x0077;;
-,\&;्;U+094D ् DEVANAGARI SIGN VIRAMA ;78;2381;x0078;;
+,\&;्;U+094D ् DEVANAGARI SIGN VIRAMA ;78;2381;x0078;;///
 %  
 %  
 ,.o;ॐ;U+0950 ॐ DEVANAGARI OM ;81;2384;x0081;;
@@ -982,7 +1168,7 @@ showoriginal .default:n = {false},
 ,ayno;ꣾ;U+A8FE ꣾ DEVANAGARI LETTER AY;159;43262;x0159;;
 ,ayno;ꣿ;U+A8FF ꣿ DEVANAGARI VOWEL SIGN AY;160;43263;x0160;;
 ,\#;…;;161;0;x0161;;
-,..;.;;162;0;x0162;;
+%,..;.;;162;0;x0162;;
 }
 \mfssortaseq[x]{devatranslit}{<}{1}
 
@@ -997,11 +1183,11 @@ formatb=\fdevb\Large,
 ]
 \end{multicols}
 
-\translit[x]{devatranslit}[
+\translitx[x]{devatranslit}[
 formata=\usefont{T1}{lmtt}{m}{n},
 formatb=\fdevb,
 ]
-{data a-baiicaii..  kauula bananasa sa\&kauula }
+{data a-biicii..  kuul bananas s\&kuul }
 
 .dha is set up as 
 \translit[x]{devatranslit}[
@@ -1012,7 +1198,7 @@ formatb=\fdevb,%\usefont{T1}{lmtt}{m}{n}\small,
 placeholder=4,
 ]{.dha}
 and maps to
-\translit[x]{devatranslit}[
+\translitx[x]{devatranslit}[
 fielda=1,
 formata=\usefont{T1}{lmtt}{m}{n},
 fieldb=2,
@@ -1121,25 +1307,95 @@ formatb=\fipa,
 रामो राजमणि सदा विजयते रामं रमेशं भजे
 }
 
+72 
+%\translitx[x]{devatranslit}[
+%fielda=7,
+%formata=\fipa,
+%fieldb=2,
+%formatb=\fdevb,
+%showoriginal=true,
+%]{
+%raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+%}
+
+78
+%\translitx[x]{devatranslit}[
+%fielda=7,
+%formata=\fipa,
+%fieldb=8,
+%formatb=\fipa,
+%showoriginal=true,
+%placeholder=4, %record number
+%]{
+%ra;aama;o ra;aajama.na;i sada;aa va;ijayata;e ra;aama.m rama;e"sa.m bhaja;e
+%}
+
+
+28
+%\translitx[x]{devatranslit}[
+%fielda=2,
+%formata=\fdevb,
+%fieldb=8,
+%formatb=\fipa,
+%placeholder=4, %record number
+%]{
+%विराम/हलन्त
+%}
+
+
+
+\newpage
+12 
+
 \translitx[x]{devatranslit}[
-fielda=7,
+fielda=1,
 formata=\fipa,
 fieldb=2,
 formatb=\fdevb,
 showoriginal=true,
 ]{
-raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje |
 }
 
+21
+
 \translitx[x]{devatranslit}[
-fielda=7,
-formata=\fipa,
-fieldb=8,
+fielda=2,
+formata=\fdevb,
+fieldb=1,
 formatb=\fipa,
-showoriginal=false,
+showoriginal=true,
 ]{
-raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+सौर मंडल में सूर्य और वह खगोलीय वस्तुएँ सम्मिलित हैं, जो इस मंडल में एक दूसरे से गुरुत्वाकर्षण बल द्वारा बंधे हैं।
 }
+
+[gt] saur mandal mein soory aur vah khagoleey vastuen sammilit hain, jo is mandal mein ek doosare se gurutvaakarshan bal dvaara bandhe hain.
+
+
+72 
+
+%\translit[x]{devatranslit}[
+%fielda=7,
+%formata=\fipa,
+%fieldb=2,
+%formatb=\fdevb,
+%showoriginal=true,
+%]{
+%raamo raajama.ni sadaa vijayate raama.m rame"sa.m bhaje
+%}
+
+82 
+
+%\translit[x]{devatranslit}[
+%fielda=8,
+%formata=\fipa,
+%fieldb=2,
+%formatb=\fdevb,
+%showoriginal=true,
+%]{
+%raamo raajamaṇi sadaa vijayate raamaṃ rameśaṃ bhaje
+%}
+
 
 
 
