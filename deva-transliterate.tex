@@ -5,7 +5,8 @@
 \newfontscript{Devanagari}{dev2,deva}
 %For script setting, see: https://tex.stackexchange.com/questions/630516/how-to-use-devanagari-variable-font-in-latex/630608#630608
 \newfontfamily\fdev[Script=Devanagari]{Noto Serif Devanagari}
-\newfontfamily\fdevb[Script=Devanagari,Renderer=HarfBuzz]{Nirmala UI}%{Shobhika}
+%\newfontfamily\fdevb[Script=Devanagari,Renderer=HarfBuzz]{Nirmala UI}%{Shobhika}
+\newfontfamily\fdevb[Script=Devanagari,Renderer=HarfBuzz]{Shobhika}
 \newfontfamily\fipa{Noto Serif}
 \usepackage{multicol}
 
@@ -102,7 +103,7 @@
 				\l_mytranslit_tl
   % before non-inherent vowel
 	\regex_replace_all:nnN
-				{ (X)([aeiou]) }
+				{ (X)([aeiou\,\|]) }
 				{ 
 					\2
 				 }
@@ -1370,6 +1371,17 @@ showoriginal=true,
 }
 
 [gt] saur mandal mein soory aur vah khagoleey vastuen sammilit hain, jo is mandal mein ek doosare se gurutvaakarshan bal dvaara bandhe hain.
+
+>> 
+\translitx[x]{devatranslit}[
+fielda=2,
+formata=\fdevb,
+fieldb=1,
+formatb=\fipa,
+showoriginal=true,
+]{ किसी तारे के इर्द गिर्द परिक्रमा करते हुई उन खगोलीय वस्तुओं के समूह को ग्रहीय मण्डल कहा जाता है जो अन्य तारे न हों, जैसे की ग्रह, बौने ग्रह, प्राकृतिक उपग्रह, क्षुद्रग्रह, उल्का, धूमकेतु और खगोलीय धूल।[5][6] हमारे सूरज और उसके ग्रहीय मण्डल को मिलाकर हमारा सौर मण्डल बनता है।[7][8] इन पिंडों में आठ ग्रह, उनके 172 ज्ञात उपग्रह, पाँच बौना ग्रह और अरबों छोटे पिंड शामिल हैं।}
+
+[gt] kisee taare ke ird gird parikrama karate huee un khagoleey vastuon ke samooh ko graheey mandal kaha jaata hai jo any taare na hon, jaise kee grah, baune grah, praakrtik upagrah, kshudragrah, ulka, dhoomaketu aur khagoleey dhool.[5][6] hamaare sooraj aur usake graheey mandal ko milaakar hamaara saur mandal banata hai.[7][8] in pindon mein aath grah, unake 172 gyaat upagrah, paanch bauna grah aur arabon chhote pind shaamil hain.
 
 
 72 
