@@ -1,0 +1,605 @@
+\documentclass{article}
+
+\usepackage[papersize={4in,6in}, total={3in,5in}]{geometry}
+
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmainfont{Noto Serif}%[Colour=blue]
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+\tcbuselibrary{breakable}
+\tcbuselibrary{magazine}
+\usetikzlibrary{decorations.pathmorphing}
+
+
+\usepackage{ekdosis}
+\SetLineation{lineation=none}
+
+\FormatDiv{1}{\begin{center}\Large}{\end{center}}
+ \FormatDiv{2}{\begin{center}\large}{\end{center}}
+ \FormatDiv{3}{\bfseries}{.}
+
+%\SetDefaultApparatus{rec1}
+%\DeclareApparatus{rec1} % new layer set as default
+%\DeclareApparatus{rec2} % additional layer below the default one
+%\DeclareApparatus{rec3} 
+
+
+%\SetHooks{lemmastyle=\bfseries\color{red},}
+%
+%\setlength{\columnseprule}{0.4pt}
+
+\newcommand\comm[1]{\hrule\vspace{0.25ex}#1}
+\newcommand\commA{\comm{A}}
+\newcommand\commB{\comm{B}}
+\newcommand\commC{\comm{C}}
+
+\newboxarray{commA}
+\newboxarray{commB}
+\newboxarray{commC}
+
+
+
+\newcommand\breakatcommon{3cm}
+\newcommand\breakatA{\breakatcommon}
+\newcommand\breakatB{\breakatcommon}
+\newcommand\breakatC{\breakatcommon}
+
+
+
+
+\ExplSyntaxOn
+
+
+
+		\cs_generate_variant:Nn 
+			\seq_gset_split:Nnn 
+			{ cno }
+
+
+\tl_new:N \g_comm_Amapin_tl
+\tl_new:N \g_comm_Bmapin_tl
+\tl_new:N \g_comm_Cmapin_tl
+
+\tl_new:N \g_comm_Amapout_tl
+\tl_new:N \g_comm_Bmapout_tl
+\tl_new:N \g_comm_Cmapout_tl
+\tl_new:N \g_comm_mapout_tl
+
+\seq_new:N \g_comm_Amapout_seq
+\seq_new:N \g_comm_Bmapout_seq
+\seq_new:N \g_comm_Cmapout_seq
+\seq_new:N \g_comm_mapout_seq
+
+
+%\int_new:N \g_comm_maxpart_int
+
+\int_new:N \g_comm_Amapout_int
+\int_new:N \g_comm_Bmapout_int
+\int_new:N \g_comm_Cmapout_int
+
+\int_new:N \g_comm_collected_int
+\int_new:N \g_comm_tocollect_int
+
+\int_new:N \g_comm_pagenum_int
+
+\int_new:N \g_comm_Aparonpage_int
+\int_new:N \g_comm_Bparonpage_int
+\int_new:N \g_comm_Cparonpage_int
+
+
+
+
+
+\bool_new:N \g_comm_collectible_bool
+\bool_new:N \g_comm_source_bool
+
+%-----------------------------------------------------
+\NewDocumentCommand { \checksourcestatus } { } { 
+
+			\bool_if:nTF {
+				 {\int_compare_p:nNn
+				   { \g_comm_Amapout_int } < { \mysizeA }}
+					||
+				 {\int_compare_p:nNn
+				   { \g_comm_Bmapout_int } < { \mysizeB }}
+					||
+				 {\int_compare_p:nNn
+				   { \g_comm_Cmapout_int } < { \mysizeC }}
+			}
+			{ % T: more to process
+					\bool_gset_true:N \g_comm_source_bool
+			}
+			{ % F: no more to process
+					\bool_gset_false:N \g_comm_source_bool
+			}
+
+
+}
+
+
+
+%-----------------------------------------------------
+\NewDocumentCommand { \mygetline } { } { 
+%   \boxarraygetbox[commC]{\l_tmpb_box}{1}
+%%   \vbox_set:Nn \l_tmpb_box { \usetcboxarray[commC]{1}{} }
+   \vbox_set:Nn \l_tmpb_box { \mfsgetitem{c2}{4} }
+%		\box_use:N \l_tmpb_box
+		\par
+		\vbox_set_split_to_ht:NNn 
+					\l_tmpa_box 
+					\l_tmpb_box %		\useboxarray[commC]{1}
+					{ \baselineskip }
+		\par  xxx
+		\the\pagetotal :: \the\pagegoal
+		\par  xxx
+		\box_use:N \l_tmpa_box
+		\par  xxx
+		\the\pagetotal :: \the\pagegoal
+		\par  xxx
+		\vbox_set_split_to_ht:NNn 
+					\l_tmpa_box 
+					\l_tmpb_box %		\useboxarray[commC]{1}
+					{ \baselineskip }
+		\par  xxx
+		\the\pagetotal :: \the\pagegoal
+		\par  xxx
+				\box_use:N \l_tmpa_box
+		\par  xxx
+		\the\pagetotal :: \the\pagegoal
+		\par  xxx
+		\par
+		\box_use:N \l_tmpb_box
+		\par  xxx
+		\the\pagetotal :: \the\pagegoal
+		\par  xxx
+}
+
+
+
+%-----------------------------------------------------
+\NewDocumentCommand { \checkcollectstatus } { } { 
+
+			\bool_if:nTF 
+			{
+				%:
+				{
+					% A &B & C
+					\seq_if_empty_p:N \g_comm_Amapout_seq
+					&&
+					\seq_if_empty_p:N \g_comm_Bmapout_seq
+					&&
+					\seq_if_empty_p:N \g_comm_Cmapout_seq
+					}
+				%or
+				||
+				{
+				 \int_compare_p:n
+				   { \g_comm_collected_int >= \g_comm_tocollect_int }
+				}
+			
+			}
+			{ % T: no more to collect
+					\bool_gset_false:N \g_comm_collectible_bool
+			}
+			{ % F: more to collect
+					\bool_gset_true:N \g_comm_collectible_bool
+			}
+
+
+}
+
+
+
+
+
+
+%-----------------------------------------------------
+\NewDocumentCommand { \setABCmapout } { m } { 
+% 1 = seq name
+
+		\tl_gset:Nx \g_comm_currseqname_tl { #1 }
+
+%output:
+\tl_gclear:N \g_comm_Amapout_tl
+\tl_gclear:N \g_comm_Bmapout_tl
+\tl_gclear:N \g_comm_Cmapout_tl
+\tl_gclear:N \g_comm_mapout_tl
+
+\int_gset:Nn \g_comm_Amapout_int		{ 0 }
+\int_gset:Nn \g_comm_Bmapout_int		{ 0 }
+\int_gset:Nn \g_comm_Cmapout_int		{ 0 }
+
+%===================
+
+
+					\checksourcestatus
+					
+					
+\tl_if_empty:NF
+		\g_comm_Amapin_tl
+		{
+				\seq_gset_split:NnV
+							\g_comm_Amapout_seq
+							{}
+							\g_comm_Amapin_tl
+			\int_gincr:N \g_comm_Amapout_int		
+		}
+		
+\tl_if_empty:NF
+		\g_comm_Bmapin_tl
+		{
+				\seq_gset_split:NnV
+							\g_comm_Bmapout_seq
+							{}
+							\g_comm_Bmapin_tl
+			\int_gincr:N \g_comm_Bmapout_int		
+		}
+					
+\tl_if_empty:NF
+		\g_comm_Cmapin_tl
+		{
+				\seq_gset_split:NnV
+							\g_comm_Cmapout_seq
+							{}
+							\g_comm_Cmapin_tl
+			\int_gincr:N \g_comm_Cmapout_int		
+		}
+
+%			\seq_show:N
+%					\g_comm_Cmapout_seq
+
+%%			A \int_use:N \g_comm_Amapout_int		,
+%%			B \int_use:N \g_comm_Bmapout_int		,
+%%			C \int_use:N \g_comm_Cmapout_int		;;
+
+
+
+%					\bool_show:N \g_comm_source_bool
+					\int_gset:Nn \g_comm_pagenum_int { 0 }
+
+%			\int_gset:Nn \g_comm_collected_int { 0 }
+
+			\bool_while_do:Nn \g_comm_source_bool
+			{
+%	\checksourcestatus
+
+					\int_gincr:N \g_comm_pagenum_int					
+					
+
+
+%1st page
+%%%		\int_compare:nNnTF
+%%%		  { \g_comm_pagenum_int } = { 1 }
+%%%		   {
+					\int_gset:Nn \g_comm_tocollect_int { 3 }
+%%%				}		
+%%%		   {
+%%%					\int_gset:Nn \g_comm_tocollect_int { 4 }
+%%%				}		
+
+				\int_set:Nn \g_comm_collected_int { 0 }
+%\int_use:N \g_comm_collected_int		 ,
+
+				\checkcollectstatus
+%\bool_show:N 	\g_comm_collectible_bool
+					
+					\newpage
+
+% for each page:
+\int_gset:Nn \g_comm_Aparonpage_int { 0 }
+\int_gset:Nn \g_comm_Bparonpage_int { 0 }
+\int_gset:Nn \g_comm_Cparonpage_int { 0 }
+
+
+
+					
+%1st page
+		\int_compare:nNnT
+		  { \g_comm_pagenum_int } = { 1 }
+		   {
+					\mfsgetitem{\tl_use:N \g_comm_currseqname_tl}{1} %%%%% current sequence
+
+	\int_gset:Nn
+			\g_comm_Amapout_int
+			{ 0 }
+	\int_gset:Nn
+			\g_comm_Bmapout_int
+			{ 0 }
+	\int_gset:Nn
+			\g_comm_Cmapout_int
+			{ 0 }
+				}		
+
+			
+		\checkcollectstatus
+	
+			\bool_while_do:Nn \g_comm_collectible_bool
+			{
+%	\checksourcestatus
+
+% commA:
+			\seq_if_empty:NF
+			\g_comm_Amapout_seq
+			{
+		\int_gincr:N \g_comm_Amapout_int
+		\int_gincr:N \g_comm_Aparonpage_int
+		
+		\int_compare:nNnT
+		  { \g_comm_Aparonpage_int } = { 1 }
+		   {
+						\ekddiv{head={\commA}, type=paragraph, depth=2, n=II.1.A}
+				}		
+\tex_par:D		\noindent\useboxarray[commA]{\int_use:N \g_comm_Amapout_int } 
+%\seq_show:N 	\g_comm_Amapout_seq		
+		\seq_gpop_left:NN 	\g_comm_Amapout_seq \l_tmpa_tl
+%\seq_show:N 	\g_comm_Amapout_seq		
+		\int_gincr:N \g_comm_collected_int
+%		\checkcollectstatus
+			}
+
+% commB:
+			\seq_if_empty:NF
+			\g_comm_Bmapout_seq
+			{
+		\int_gincr:N \g_comm_Bmapout_int
+		\int_gincr:N \g_comm_Bparonpage_int
+		\int_compare:nNnT
+		  { \g_comm_Bparonpage_int } = { 1 }
+		   {
+					\ekddiv{head={\commB}, type=paragraph, depth=2, n=II.1.B}
+				}		
+\tex_par:D		\noindent\useboxarray[commB]{\int_use:N \g_comm_Bmapout_int } 
+		\seq_gpop_left:NN 	\g_comm_Bmapout_seq \l_tmpa_tl
+		\int_gincr:N \g_comm_collected_int
+%		\checkcollectstatus
+			}
+
+
+
+% commC:
+			\seq_if_empty:NF
+			\g_comm_Cmapout_seq
+			{
+		\int_gincr:N \g_comm_Cmapout_int
+		\int_gincr:N \g_comm_Cparonpage_int
+		\int_compare:nNnT
+		  { \g_comm_Cparonpage_int } = { 1 }
+		   {
+						\ekddiv{head={\commC}, type=paragraph, depth=2, n=II.1.C}
+				}		
+\tex_par:D		\noindent\useboxarray[commC]{\int_use:N \g_comm_Cmapout_int } 
+		\seq_gpop_left:NN 	\g_comm_Cmapout_seq \l_tmpa_tl
+		\int_gincr:N \g_comm_collected_int
+%		\checkcollectstatus
+			}
+
+		\checkcollectstatus
+
+				
+	} % while collectible 
+
+	\checksourcestatus
+%	\bool_show:N \g_comm_source_bool
+
+	} % while source 
+
+
+
+		\int_compare:nNnT
+		  { \pagegoal - \pagetotal } > { \baselineskip }
+		  { \vfil {\begin{center} * \end{center} } \vfil }
+
+
+}
+
+
+
+
+\NewDocumentCommand { \setABCmapin } { } { 
+
+\boxarraygetsize[commA]{\mysizeA}
+\boxarraygetsize[commB]{\mysizeB}
+\boxarraygetsize[commC]{\mysizeC}
+
+\tl_gclear:N 
+		\g_comm_Amapin_tl
+
+%mysizeA=\mysizeA
+\int_set:Nn \l_tmpa_int { \mysizeA }
+\tl_gset:Nx 
+		\g_comm_Amapin_tl 
+		{ 
+%			\prg_replicate:nn { \mysizeA } { A } 
+			\int_step_inline:nn { \l_tmpa_int } { A }
+		}
+
+%%:: \tl_use:N 
+%%		\g_comm_Amapin_tl ::
+		
+\tl_gset:Nx 
+		\g_comm_Bmapin_tl
+		{ 
+			\prg_replicate:nn { \mysizeB } { B } 
+		}
+		
+\tl_gset:Nx 
+		\g_comm_Cmapin_tl
+		{ 
+			\prg_replicate:nn { \mysizeC } { C } 
+		}
+%\tl_show:N 
+%		\g_comm_Cmapin_tl
+}
+
+
+\NewDocumentCommand { \mfsgetitem } { o m m } { 
+% 1=namespace
+% 2=seq name
+% 3=item
+
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+
+
+	\tl_set:Nx
+			\l_tmpa_tl
+			{
+				\seq_item:cn
+						{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+						{ #3 }
+			}
+
+	\tl_use:N
+			\l_tmpa_tl
+
+}
+
+
+
+\tl_new:N \g_comm_currseqname_tl
+
+\NewDocumentCommand { \mfsloadaseql } { o m m +m } { 
+% 1=namespace
+% 2=seq name
+% 3=sep
+% 4=data
+
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+%	\tl_gset:Nx \g_comm_currseqname_tl { #2 }
+
+	\cs_if_free:cT
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq }
+			{ \seq_new:c
+					{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			}
+			
+	\seq_gclear:c 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+	\seq_gset_split:cno 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ #3 } 
+			{ #4 }
+
+}
+
+\ExplSyntaxOff
+
+
+
+\newcommand\boxcommA[2]{%
+\begin{tcolorbox}[enhanced jigsaw,size=fbox,width=\textwidth,
+colback=yellow!10,colframe=yellow!10!black,
+fontupper=\footnotesize,
+breakable,% use only breakable in the real world!
+break at=#2, % \breakatA,
+height fixed for=none,
+%enlargepage flexible=2\baselineskip,
+watermark text=A\arabic{tcbbreakpart},
+reset box array=commA,
+store to box array=commA,
+extras last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+extras unbroken and last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+]
+#1
+\end{tcolorbox}
+}
+
+\newcommand\boxcommB[2]{%
+\begin{tcolorbox}[enhanced jigsaw,size=fbox,width=\textwidth,
+colback=blue!10,colframe=yellow!10!black,
+fontupper=\footnotesize,
+breakable,% use only breakable in the real world!
+break at=#2, % \breakatB,
+height fixed for=none,
+%enlargepage flexible=2\baselineskip,
+watermark text=B\arabic{tcbbreakpart},
+reset box array=commB,
+store to box array=commB,
+extras last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+extras unbroken and last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+]
+#1
+\end{tcolorbox}
+}
+
+\newcommand\boxcommC[2]{%
+\begin{tcolorbox}[enhanced jigsaw,size=fbox,width=\textwidth,
+colback=green!10,colframe=red!10!black,
+fontupper=\footnotesize,
+breakable,% use only breakable in the real world!
+break at=#2, % \breakatC,
+%enlargepage flexible=2\baselineskip,
+height fixed for=none,
+watermark text=C\arabic{tcbbreakpart},
+reset box array=commC,
+store to box array=commC,
+extras last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+extras unbroken and last={
+borderline south={0.25mm}{-0.5mm}{blue,decoration={zigzag,amplitude=0.5mm},decorate}},
+]
+#1
+\end{tcolorbox}
+}
+
+\newcommand\docommentarypart[4]{
+\begin{ekdosis}
+\boxarrayreset[commA]
+\boxarrayreset[commB]
+\boxarrayreset[commC]
+\boxcommA{\mfsgetitem{#1}{2}}{#2}
+\boxcommB{\mfsgetitem{#1}{3}}{#3}
+\boxcommC{\mfsgetitem{#1}{4}}{#4}
+\setABCmapin
+\setABCmapout{#1}
+\end{ekdosis}
+}
+
+
+
+
+
+\input{commdata.tex}
+
+
+
+
+
+\begin{document}
+
+Commentaries
+
+Manual-adjustment method
+
+
+%=======================
+\docommentarypart{c1}{8\baselineskip/2\baselineskip}{9\baselineskip}{5\baselineskip}
+
+%=======================
+\docommentarypart{c2}{9\baselineskip}{7\baselineskip/12\baselineskip}{8\baselineskip/6\baselineskip}
+
+%\mygetline
+
+%=======================
+\docommentarypart{c3}{10\baselineskip}{3\baselineskip}{9\baselineskip}
+
+%=======================
+\docommentarypart{c4}{\baselineskip}{\baselineskip}{\baselineskip}
+
+
+\end{document}
+
+
+
+https://tex.stackexchange.com/questions/665060/typesetting-text-and-commentaries-with-reasonable-page-breaking/665388#665388
