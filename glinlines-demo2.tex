@@ -7,6 +7,7 @@
 \setmonofont{Noto Sans Mono}
 \newfontfamily\cjk{NotoSerifCJKtc-Regular}[Path=C:/Users/epam2/Downloads/fonts/noto/,Extension=.otf]
 \newfontfamily\cjkb{MingLiu-ExtB}
+\newfontfamily\fgreek{Garamond}
 \newfontface\sym{DejaVu Sans}
 \newcommand\tick{{\sym ✓}}
 
@@ -30,6 +31,10 @@
 
 %================
 
+\ExplSyntaxOn
+\NewDocumentCommand{\greekon}{}{\group_begin:\fgreek\selectlanguage{greek}}
+\NewDocumentCommand{\greekoff}{}{\group_end:}
+\ExplSyntaxOff
 
 
 \newcommand\dogl[1]{\par\noindent\glmeta{#1} $\mapsto$ \glinlines{#1}}
@@ -451,7 +456,7 @@ glt    I brought the letter to Ali.
 
 \glcmd{commandA}\glmeta{na}\glcmd{commandB}
 
-\gleg upright brackets: \glmeta{:uplb;na:uprb } $\mapsto$ \uplb na\uprb.
+\gleg upright brackets: \dogl{:uplb;na:uprb}.%\glmeta{:uplb;na:uprb } $\mapsto$ \uplb na\uprb.
 
 
 \begin{exe}
@@ -564,10 +569,10 @@ glt This item has a language note.
 \glinlines{%
         On the honeydew melon:footnotemark;
 glt     The honeydew:space;melon::ttikz; is one of the two main cultivar types in Cucumis melo Inodorus Group. It is characterized by the smooth rind and lack of musky odor. 
-%glt Το πεπόνι χάνεϊντιου, γνωστό και ως μελοπέπονο, είναι φρούτο της ποικιλίας muskmelon ή Cucumis melo της οικογένειας των κολοκυνθοειδών. Η ομάδα αυτή των Inodorus περιλαμβάνει το συγκεκριμένο πεπόνι αλλά και άλλα ανάμεικτα είδη πεπονιού και κολοκύθας. 
+glt :par;:smallskip;:greekon;:large;Το πεπόνι:space;χάνεϊντι::ttikz;, γνωστό και ως μελοπέπονο, είναι φρούτο της ποικιλίας muskmelon ή Cucumis melo της οικογένειας των κολοκυνθοειδών. Η ομάδα αυτή των Inodorus περιλαμβάνει το συγκεκριμένο πεπόνι αλλά και άλλα ανάμεικτα είδη πεπονιού και κολοκύθας:greekoff;. 
 glt :par;:smallskip;El melón:space;verde::ttikz;, melón blanco, casaba, melón rocío de miel o melón tuna es un fruto de la familia del melónCucumis melo (Cucumis melo) que se cultiva en general para el consumo gastronómico. La fruta es similar al melón anaranjado o cantalupo, pero tiene un sabor más dulce, contiene más agua y posee un color verde pálido o claro en su interior.
-glt :par;:smallskip;Le melon honeydew, ou melon miel, est un melon du groupe de cultivars de l'espèce Cucumis melo (famille des Cucurbitaceae). Le groupe Inodorus inclut le melon honeydew, le melon musqué, le melon d'hiver et d'autres hybrides du melon.
-glt :par;:smallskip;Il melone verde è un gruppo di colture appartenente al gruppo Inodorus della specie dei Cucumis melo.
+glt :par;:smallskip;Le melon:space;honeydew::ttikz;, ou melon miel, est un melon du groupe de cultivars de l'espèce Cucumis melo (famille des Cucurbitaceae). Le groupe Inodorus inclut le melon honeydew, le melon musqué, le melon d'hiver et d'autres hybrides du melon.
+glt :par;:smallskip;Il melone:space;verde::ttikz; è un gruppo di colture appartenente al gruppo Inodorus della specie dei Cucumis melo.
 
 Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno, casaba e crenshaw. 
 %glt   ハネデューメロン（英: honeydew melon）は、白色系の果皮で橙色の果肉（赤肉）、淡い緑色の果肉（青肉）、白い果肉（白肉）の3種類があるノーネットメロン。
@@ -669,10 +674,16 @@ glt   :space;:hfill;(Rom 1.13):space;
 \end{exe}
 
 
-The default style is  \texttt{\textbackslash colorbox\{blue!12\}}. It can be changed by setting the \glmeta{[wordstackstyle = ...,]} option, \gleg \glmeta{[wordstackstyle = \{\textbackslash fcolorbox\{blue\}\{red!12\}\},]} produces:
+The default style is  \texttt{\textbackslash colorbox\{blue!12\}}. It can be changed by setting the \glmeta{[wordstackstyle = ...,]} option, 
+
+\gleg 
+
+\glmeta{[wordstackstyle = \{\textbackslash fcolorbox\{blue\}\{red!8\}\},]} 
+
+produces:
 \begin{exe}
 \ex
-\glinlines[wordstackstyle = {\fcolorbox{blue}{red!12}},]{%
+\glinlines[wordstackstyle = {\fcolorbox{blue}{red!8}},]{%
    οὐ θέλω δὲ ὑμᾶς ἀγνοεῖν
 */  ou thelō de humas agnoein
 */  not want.1Sg but you.Acc.Pl be-ignorant.Pres.Inf 
@@ -737,7 +748,7 @@ glt   Line 4, Trans C
 %\mfsformattedvboxon
 \begin{exe}
 \ex%
-\glinlines[preamble={Somebody has arrived late.}]{%
+\glinlines[preamble={\textsc{Somebody has arrived late}.}]{%
        :llaphash;Ich bin schon da
 */    I am already there
 glt   `I am here already.'}
@@ -1218,7 +1229,7 @@ General formating is:
 \end{verbatim}
 
 %----------------------
-\para{Attaching commands to specific words}
+\para{Using options to attach commands to specific words}
 
 \begin{exe}
 \ex \mnote{addc\fbox{b}=\\ addc\fbox{a}w=\\ addc\fbox{c}w=\\ addcxa=} 
@@ -1272,8 +1283,13 @@ of some inline glossing.
 
 
 %----------------------
-\para{Separator string} The \glcmd{glinlines} assumes that the line separator markup is \glmeta{*/}. The underlying macro \glcmd{glinlinesbase} takes the separator string as a parameter (namespace, sequence name, separator string, data), so that\\
- \glcmd{glinlinesbase}[gloss]\{sep\}\{xx\}\{AtextxxBtext\}\\ 
+\para{Separator string} The \glcmd{glinlines} assumes that the line separator markup is \glmeta{*/}. The underlying macro \glcmd{glinlinesbase} takes the separator string as a parameter (namespace, sequence name, separator string, data), so that
+\qq
+ \glcmd{glinlinesbase}[\glruby{gloss}{\glmarker{1}}]\{\glruby{sep}{\glmarker{2}}\}\{\glruby{xx}{\glmarker{3}}\}\{\glruby{AtextxxBtext}{\glmarker{4}}\} 
+ 
+ \noindent{\small\glmarker{1} = sequence namespace, \glmarker{2}= sequence name, \glmarker{3} = delimiter, \glmarker{4}~=~delimited data
+ }
+ \eqq
  uses xx as separator and produces \glinlinesbase[gloss]{sep}{xx}{AtextxxBtext}.
 The \glmeta{linesep} option passes the line separator through, so that\\
 \{ \glcmd{glinlines}[linesep=yy]\{CtextyyDtext\} \}\\ 
@@ -1281,7 +1297,9 @@ The \glmeta{linesep} option passes the line separator through, so that\\
 
 
 
-
+%\para{Referring to a subset of a gloss} By default, the \glcmd{glinlines} command  stores its glossing information in the \glmeta{gloss} namespace, in a sequence called \glmeta{ex2a}. The information remains available until the command is used again.
+%
+%To retrieve a subset range of the last-used gloss, use \glcmdb{glrange}: \glrange{1}{1}.  %\textglossout
 
 
 
@@ -1737,6 +1755,184 @@ For \glcmdb{uniq} defined as
 glt  Once upon a time there were three Bears...
          }  
 \end{exe}
+
+
+\para{Prepending and postpending commands in general} Normal commands can be added to the text as markdown-style affixes, which are then processed as regular expressions.
+
+
+Part of speech: .pos
+
+\qq
+\dogl{text.pos}
+\eqq
+
+Overlay PoS formatting: text.pos-command; $\mapsto$ text.\textbackslash command\{pos\}
+
+\qq
+\dogl{text.pos-textit;}
+
+\dogl{text.pos-uniq;}
+\eqq
+
+Command+argument: ::command!arg; $\mapsto$ \textbackslash command\{arg\}
+
+\qq
+\dogl{textA::textsubscript!n;}
+\eqq
+
+Command+word-as-argument: word::command;	  $\mapsto$ \textbackslash command\{word\}
+
+\qq
+\dogl{text::textbf;}
+\eqq
+
+Command: :command;text $\mapsto$ \textbackslash command text
+
+and
+
+Command:  text:command $\mapsto$ text\textbackslash command
+
+
+\qq
+\dogl{text :Large;text:normalsize text}
+
+\dogl{:tick;text:emphe}
+
+\dogl{:uplbrace;text:writing;:uprbrace}
+
+\dogl{text::underWavy;;}
+
+\dogl{text :UL;text text:LU;:gluline text text*/a b c d e}
+
+\eqq
+
+\squiggle
+
+
+\para{Usage}
+
+\bigskip
+\textsc{Commands}
+
+
+\bigskip
+\textsc{User Commands}
+
+glinlinesbase
+\ttikz{glinlines}
+
+
+
+\bigskip
+\textsc{Options}
+
+preamble
+linesep
+wordstackstyle
+addca
+addcb
+addcc
+addcaw
+addcbw
+addccw
+addcxa
+addcxb
+addcxc
+addcxd
+addcxe
+addcxf
+linenumsa
+addwsa
+addwsb
+addwsc
+glossary
+
+
+\bigskip
+\textsc{Standalone Commands}
+
+glnote (right-hand side language note)
+glspeaker (speaker name)
+gltwoex (two examples)
+glmarker (circled numbers, \glmarker{1})
+glruby (two-stacked text, \glruby{two}{\glmarker{2}})
+
+
+\bigskip
+\textsc{To Do}
+
+glrange
+
+
+\bigskip
+\textsc{Formatting}
+
+glusebox
+glinlinesnote
+glfirstlineformat
+glsetfirstlineformat
+glsecondlineformat
+glsetsecondlineformat
+glthirdlineformat
+glsetthirdlineformat
+glfourthlineformat
+glsetfourthlineformat
+glfifthlineformat
+glsetfifthlineformat
+glsixthlineformat
+glsetsixthlineformat
+glresetlineformats
+mfspreformat
+mfssetpreformat
+mfsposformat
+mfssetposformat
+mfssetfirstlinefunc
+mfskeepdotposon
+mfskeepdotposoff
+mfsglosstranson
+mfsglosstransoff
+mfsformattedvboxon
+mfsformattedvboxoff
+mfsnumberedwordson
+mfsnumberedwordsoff
+
+
+\bigskip
+\textsc{Admin Commands}
+
+mfsloadwords
+mfsuseaseql
+mfsuseaseqli
+mfsloadaseql
+textglossout
+transout
+mfsloadaseq
+mfsloadaprop
+mfssortaseq
+mfsgetapropkv
+mfsaddaprop
+mfsseqtoprop
+mfsuseaprop
+makenewge
+
+
+
+
+
+\bigskip
+\textsc{Sundry Commands}
+
+marktext
+xpppinyin
+xppname
+
+
+
+
+
+
+
+
 
 
 
