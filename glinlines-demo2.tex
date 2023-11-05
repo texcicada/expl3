@@ -20,6 +20,17 @@
 %\noautomath
 
 
+\newglossaryentry{cat}{
+name={cat},
+description={feline carnivore, member of the mammalian family, Felidæ},
+type={cat},
+}
+
+\newglossaryentry{dog}{
+name={dog},
+description={canine carnivore, member of the mammalian family, Canidæ},
+type={cat},
+}
 %\usepackage{enumitem}
 \usepackage{etoolbox} % patch
 %\usepackage{tabularx}
@@ -42,8 +53,37 @@
 \newcommand\uniq[1]{{\normalfont\mdseries\itshape\color{red}#1}}
 \newcommand\qq{\begin{quotation}\noindent}
 \newcommand\eqq{\end{quotation}}
+\newcommand\divline{\vrule width 0.25\textwidth height 0.4pt depth 0pt}
+\newcommand\divend{\par\begin{center}*\end{center}}
+
 
 \begin{document}
+
+
+\begin{center}
+{\Large \textbackslash glinlines}
+
+\divline
+\par\bigskip
+\end{center}
+
+\qq\ttfamily
+\textsc{Files}
+
+- glinlines-demo2.pdf: this document.
+
+- glinlines-demo2.tex: code for this document.
+
+- in-glinlines2.tex: macro code.
+
+- in-glossing.tex: user input file for PoS glossary.
+\eqq
+
+
+\begin{center}
+\divline
+%\par\bigskip
+\end{center}
 
 %
 %\mfsloadaseql[gloss]{ex1}{*/}{%
@@ -514,7 +554,9 @@ glt `He said, ``I know him.'''
 
 
 %++++++++++++++++++++++++++++++++++++++++
-\para{Adding information to the right} is done with \glcmd{glinlinesnote}\{\glmeta{gloss example}\}\{\glmeta{note}\}.
+\para{Adding information to the right} is done with 
+
+\glcmd{glinlinesnote}\{\glmeta{gloss example}\}\{\glmeta{note}\}.
 
 \begin{verbatim}
 \begin{exe}
@@ -561,6 +603,7 @@ glt This item has a language note.
 
 
 
+
 %++++++++++++++++++++++++++++++++++++++++
 \para{Extended commentary} The example can be almost all free-form text (\glie \glmeta{glt}-tagged material):
 
@@ -586,11 +629,11 @@ Tale gruppo comprende oltre al melone verde anche il melone persiano, di inverno
 
 This example also illustrates the use of custom markdown commands and their attachment as postfixes, acting on the word they are attached to: \glmeta{honeydew melon} becomes \glmeta{honeydew:space;melon}, to be seen as one `word', to which the \glcmd{ttikz} command (an overlaid green bounding box with red text) is applied as the pattern \glmeta{word::command;} and the pattern is converted to \glcmd{command	}\{\glmeta{word}\} by a regular expression. The pattern \glmeta{:command;} is converted to \glcmd{command}.
 
-\glmeta{honeydew::ttikz;} produces:
+\glmeta{honeydew::ttikz;} produces (in example \ref{honeyt}a):
 
 \begin{exe}
-\ex
-\glinlines{%
+\ex\label{honeyt}
+\glinlines[linenumsa=true]{%
      The honeydew::ttikz; melon
 */   .art .prod.met.attr .fruit
 }
@@ -601,7 +644,7 @@ This example also illustrates the use of custom markdown commands and their atta
 \mfskeepdotposoff
 \begin{exe}
 \ex
-\glinlines{%
+\glinlines[linenumsa=false]{%
  Naoya-wa Mari-ga Nani::bffbox;-o Non-da ka Yumi-ni it-ta no::textbf;? 
  */     Naoya-.Top Mari-.Nom what-.Acc drink-.Past Q Yumi-.Dat it-.Past Q?  
  glt   `(Lit.) For which :emphx;, :emphx; a thing, Naoya said to Yumi whether Mari drink :emphx;.'  
@@ -659,7 +702,7 @@ This example also illustrates the use of custom markdown commands and their atta
 
 
 %++++++++++++++++++++++++++++++++++++++++
-\para{Word-stacks}, which are \glmeta{vbox}es, can be formatted with \glcmd{mfsformattedvboxon}.
+\para{Word-stacks} are \glmeta{vbox}es and can be formatted with \glcmd{mfsformattedvboxon}.
  
 \mfsformattedvboxon
 \begin{exe}
@@ -879,15 +922,16 @@ luizcid dun-  ua-  glud-  gan giumima
 \vspace{8em}
 \surl{https://tex.stackexchange.com/questions/355934/horizontal-curly-braces-in-expex-glossing-example}
 
-xxx
+
 
 \para{Right-to-Left} See the example (uses polyglossia).
 
-\subpara{Even height and depth} with a zero width \textbackslash vrule.
+\subpara{Even height and depth} with an invisible \textbackslash vrule.\footnote{The second, third and fourth lines are just dummy text.}
            
 \para{Right-to-Left}
+
 \begin{Arabic}
-\glsetfirstlineformat{\selectlanguage{arabic}\Large\color{blue}{\vrule height 28pt depth 16pt width 0.2pt}}
+\glsetfirstlineformat{\selectlanguage{arabic}\Large\color{blue}{\color{blue!12}\vrule height 28pt depth 16pt width 0pt}}
 \glsetsecondlineformat{\selectlanguage{greek}}
 \glsetthirdlineformat{\selectlanguage{brazil}}
 \glsetfourthlineformat{\selectlanguage{english}}
@@ -985,7 +1029,7 @@ An item that will be used multiple times can be stored once and retrieved multip
 }
 \end{exe}
 
-The command \glcmd{mfsloadaseql} takes four parameters:
+\textsc{How To}: The command \glcmd{mfsloadaseql} takes four parameters:
 [ namespace (optional) ]
 \{ sequence name \}
 \{ separator \}
@@ -1097,7 +1141,7 @@ Retrieving the value attached to key \glmeta{the} = \mfsgetapropkv{cat}{the}.
 %>  {mat}  =>  {6}.
 
 %----------------------
-\para{Auto-attaching a command to every word on a line} The option [ addca = pkvcat ] will postfix the example custom command \glcmd{pkvcat} to every word on line \glmeta{a} (the first line). The first three lines (a--c) have this built-in addc- ability.
+\para{Auto-attaching a command to every word on a line} The option [ addca = pkvcat ] will postfix the example custom command \glcmd{pkvcat} to every word on line \glmeta{a} (the first line). The first three lines (addc[a--c]) have this built-in addc- ability.
 
 
 \begin{exe}
@@ -1262,7 +1306,7 @@ The option \glmeta{linenumsa=true,} displays the (first six) line numbers as low
 %----------------------
 \para{An inline lookup}
 
-``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
+\mnote{Inline lookup}``Cat'' is word {\glinlines[addcaw=1;pkvcat]{cat}} in the lookup.
 
 Done with:
 
@@ -1272,7 +1316,7 @@ Done with:
 in the lookup.
 \end{verbatim}
 
-Here is an example, 
+\mnote{Inline gloss}Here is an example, 
 \glinlines{%
  Naoya-wa Mari-ga 
  */     Naoya-.Top Mari-.Nom
@@ -1321,7 +1365,7 @@ linenumsa=true,
 \end{exe}
 
 
-\glmeta{addcaw=1;textbf,} makes the first word (1) on the first line (a) bold (textbf). There are 3 line-based options like this:
+\textsc{How To} \glmeta{addcaw=1;textbf,} makes the first word (1) on the first line (a) bold (textbf). There are 3 line-based options like this:
 \glmeta{addcaw}, \glmeta{addcbw}, \glmeta{addccw}, for the first, second and third lines respectively.
 
 \glmeta{addcxa=1;1;textit,}, line;word;command format, makes the first word (1) on the first line (1) italic (textit). There are 6 options like this: addcx[a-f]. They can refer to any line, including the same one.
@@ -1455,15 +1499,18 @@ linenumsa=true,
 \begin{exe}
 \gltwoex{
 \ex
-\glinlines{ The quick brown fox jumps over the lazy dog.
+\glinlines{ The quick brown fox jumps over the lazy dog::gls;.
 */       DA ADJ1 ADJ2 N V PREP DA ADJ1 N}
 }
 {
 \ex
-\glinlines{ The cat sat on the mat.
+\glinlines{ The cat::gls; sat on the mat.
 */          DA N V PREP DA N}
 }
 \end{exe}
+
+
+
 
 \squiggle
 
@@ -1685,7 +1732,7 @@ glt `My mother asked me what the teacher gave me a book and Toki sold me'
 %%%
 %%%%{::glinlines!Ein-mal  es */ One-.adv gave.3ps it.3pspp;}
 
-\subpara{Parts-of-speech Glossary} Items for the parts-of-speech glossary are collected when \glmeta{glossary=} option is set to true; and printed with t\glcmd{printglossaries} (from the \glmeta{glossaries} package). Definitions are loaded into a sequence via an input file, \glmeta{in-glossing.tex}.
+\subpara{Parts-of-speech Glossary} The PoS Glossary is automated: Items for the parts-of-speech glossary are collected when \glmeta{glossary=} option is set to true; and printed with \glcmd{printglossary[type=pos]} (see the \glmeta{glossaries} package). Definitions are loaded into a sequence via a manually edited input file, \glmeta{in-glossing.tex}.
 
 \begin{exe}
         \ex 
@@ -1711,7 +1758,7 @@ glt		 To the woman
          }  
 \end{exe}
 
-\printglossaries
+\printglossary[type=pos]
 
 The definitional file for the above is \glmeta{in-glossing.tex} and contains:
 
@@ -1725,7 +1772,13 @@ def;Definite article
 }
 \end{verbatim}
 
-The expl3 sequence is sorted, loaded into a property list of key-value pairs (name, definition) and added to the glossary when used (and formatted).
+The expl3 sequence is sorted, loaded into a property list of key-value pairs (name, definition) and added to the glossary (type=pos) when used (and formatted).
+
+`Ordinary' glossaries can be done the usual (manual) way. For example, \verb|cat| and \verb|dog| were \verb|gls|ed a few pages back, using \verb|cat::gls;| meta code, producing:
+
+
+\printglossary[type=cat]
+
 
 \surl{https://tex.stackexchange.com/questions/699687/get-the-same-effect-of-the-leipzig-commands-with-the-typgloss-package}
 
@@ -1928,7 +1981,7 @@ xppname
 
 
 
-
+\divend
 
 
 

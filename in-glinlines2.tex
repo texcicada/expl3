@@ -1,11 +1,17 @@
 
 %\usepackage{xcolor}
 %\usepackage{ruby}
+\usepackage{stackengine}
+
 \usepackage[automake,order=letter,]{glossaries}
+%\newglossary[flog]{flabel}{fout}{fin}{Flowers}
+\newglossary[flog]{cat}{fout}{fin}{Glossary of Cats and Dogs}
+\newglossary[plog]{pos}{pout}{pin}{Parts of Speech}
 \makeglossaries
 
 \usepackage{xcolor,luacolor,lua-ul}
-%\usepackage{fontspec}
+\usepackage{fontspec}
+\newfontfamily\glrubytext{LinuxLibertineDisplayG}
 %\setmainfont{Noto Serif}
 %\setsansfont{Noto Sans}
 %\setmonofont{Noto Sans Mono}
@@ -1462,8 +1468,33 @@ glossary .default:n = false,
 											\l__vpair_box
 								} %end false
 					} 	% end box_set
+					
+					
+%\int_if_exist:cF
+%	{ l__xxx_int }					
+%	{
+%	  \int_new:c 
+%	  		{ l__xxx_int }
+%	  \int_gset:cn 
+%	  		{ l__xxx_int }
+%	  		{ 1 }
+%	}
+%\box_if_exist:cF
+%	{ l_gloss_store \l__xxx_int _box }
+%	{
+%	  \box_new:c 
+%	  		{ l_gloss_store \l__xxx_int _box }
+%	}
+%\box_gset_eq:cN
+%	{ l_gloss_store \l__xxx_int _box }
+%	\l__hunit_box
+%\box_show:c
+%	{ l_gloss_store \l__xxx_int _box }
+	
 
 
+%		\box_show:N %=
+%				\l__hunit_box 
 
 		\box_use:N %=
 				\l__hunit_box 
@@ -2952,10 +2983,19 @@ glossary .default:n = false,
 					\box_use:N %=
 								\l__vpair_box
 					} 	
-
-
-
-
+%
+%\box_if_exist:cF
+%	{ l_gloss_store \l__wordloop_int _box }
+%	{
+%	  \box_new:c 
+%	  		{ l_gloss_store \l__wordloop_int _box }
+%	}
+%\box_gset_eq:cN
+%	{ l_gloss_store \l__wordloop_int _box }
+%	\l__hunit_box
+%\box_show:c
+%	{ l_gloss_store \l__wordloop_int _box }
+%	
 						\int_incr:N 
 								\l__wordloop_int
 
@@ -3353,6 +3393,7 @@ glossary .default:n = false,
 	\newglossaryentry
 		{ #1 }% label
 		{% definition:
+		type=pos,
 		name={ #1 },
 		description={ \mfsgetapropkv[leipzig]{glossing}{ #1 } },%\tl_use:N \l_gloss_desc_tl },
 		}
@@ -3414,7 +3455,55 @@ glossary .default:n = false,
 \end{minipage}
 }
 
+%%%
 \cs_set_eq:NN \dofileinput \file_input:n
+
+%%%
+\NewDocumentCommand { \glmarker } { O{gloss} O{circnum} m } {
+				\IfNoValueTF { #1 } 
+						{ \tl_clear:N \g_fc_namespace_tl } 
+						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+
+%   \seq_show:c 
+%			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+
+	\group_begin:
+	\glrubytext
+   \seq_item:cn 
+			{ g_fc_rwe \g_fc_namespace_tl #2 _seq } 
+			{ #3 }
+	\group_end:
+
+}
+
+
+\NewDocumentCommand { \glruby } { m m } {
+
+		\stackon { \strut#1 } { #2 }
+		
+}
+
+
+\NewDocumentCommand { \glrange } { m } { %{ O{gloss} O{ex2a} m m } {
+		\box_use:c
+%			{ l_gloss_store \l__wordloop_int _box }
+			{ l_gloss_store #1 _box }
+
+%				\IfNoValueTF { #1 } 
+%						{ \tl_clear:N \g_fc_namespace_tl } 
+%						{ \tl_gset:Nn \g_fc_namespace_tl { #1 } }
+%
+%   \seq_set_eq:Nc
+%   			\l_tmpa_seq 
+%			{ g_gloss \g_fc_namespace_tl #2 _seq } 
+%
+%	Seq ~ #1/#2 ~ has ~
+%	\seq_count:N \l_tmpa_seq 
+%	 \tex_space:D words.
+}
+
+
+
 
 \ExplSyntaxOff
 
@@ -3434,6 +3523,16 @@ glossary .default:n = false,
 \mfssortaseq[leipzig]{glossing}
 \mfsseqtoprop[leipzig]{glossing}[leipzig]{glossing}
 %\mfsuseaprop[leipzig]{glossing}
+
+%
+% circled numbers
+
+\mfsloadaseq[gloss]{circnum}{%
+①,②,③,④,⑤,⑥,⑦,⑧,⑨,⑩
+,⑪,⑫,⑬,⑭,⑮,⑯,⑰,⑱,⑲,⑳
+}
+
+
 
 \endinput
 
